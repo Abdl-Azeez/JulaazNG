@@ -1394,46 +1394,79 @@ interface Notification {
 
 ## 9. Technical Requirements
 
+Core Stack Philosophy
+
+| Principle                       | Explanation                                                   |
+| ------------------------------- | ------------------------------------------------------------- |
+| **Type-Safety First**           | All code should be typed (TypeScript across stack)            |
+| **Mobile-First, Offline-First** | Majority of users are mobile and may have poor connections    |
+| **Real-Time Native**            | Messaging and notifications are essential                     |
+| **Free-to-Launch**              | All MVP choices avoid cost until you're ready to scale        |
+| **Scalable by Layers**          | Every layer can evolve (DB, messaging, hosting, queues, auth) |
+
+
 ### 9.1 Frontend Stack
 
-- React 18 + TypeScript + Vite
-- Zustand + TanStack Query
-- Tailwind CSS + shadcn/ui + Lucide Icons
-- Routing: React Router
-- Validation: Zod + React Hook Form
-- Offline PWA with service workers
+- Framework: React 18 + TypeScript + Vite
+- State Management: Zustand (global state), TanStack Query (server state)
+- Styling & UI: Tailwind CSS + shadcn/ui + Lucide Icons
+- Routing: React Router v6
+- Forms & Validation: Zod + React Hook Form
+- Real-time Messaging: Server-Sent Events (SSE), Socket.IO/Pusher `socket.io-client` (for in-app chat and presence)
+- Support 🇳🇬 languages: i18next or next-intl	
+- Push Notifications: Firebase Cloud Messaging (FCM) + Service Workers
+- Offline Support: Progressive Web App (PWA) using Vite plugin + Service Worker
+- Theme System: Custom theme engine (supports 6+ Naija-themed color modes)
+- Message Composer: Emoji picker, file attachments, typing indicator and templates
+- Animations: Framer Motion (for smooth transitions & chat animations) + Lottie + CSS animations
+- Notification Center: Zustand store + Toast/Badge system
+- Dev Tooling: ESLint, Prettier, Husky, Lint-staged
 
 ### 9.2 Backend Stack
 
-#### 9.2.1 MVP (Free Tier)
+#### 9.2.1 MVP (Zero-Cost Setup)
 
-- Supabase (PostgreSQL, Auth, File Storage, Edge Functions)
+- Framework: NestJS (TypeScript)
+- Database: PostgreSQL (via Supabase Free Tier)
+- Auth: Custom JWT via HTTP-only cookies
+- ORM: Prisma (connected to Supabase DB)
+- File Storage: Cloudinary Free Tier (images/videos)
+- Search: Typesense (self-hosted), PostgreSQL Full-Text Search
+- Hosting: Railway or Render (free Node.js backend hosting)
+- Messaging: Socket.IO (real-time chat)
+- Firebase Cloud Messaging (FCM) for push notifications
+- Chatbot: Basic rule-based Node logic
+- Admin Access: Supabase dashboard for managing users, properties, services
 
-#### 9.2.2 MVP (Recommended)
+#### 9.2.2 MVP+ (Scaling)
 
-- **Framework:** NestJS (TypeScript)
-- **Database:** PostgreSQL (managed)
-- **ORM:** Prisma
-- **Cache:** Redis
-- **File Storage:** AWS S3
-- **Queue:** BullMQ
-- **Messaging:** Socket.IO or WebSocket Gateway
-- **API Auth:** JWT + Role-based access control (RBAC)
+- Framework: NestJS (TypeScript)
+- Database: PostgreSQL (Railway/Supabase managed)
+- ORM: Prisma
+- Auth: JWT (access + refresh token strategy) with Role-based Access Control (RBAC)
+- Cache: Redis (for sessions, rate limiting, or job queue)
+- File Storage: AWS S3 (or Cloudinary Pro when needed)
+- Queue: BullMQ (for delayed jobs, notifications, background tasks)
+- Messaging: Socket.IO or WebSocket Gateway using NestJS (for chat & real-time notifications)
+- Notifications: Firebase Cloud Messaging (FCM) (all tiers)
+Chatbot: OpenAI Assistants API LangChain (custom logic)
+- Admin Panel: Custom-built React dashboard
+- Custom-built chatbot for real-time messaging
 
 ### 9.3 Third-Party Integrations
 
 - Payments: Paystack, Flutterwave
-- Maps: OpenStreetMap (MVP), Google Maps (Scale)
-- Messaging: WhatsApp Business, Email (SendGrid), SMS (Termii)
+- Maps: OpenLayers + OSM, Mapbox, OpenStreetMap (MVP), Google Maps (Scale)
+- Messaging: WhatsApp Business, Email (SendGrid, Resend), SMS (Termii)
 - File: Cloudinary (MVP), S3 (scale)
 - Docs: DocuSign (e-signature)
 - Analytics: Mixpanel, Google Analytics, Hotjar
 
 ### 9.4 Security & Compliance
 
-- JWT + refresh tokens, RBAC
-- AES-256 encryption
-- API rate limiting
+- JWT (HTTP-only cookies) + Refresh Token strategy, RBAC
+- AES-256 encryption for sensitive data
+- API rate limiting & CORS protection
 - GDPR + Nigerian Data Compliance
 - PCI-DSS (via payment processors)
 
