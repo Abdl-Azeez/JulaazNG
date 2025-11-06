@@ -1,0 +1,111 @@
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: hsl(var(--background));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.splash-screen__circle {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: hsl(var(--surface));
+  margin-left: -75px;
+  margin-top: -75px;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.splash-screen__container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 1;
+}
+
+.splash-screen__icon-wrapper {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-screen__icon {
+  width: 100%;
+  height: 100%;
+  max-width: 120px;
+  max-height: 120px;
+}
+
+/* Stroke draw animation for lines */
+.splash-screen__icon svg line,
+.splash-screen__icon line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: strokeDraw 1.2s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+.splash-screen__icon svg path[stroke],
+.splash-screen__icon path[stroke] {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: strokeDraw 1.2s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+/* Fill fade animation for windows */
+.splash-screen__icon svg rect,
+.splash-screen__icon rect {
+  opacity: 0;
+  animation: fillFade 0.8s ease-out forwards;
+  animation-delay: 1.2s;
+}
+
+/* Fill fade animation for text */
+.splash-screen__icon svg path[fill]:not([stroke]),
+.splash-screen__icon path[fill]:not([stroke]) {
+  opacity: 0;
+  animation: fillFade 0.6s ease-out forwards;
+  animation-delay: 1.8s;
+}
+
+@keyframes strokeDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fillFade {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile-only: Hide on larger screens */
+@media (min-width: 768px) {
+  .splash-screen {
+    display: none;
+  }
+}

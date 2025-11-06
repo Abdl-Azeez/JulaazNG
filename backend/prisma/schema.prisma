@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  TENANT
+  LANDLORD
+  SERVICE_PROVIDER
+  ARTISAN
+  PROPERTY_MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+// User Model
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  phone     String     @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole
+  status    UserStatus @default(PENDING_VERIFICATION)
+  
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("users")
+}
+
+// Add more models as you develop
+

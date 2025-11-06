@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: julaazng-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: julaazng
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: julaazng_dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - julaazng-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: julaazng-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - julaazng-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  julaazng-network:
+    driver: bridge
+

@@ -1,0 +1,119 @@
+.logo-loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-loader--sm .logo-loader__svg {
+  width: 60px;
+  height: 20px;
+}
+
+.logo-loader--md .logo-loader__svg {
+  width: 102px;
+  height: 33px;
+}
+
+.logo-loader--lg .logo-loader__svg {
+  width: 150px;
+  height: 49px;
+}
+
+.logo-loader__svg {
+  animation: logoPulse 2s ease-in-out infinite;
+}
+
+/* Stroke draw animation for roof lines */
+.logo-loader__svg svg line,
+.logo-loader__svg line {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: strokeDraw 1.5s ease-out forwards;
+}
+
+.logo-loader__svg svg path[stroke],
+.logo-loader__svg path[stroke] {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: strokeDraw 1.5s ease-out forwards;
+}
+
+/* Staggered window fade-in animation - using a different approach */
+.logo-loader__svg svg rect,
+.logo-loader__svg rect {
+  opacity: 0;
+  animation: windowFadeIn 0.4s ease-out forwards;
+}
+
+/* Stagger animation delays for windows - using animation-delay with CSS custom properties */
+.logo-loader__svg rect:nth-of-type(1),
+.logo-loader__svg rect:nth-of-type(2),
+.logo-loader__svg rect:nth-of-type(3) {
+  animation-delay: 1.2s;
+}
+
+.logo-loader__svg rect:nth-of-type(4),
+.logo-loader__svg rect:nth-of-type(5),
+.logo-loader__svg rect:nth-of-type(6) {
+  animation-delay: 1.35s;
+}
+
+.logo-loader__svg rect:nth-of-type(7),
+.logo-loader__svg rect:nth-of-type(8),
+.logo-loader__svg rect:nth-of-type(9) {
+  animation-delay: 1.5s;
+}
+
+.logo-loader__svg rect:nth-of-type(10),
+.logo-loader__svg rect:nth-of-type(11),
+.logo-loader__svg rect:nth-of-type(12) {
+  animation-delay: 1.65s;
+}
+
+/* Text fade-in */
+.logo-loader__svg svg path[fill]:not([stroke]),
+.logo-loader__svg path[fill]:not([stroke]) {
+  opacity: 0;
+  animation: textFadeIn 0.6s ease-out forwards;
+  animation-delay: 1.8s;
+}
+
+@keyframes strokeDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes windowFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes textFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes logoPulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.85;
+    filter: brightness(1.1);
+  }
+}
