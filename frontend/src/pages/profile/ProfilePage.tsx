@@ -115,7 +115,7 @@ export function ProfilePage() {
       <Header onMenuClick={handleMenuClick} onProfileClick={handleProfileClick} />
       
       {/* Profile Header with Settings Button */}
-      <header className="sticky top-20 z-40 w-full border-b bg-surface/95 backdrop-blur-sm shadow-sm">
+      <header className="sticky z-40 w-full border-b bg-surface/95 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto px-4 lg:px-6 xl:px-8 h-16 lg:h-20 flex items-center justify-end max-w-7xl">
           <Button
             variant="ghost"
