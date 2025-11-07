@@ -33,7 +33,7 @@ export function Footer({ className }: FooterProps) {
                             <Input
                                 type="email"
                                 placeholder="Your email address"
-                                className="flex-1 bg-transparent text-primary placeholder:text-black outline-none px-3"
+                                className="flex-1 bg-transparent text-primary placeholder:text-foreground outline-none px-3"
                             />
                             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm rounded-[10px] px-4 py-1.5">
                                 Subscribe

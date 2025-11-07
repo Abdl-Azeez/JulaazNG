@@ -27,8 +27,7 @@ export function SearchBar({ onSearch, onFilterClick, className }: SearchBarProps
           <Input
             type="search"
             placeholder="Search properties, locations..."
-            className="pl-12 pr-4 h-[41px] rounded-[10px] border-0 shadow-[0px_1px_4px_0px_rgba(0,0,0,0.25)] focus:shadow-[0px_1px_4px_0px_rgba(0,0,0,0.25)] transition-shadow bg-surface"
-            // style={{ paddingTop: '8px', paddingRight: '16px', paddingBottom: '8px', paddingLeft: '44px' }}
+            className="pl-12 pr-4 h-[41px] rounded-[10px] border-0 shadow-sm focus:shadow-sm transition-shadow bg-surface"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 onSearch?.(e.currentTarget.value)

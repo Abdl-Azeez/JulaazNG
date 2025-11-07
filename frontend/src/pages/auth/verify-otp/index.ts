@@ -1,0 +1,2 @@
+export { VerifyOtpPage } from './VerifyOtpPage'
+

@@ -9,6 +9,7 @@ export const ROUTES = {
   
   // Auth routes
   LOGIN: '/login',
+  LOGIN_PASSWORD: '/login/password',
   SIGNUP: '/signup',
   VERIFY_OTP: '/verify-otp',
   FORGOT_PASSWORD: '/forgot-password',

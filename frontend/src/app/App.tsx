@@ -4,6 +4,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { SplashScreen } from '@/widgets/splash-screen'
 import { HomePage } from '@/pages/home'
+import { PropertiesPage } from '@/pages/properties'
+import { ProfilePage } from '@/pages/profile'
+import { SettingsPage } from '@/pages/settings'
+import { ServicesPage } from '@/pages/services'
+import { LoginPage } from '@/pages/auth/login'
+import { PasswordPage } from '@/pages/auth/password'
+import { SignupPage } from '@/pages/auth/signup'
+import { VerifyOtpPage } from '@/pages/auth/verify-otp'
 import { ROUTES } from '@/shared/constants/routes'
 
 const queryClient = new QueryClient({
@@ -49,6 +57,14 @@ function App() {
         ) : (
           <Routes>
             <Route path={ROUTES.HOME} element={<HomePage />} />
+            <Route path={ROUTES.PROPERTIES} element={<PropertiesPage />} />
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            <Route path={ROUTES.LOGIN_PASSWORD} element={<PasswordPage />} />
+            <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+            <Route path={ROUTES.VERIFY_OTP} element={<VerifyOtpPage />} />
+            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+            <Route path={ROUTES.SERVICES} element={<ServicesPage />} />
             <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
           </Routes>
         )}

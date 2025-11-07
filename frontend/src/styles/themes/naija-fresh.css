@@ -1,38 +1,49 @@
 /* Naija Fresh Theme - Default Light Theme */
 [data-theme='naija-fresh'],
 :root {
+  /* Base Colors */
   --background: 0 0% 100%; /* Pure White */
-  --foreground: 0 0% 0%; /* Dark Slate - Primary Text */
-
+  --foreground: 0 0% 0%; /* Dark Text */
+  
+  /* Brand Colors */
   --primary: 158 100% 30%; /* Brand Green #00965D */
   --primary-foreground: 0 0% 100%; /* White */
-
-  --secondary: 210 20% 98%; /* Light Gray - Input/Field Background */
-  --secondary-foreground: 215 16% 37%; /* Body Text */
-
+  
+  /* Accent Colors */
   --accent: 142 71% 45%; /* Highlight Green #48BB78 */
   --accent-foreground: 0 0% 100%; /* White */
-
-  --muted: 210 40% 96%; /* Lighter Background */
+  
+  /* Muted/Secondary */
+  --muted: 210 40% 96%; /* Light Background */
   --muted-foreground: 220 9% 46%; /* Placeholder Text */
-
-  --card: 0 0% 100%; /* White */
-  --card-foreground: 215 25% 17%; /* Dark Slate */
-
+  
+  --secondary: 210 20% 98%; /* Input/Field Background */
+  --secondary-foreground: 215 16% 37%; /* Body Text */
+  
+  /* Surface & Card */
+  --surface: 150 17% 95%; /* Card Surface */
+  --card: 0 0% 100%; /* White Card */
+  --card-foreground: 215 25% 17%; /* Card Text */
+  
+  /* Borders & Inputs */
   --border: 220 13% 91%; /* Border Gray */
-  --input: 210 20% 98%; /* Same as secondary */
-  --ring: 158 100% 30%; /* Matches primary */
-
-  --destructive: 0 84% 60%; /* Red */
+  --input: 210 20% 98%; /* Input Background */
+  --ring: 158 100% 30%; /* Focus Ring - Matches Primary */
+  
+  /* Status Colors */
+  --destructive: 0 84% 60%; /* Error Red */
   --destructive-foreground: 0 0% 100%; /* White */
-
-  --success: 142 76% 36%; /* Green */
+  
+  --success: 142 76% 36%; /* Success Green */
   --success-foreground: 0 0% 100%; /* White */
-
-  --warning: 38 92% 50%; /* Orange */
+  
+  --warning: 38 92% 50%; /* Warning Orange */
   --warning-foreground: 0 0% 100%; /* White */
-
-  --surface: 150 17% 95%; 
-  --icon-bg: 0 0% 100%; /* White background for icons */
+  
+  /* Icon Background */
+  --icon-bg: 0 0% 100%; /* White */
+  
+  /* Overlay */
+  --overlay: 0 0% 0%; /* Black for overlays */
 }
 

@@ -23,6 +23,47 @@
   animation: logoPulse 2s ease-in-out infinite;
 }
 
+/* Color Variants */
+.logo-loader--primary .logo-loader__svg svg path[fill],
+.logo-loader--primary .logo-loader__svg path[fill] {
+  fill: hsl(var(--primary)) !important;
+}
+
+.logo-loader--primary .logo-loader__svg svg path[stroke],
+.logo-loader--primary .logo-loader__svg path[stroke],
+.logo-loader--primary .logo-loader__svg svg line,
+.logo-loader--primary .logo-loader__svg line {
+  stroke: hsl(var(--primary)) !important;
+}
+
+.logo-loader--white .logo-loader__svg svg path[fill],
+.logo-loader--white .logo-loader__svg path[fill],
+.logo-loader--white .logo-loader__svg svg path[fill]:not([fill="none"]) {
+  fill: white !important;
+}
+
+.logo-loader--white .logo-loader__svg svg path[stroke],
+.logo-loader--white .logo-loader__svg path[stroke],
+.logo-loader--white .logo-loader__svg svg line,
+.logo-loader--white .logo-loader__svg line,
+.logo-loader--white .logo-loader__svg svg path[stroke]:not([stroke="none"]) {
+  stroke: white !important;
+}
+
+.logo-loader--foreground .logo-loader__svg svg path[fill],
+.logo-loader--foreground .logo-loader__svg path[fill],
+.logo-loader--foreground .logo-loader__svg svg path[fill]:not([fill="none"]) {
+  fill: hsl(var(--primary-foreground)) !important;
+}
+
+.logo-loader--foreground .logo-loader__svg svg path[stroke],
+.logo-loader--foreground .logo-loader__svg path[stroke],
+.logo-loader--foreground .logo-loader__svg svg line,
+.logo-loader--foreground .logo-loader__svg line,
+.logo-loader--foreground .logo-loader__svg svg path[stroke]:not([stroke="none"]) {
+  stroke: hsl(var(--primary-foreground)) !important;
+}
+
 /* Stroke draw animation for roof lines */
 .logo-loader__svg svg line,
 .logo-loader__svg line {
