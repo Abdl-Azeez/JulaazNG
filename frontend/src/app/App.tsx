@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import type { Location } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { SplashScreen } from '@/widgets/splash-screen'
@@ -33,6 +34,10 @@ import { LandlordEarningsPage } from '@/pages/landlord/earnings'
 import { ROUTES } from '@/shared/constants/routes'
 import { useThemeStore } from '@/shared/store/theme.store'
 import { AboutPage, LandlordFaqPage, SitemapPage, BuildingsPage, TermsPage, CookiesPage, DisclaimerPage, ContactPage } from '@/pages/info'
+import { LoginModal } from '@/pages/auth/login/LoginModal'
+import { SignupModal } from '@/pages/auth/signup/SignupModal'
+import { PasswordModal } from '@/pages/auth/password/PasswordModal'
+import { VerifyOtpModal } from '@/pages/auth/verify-otp/VerifyOtpModal'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -49,21 +54,92 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
   },
 })
+
+type ModalLocationState = {
+  backgroundLocation?: Location
+  modal?: boolean
+}
+
+interface AppRoutesProps {
+  showSplash: boolean
+  isMobile: boolean
+  onSplashComplete: () => void
+}
+
+function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
+  const location = useLocation()
+  const state = location.state as ModalLocationState | undefined
+  const isModal = Boolean(state?.modal && state.backgroundLocation)
+  const routesLocation = isModal && state?.backgroundLocation ? state.backgroundLocation : location
+
+  if (showSplash && isMobile) {
+    return <SplashScreen onComplete={onSplashComplete} />
+  }
+
+  return (
+    <>
+      <Routes location={routesLocation}>
+        <Route path={ROUTES.HOME} element={<HomePage />} />
+        <Route path={ROUTES.PROPERTIES} element={<PropertiesPage />} />
+        <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+        <Route path="/properties/:id/booking" element={<PropertyViewingPage />} />
+        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTES.LOGIN_PASSWORD} element={<PasswordPage />} />
+        <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+        <Route path={ROUTES.VERIFY_OTP} element={<VerifyOtpPage />} />
+        <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+        <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+        <Route path={ROUTES.SERVICES} element={<ServicesPage />} />
+        <Route path={ROUTES.MESSAGING} element={<MessagingPage />} />
+        <Route path="/messaging/:conversationId" element={<MessagingPage />} />
+        <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
+        <Route path={ROUTES.EVENTS} element={<EventsPage />} />
+        <Route path={ROUTES.FAVOURITES} element={<FavouritesPage />} />
+        <Route path={ROUTES.MY_BOOKINGS} element={<MyBookingsPage />} />
+        <Route path={ROUTES.MY_SERVICES} element={<MyServicesPage />} />
+        <Route path={ROUTES.AGREEMENTS} element={<AgreementsPage />} />
+        <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
+        <Route path={ROUTES.LANDLORD_PROPERTIES} element={<LandlordPropertiesPage />} />
+        <Route path={ROUTES.LANDLORD_PROPERTY_CREATE} element={<LandlordPropertyCreatePage />} />
+        <Route path="/landlord/properties/:id" element={<LandlordPropertyDetailsPage />} />
+        <Route path={ROUTES.LANDLORD_APPLICATIONS} element={<LandlordApplicationsPage />} />
+        <Route path={ROUTES.LANDLORD_EARNINGS} element={<LandlordEarningsPage />} />
+        <Route path="/landlord/properties/:id/insights" element={<LandlordPropertyInsightsPage />} />
+        <Route path="/landlord/properties/:id/manage" element={<LandlordPropertyManagePage />} />
+        <Route path={ROUTES.ABOUT} element={<AboutPage />} />
+        <Route path={ROUTES.LANDLORD_FAQ} element={<LandlordFaqPage />} />
+        <Route path={ROUTES.SITEMAP} element={<SitemapPage />} />
+        <Route path={ROUTES.BUILDINGS} element={<BuildingsPage />} />
+        <Route path={ROUTES.TERMS} element={<TermsPage />} />
+        <Route path={ROUTES.COOKIES} element={<CookiesPage />} />
+        <Route path={ROUTES.DISCLAIMER} element={<DisclaimerPage />} />
+        <Route path={ROUTES.CONTACT} element={<ContactPage />} />
+        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+      </Routes>
+
+      {isModal && (
+        <Routes>
+          <Route path={ROUTES.LOGIN} element={<LoginModal />} />
+          <Route path={ROUTES.SIGNUP} element={<SignupModal />} />
+          <Route path={ROUTES.LOGIN_PASSWORD} element={<PasswordModal />} />
+          <Route path={ROUTES.VERIFY_OTP} element={<VerifyOtpModal />} />
+        </Routes>
+      )}
+    </>
+  )
+}
 
 function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const { theme } = useThemeStore()
 
-  // Initialize theme on mount
   useEffect(() => {
-    // Get theme from store (will use persisted value or default)
     const currentTheme = useThemeStore.getState().theme
-    // Apply theme to document immediately
     document.documentElement.setAttribute('data-theme', currentTheme)
     const selectedTheme = useThemeStore.getState().getTheme()
     if (selectedTheme) {
@@ -75,9 +151,7 @@ function App() {
     }
   }, [])
 
-  // Update theme when it changes
   useEffect(() => {
-    // Apply theme to document
     document.documentElement.setAttribute('data-theme', theme)
     const selectedTheme = useThemeStore.getState().getTheme()
     if (selectedTheme) {
@@ -90,11 +164,9 @@ function App() {
   }, [theme])
 
   useEffect(() => {
-    // Check if device is mobile
     const checkMobile = () => {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
-      // If not mobile, skip splash screen
       if (!mobile) {
         setShowSplash(false)
       }
@@ -114,48 +186,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ScrollToTop />
-        {showSplash && isMobile ? (
-          <SplashScreen onComplete={handleSplashComplete} />
-        ) : (
-          <Routes>
-            <Route path={ROUTES.HOME} element={<HomePage />} />
-            <Route path={ROUTES.PROPERTIES} element={<PropertiesPage />} />
-            <Route path="/properties/:id" element={<PropertyDetailsPage />} />
-            <Route path="/properties/:id/booking" element={<PropertyViewingPage />} />
-            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-            <Route path={ROUTES.LOGIN_PASSWORD} element={<PasswordPage />} />
-            <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
-            <Route path={ROUTES.VERIFY_OTP} element={<VerifyOtpPage />} />
-            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
-            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
-            <Route path={ROUTES.SERVICES} element={<ServicesPage />} />
-            <Route path={ROUTES.MESSAGING} element={<MessagingPage />} />
-            <Route path="/messaging/:conversationId" element={<MessagingPage />} />
-            <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
-            <Route path={ROUTES.EVENTS} element={<EventsPage />} />
-            <Route path={ROUTES.FAVOURITES} element={<FavouritesPage />} />
-            <Route path={ROUTES.MY_BOOKINGS} element={<MyBookingsPage />} />
-            <Route path={ROUTES.MY_SERVICES} element={<MyServicesPage />} />
-            <Route path={ROUTES.AGREEMENTS} element={<AgreementsPage />} />
-            <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
-            <Route path={ROUTES.LANDLORD_PROPERTIES} element={<LandlordPropertiesPage />} />
-            <Route path={ROUTES.LANDLORD_PROPERTY_CREATE} element={<LandlordPropertyCreatePage />} />
-            <Route path="/landlord/properties/:id" element={<LandlordPropertyDetailsPage />} />
-            <Route path={ROUTES.LANDLORD_APPLICATIONS} element={<LandlordApplicationsPage />} />
-            <Route path={ROUTES.LANDLORD_EARNINGS} element={<LandlordEarningsPage />} />
-            <Route path="/landlord/properties/:id/insights" element={<LandlordPropertyInsightsPage />} />
-            <Route path="/landlord/properties/:id/manage" element={<LandlordPropertyManagePage />} />
-            <Route path={ROUTES.ABOUT} element={<AboutPage />} />
-            <Route path={ROUTES.LANDLORD_FAQ} element={<LandlordFaqPage />} />
-            <Route path={ROUTES.SITEMAP} element={<SitemapPage />} />
-            <Route path={ROUTES.BUILDINGS} element={<BuildingsPage />} />
-            <Route path={ROUTES.TERMS} element={<TermsPage />} />
-            <Route path={ROUTES.COOKIES} element={<CookiesPage />} />
-            <Route path={ROUTES.DISCLAIMER} element={<DisclaimerPage />} />
-            <Route path={ROUTES.CONTACT} element={<ContactPage />} />
-            <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-          </Routes>
-        )}
+        <AppRoutes showSplash={showSplash} isMobile={isMobile} onSplashComplete={handleSplashComplete} />
         <Toaster
           position="top-right"
           toastOptions={{

@@ -9,7 +9,7 @@ import { Button } from '@/shared/ui/button'
 import { cn } from '@/shared/lib/utils/cn'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface AuthDrawerProps {
   open: boolean
@@ -18,6 +18,8 @@ interface AuthDrawerProps {
 
 export function AuthDrawer({ open, onOpenChange }: AuthDrawerProps) {
   const navigate = useNavigate()
+  const location = useLocation()
+  const baseState = { backgroundLocation: location, modal: true }
   const [selectedRole, setSelectedRole] = useState<'landlord' | 'tenant' | null>(null)
   const [language, setLanguage] = useState('en')
 
@@ -86,7 +88,7 @@ export function AuthDrawer({ open, onOpenChange }: AuthDrawerProps) {
               onClick={() => {
                 if (selectedRole) {
                   navigate(`${ROUTES.LOGIN}?role=${selectedRole}`, {
-                    state: { from: ROUTES.HOME },
+                    state: baseState,
                   })
                   onOpenChange(false)
                 }
@@ -101,7 +103,7 @@ export function AuthDrawer({ open, onOpenChange }: AuthDrawerProps) {
               onClick={() => {
                 if (selectedRole) {
                   navigate(`${ROUTES.SIGNUP}?role=${selectedRole}`, {
-                    state: { from: ROUTES.HOME },
+                    state: baseState,
                   })
                   onOpenChange(false)
                 }
