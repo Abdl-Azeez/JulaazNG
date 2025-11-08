@@ -21,8 +21,18 @@ import { AgreementsPage } from '@/pages/tenant/agreements'
 import { PaymentsPage } from '@/pages/tenant/payments'
 import { MyBookingsPage } from '@/pages/my-bookings'
 import { MyServicesPage } from '@/pages/my-services'
+import {
+  LandlordPropertiesPage,
+  LandlordPropertyCreatePage,
+  LandlordPropertyDetailsPage,
+  LandlordPropertyInsightsPage,
+  LandlordPropertyManagePage,
+} from '@/pages/landlord/properties'
+import { LandlordApplicationsPage } from '@/pages/landlord/applications'
+import { LandlordEarningsPage } from '@/pages/landlord/earnings'
 import { ROUTES } from '@/shared/constants/routes'
 import { useThemeStore } from '@/shared/store/theme.store'
+import { AboutPage, LandlordFaqPage, SitemapPage, BuildingsPage, TermsPage, CookiesPage, DisclaimerPage, ContactPage } from '@/pages/info'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -128,6 +138,21 @@ function App() {
             <Route path={ROUTES.MY_SERVICES} element={<MyServicesPage />} />
             <Route path={ROUTES.AGREEMENTS} element={<AgreementsPage />} />
             <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
+            <Route path={ROUTES.LANDLORD_PROPERTIES} element={<LandlordPropertiesPage />} />
+            <Route path={ROUTES.LANDLORD_PROPERTY_CREATE} element={<LandlordPropertyCreatePage />} />
+            <Route path="/landlord/properties/:id" element={<LandlordPropertyDetailsPage />} />
+            <Route path={ROUTES.LANDLORD_APPLICATIONS} element={<LandlordApplicationsPage />} />
+            <Route path={ROUTES.LANDLORD_EARNINGS} element={<LandlordEarningsPage />} />
+            <Route path="/landlord/properties/:id/insights" element={<LandlordPropertyInsightsPage />} />
+            <Route path="/landlord/properties/:id/manage" element={<LandlordPropertyManagePage />} />
+            <Route path={ROUTES.ABOUT} element={<AboutPage />} />
+            <Route path={ROUTES.LANDLORD_FAQ} element={<LandlordFaqPage />} />
+            <Route path={ROUTES.SITEMAP} element={<SitemapPage />} />
+            <Route path={ROUTES.BUILDINGS} element={<BuildingsPage />} />
+            <Route path={ROUTES.TERMS} element={<TermsPage />} />
+            <Route path={ROUTES.COOKIES} element={<CookiesPage />} />
+            <Route path={ROUTES.DISCLAIMER} element={<DisclaimerPage />} />
+            <Route path={ROUTES.CONTACT} element={<ContactPage />} />
             <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
           </Routes>
         )}

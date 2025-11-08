@@ -17,15 +17,18 @@ interface HeaderProps {
 export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
+
+  const hideTenantFeatures = user?.role === 'landlord' || location.pathname.includes('/landlord')
 
   const navItems = [
     { icon: Home, label: 'Home', path: ROUTES.HOME },
-    { icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES },
+    // Hide tenant 'Properties' page for landlords or while within landlord area
+    ...(!hideTenantFeatures ? [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }] : []),
     { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
   ]
 
-  const activityItems = [
+  const baseActivityItems = [
     { icon: MessageCircle, label: 'Messages', path: ROUTES.MESSAGING, badge: 2 },
     { icon: Bell, label: 'Notifications', path: ROUTES.NOTIFICATIONS, badge: 5 },
     { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
@@ -33,6 +36,11 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
     { icon: FileText, label: 'My Bookings', path: ROUTES.MY_BOOKINGS },
     { icon: Briefcase, label: 'My Services', path: ROUTES.MY_SERVICES },
   ]
+  const activityItems = hideTenantFeatures
+    ? baseActivityItems.filter(
+        (item) => item.path !== ROUTES.MY_BOOKINGS && item.path !== ROUTES.MY_SERVICES
+      )
+    : baseActivityItems
 
   const isActive = (path: string) => {
     if (path === ROUTES.HOME) {

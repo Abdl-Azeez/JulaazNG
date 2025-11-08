@@ -1,0 +1,8 @@
+export { AboutPage } from './AboutPage'
+export { LandlordFaqPage } from './LandlordFaqPage'
+export { SitemapPage } from './SitemapPage'
+export { BuildingsPage } from './BuildingsPage'
+export { TermsPage } from './TermsPage'
+export { CookiesPage } from './CookiesPage'
+export { DisclaimerPage } from './DisclaimerPage'
+export { ContactPage } from './ContactPage'

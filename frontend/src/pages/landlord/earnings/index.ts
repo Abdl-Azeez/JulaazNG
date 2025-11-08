@@ -1,0 +1,2 @@
+export { LandlordEarningsPage } from './LandlordEarningsPage'
+

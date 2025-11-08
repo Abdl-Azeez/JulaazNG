@@ -3,6 +3,8 @@ import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { cn } from '@/shared/lib/utils/cn'
+import { Link } from 'react-router-dom'
+import { ROUTES } from '@/shared/constants/routes'
 
 interface FooterProps {
     className?: string
@@ -49,11 +51,16 @@ export function Footer({ className }: FooterProps) {
                 <div className="grid grid-cols-3 gap-4 lg:gap-12 text-center lg:text-left">
                     {/* Contact */}
                     <div className="space-y-3">
-                        <h4 className="font-bold text-primary">Contact</h4>
-                        <div className="space-y-2 text-sm text-footer-foreground/70">
-                            <p className="font-semibold">+601139631049</p>
-                            <p className="font-semibold">julazng@gmail.com</p>
-                            <div className="flex items-center gap-2 pt-2">
+                        <h4 className="font-bold text-primary">Stay Connected</h4>
+                        <div className="space-y-4 text-sm text-footer-foreground/70">
+                            <p className="font-semibold">Let’s craft your next rental experience.</p>
+                            <Button
+                                asChild
+                                className="w-full rounded-xl bg-primary text-primary-foreground shadow-lg hover:shadow-xl"
+                            >
+                                <Link to={ROUTES.CONTACT}>Contact Support</Link>
+                            </Button>
+                            <div className="flex items-center justify-center lg:justify-start gap-2">
                                 <a
                                     href="#"
                                     aria-label="Instagram"
@@ -84,24 +91,24 @@ export function Footer({ className }: FooterProps) {
                         <h4 className="font-bold text-primary">Quick Links</h4>
                         <ul className="space-y-2 text-sm text-footer-foreground/70">
                             <li>
-                                <a href="#" className="hover:text-primary/95 transition-colors font-semibold">
+                                <Link to={ROUTES.ABOUT} className="hover:text-primary/95 transition-colors font-semibold">
                                     About Us
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-primary/95 transition-colors font-semibold">
+                                <Link to={ROUTES.LANDLORD_FAQ} className="hover:text-primary/95 transition-colors font-semibold">
                                     Landlord FAQ
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-primary/95 transition-colors font-semibold">
+                                <Link to={ROUTES.SITEMAP} className="hover:text-primary/95 transition-colors font-semibold">
                                     Sitemap
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-primary/95 transition-colors font-semibold">
+                                <Link to={ROUTES.BUILDINGS} className="hover:text-primary/95 transition-colors font-semibold">
                                     Buildings
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
@@ -111,19 +118,19 @@ export function Footer({ className }: FooterProps) {
                         <h4 className="font-bold text-primary">Legal & Policies</h4>
                         <ul className="space-y-2 text-sm text-footer-foreground/70">
                             <li>
-                                <a href="#" className="hover:text-primary/95 transition-colors font-semibold">
+                                <Link to={ROUTES.TERMS} className="hover:text-primary/95 transition-colors font-semibold">
                                     Terms & Conditions
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-primary/95 transition-colors font-semibold">
+                                <Link to={ROUTES.COOKIES} className="hover:text-primary/95 transition-colors font-semibold">
                                     Cookie Policy
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-primary/95 transition-colors font-semibold">
+                                <Link to={ROUTES.DISCLAIMER} className="hover:text-primary/95 transition-colors font-semibold">
                                     Disclaimer
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>

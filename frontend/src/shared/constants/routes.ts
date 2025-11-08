@@ -65,6 +65,25 @@ export const ROUTES = {
   AGREEMENTS: '/tenant/agreements',
   PAYMENTS: '/tenant/payments',
   
+  // Landlord routes
+  LANDLORD_PROPERTIES: '/landlord/properties',
+  LANDLORD_PROPERTY_CREATE: '/landlord/properties/create',
+  LANDLORD_EARNINGS: '/landlord/earnings',
+  LANDLORD_APPLICATIONS: '/landlord/applications',
+  LANDLORD_PROPERTY_DETAILS: (id: string) => `/landlord/properties/${id}`,
+  LANDLORD_PROPERTY_INSIGHTS: (id: string) => `/landlord/properties/${id}/insights`,
+  LANDLORD_PROPERTY_MANAGE: (id: string) => `/landlord/properties/${id}/manage`,
+ 
+  // Info routes
+  ABOUT: '/about',
+  LANDLORD_FAQ: '/landlord/faq',
+  SITEMAP: '/sitemap',
+  BUILDINGS: '/buildings',
+  TERMS: '/terms',
+  COOKIES: '/cookies',
+  DISCLAIMER: '/disclaimer',
+  CONTACT: '/contact',
+ 
   // Profile routes
   PROFILE: '/profile',
   SETTINGS: '/profile/settings',

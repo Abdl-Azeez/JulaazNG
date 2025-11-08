@@ -1,0 +1,2 @@
+export { LandlordApplicationsPage } from './LandlordApplicationsPage'
+

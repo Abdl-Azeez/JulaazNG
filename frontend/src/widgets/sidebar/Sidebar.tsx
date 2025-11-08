@@ -31,9 +31,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     return location.pathname.startsWith(path)
   }
 
+  const hideTenantFeatures = user?.role === 'landlord' || location.pathname.includes('/landlord')
+
   const publicMenuItems: MenuItem[] = [
     { icon: Home, label: 'Home', path: ROUTES.HOME },
-    { icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES },
+    // Hide tenant 'Properties' menu for landlords
+    ...(!hideTenantFeatures ? [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }] : []),
     { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
   ]
 
@@ -46,14 +49,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { icon: Briefcase, label: 'My Services', path: ROUTES.MY_SERVICES, requiresAuth: true },
   ]
 
+  const filteredAuthenticatedMenuItems = hideTenantFeatures
+    ? authenticatedMenuItems.filter(
+        (item) => item.path !== ROUTES.MY_BOOKINGS && item.path !== ROUTES.MY_SERVICES
+      )
+    : authenticatedMenuItems
+
   const tenantMenuItems: MenuItem[] = [
     { icon: Receipt, label: 'Agreements', path: ROUTES.AGREEMENTS, requiresAuth: true, roles: ['tenant'] },
     { icon: CreditCard, label: 'Payments', path: ROUTES.PAYMENTS, requiresAuth: true, roles: ['tenant'] },
   ]
 
   const landlordMenuItems: MenuItem[] = [
-    { icon: Building2, label: 'My Properties', path: ROUTES.PROPERTY_MANAGEMENT, requiresAuth: true, roles: ['landlord'] },
-    { icon: FileText, label: 'Bookings', path: ROUTES.MY_BOOKINGS, requiresAuth: true, roles: ['landlord'] },
+    { icon: Building2, label: 'My Properties', path: ROUTES.LANDLORD_PROPERTIES, requiresAuth: true, roles: ['landlord'] },
+    { icon: FileText, label: 'Applications', path: ROUTES.LANDLORD_APPLICATIONS, requiresAuth: true, roles: ['landlord'] },
+    { icon: CreditCard, label: 'Earnings', path: ROUTES.LANDLORD_EARNINGS, requiresAuth: true, roles: ['landlord'] },
   ]
 
   const bottomMenuItems: MenuItem[] = [
@@ -226,7 +236,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <>
               <div className="sidebar__section">
                 <h3 className="sidebar__section-title">Activity</h3>
-                {authenticatedMenuItems.filter(shouldShowItem).map((item) => {
+                {filteredAuthenticatedMenuItems.filter(shouldShowItem).map((item) => {
                   const active = isActive(item.path)
                   return (
                     <button
