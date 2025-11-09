@@ -9,7 +9,7 @@ import { Button } from '@/shared/ui/button'
 import { cn } from '@/shared/lib/utils/cn'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 interface AuthDrawerProps {
   open: boolean
@@ -18,8 +18,6 @@ interface AuthDrawerProps {
 
 export function AuthDrawer({ open, onOpenChange }: AuthDrawerProps) {
   const navigate = useNavigate()
-  const location = useLocation()
-  const baseState = { backgroundLocation: location, modal: true }
   const [selectedRole, setSelectedRole] = useState<'landlord' | 'tenant' | null>(null)
   const [language, setLanguage] = useState('en')
 
@@ -87,9 +85,7 @@ export function AuthDrawer({ open, onOpenChange }: AuthDrawerProps) {
               className="w-full h-16 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-lg"
               onClick={() => {
                 if (selectedRole) {
-                  navigate(`${ROUTES.LOGIN}?role=${selectedRole}`, {
-                    state: baseState,
-                  })
+                  navigate(`${ROUTES.LOGIN}?role=${selectedRole}`)
                   onOpenChange(false)
                 }
               }}
@@ -102,9 +98,7 @@ export function AuthDrawer({ open, onOpenChange }: AuthDrawerProps) {
               className="w-full h-16 bg-surface hover:bg-primary/80 rounded-xl text-lg border-primary"
               onClick={() => {
                 if (selectedRole) {
-                  navigate(`${ROUTES.SIGNUP}?role=${selectedRole}`, {
-                    state: baseState,
-                  })
+                  navigate(`${ROUTES.SIGNUP}?role=${selectedRole}`)
                   onOpenChange(false)
                 }
               }}

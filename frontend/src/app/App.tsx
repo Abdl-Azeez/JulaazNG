@@ -73,8 +73,8 @@ interface AppRoutesProps {
 function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
   const location = useLocation()
   const state = location.state as ModalLocationState | undefined
-  const isModal = Boolean(state?.modal && state.backgroundLocation)
-  const routesLocation = isModal && state?.backgroundLocation ? state.backgroundLocation : location
+  const showModalOverlay = Boolean(!isMobile && state?.modal && state.backgroundLocation)
+  const routesLocation = showModalOverlay && state?.backgroundLocation ? state.backgroundLocation : location
 
   if (showSplash && isMobile) {
     return <SplashScreen onComplete={onSplashComplete} />
@@ -121,7 +121,7 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>
 
-      {isModal && (
+      {showModalOverlay && (
         <Routes>
           <Route path={ROUTES.LOGIN} element={<LoginModal />} />
           <Route path={ROUTES.SIGNUP} element={<SignupModal />} />
