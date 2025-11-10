@@ -16,6 +16,7 @@ import {
   RefreshCcw as RefreshCw,
   ChevronDown,
   LayoutGrid,
+  HardHat,
 } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import LogoSvg from '@/assets/images/logo.svg?react'
@@ -101,10 +102,18 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
   const buildNavItems = (role?: RoleType | null, includeLandlordNav = false): NavigationItem[] => {
     if (role === 'landlord' || includeLandlordNav) {
       return [
-    { icon: Home, label: 'Home', path: ROUTES.HOME },
-      { icon: Building2, label: 'My Properties', path: ROUTES.LANDLORD_PROPERTIES },
-      { icon: FileText, label: 'Applications', path: ROUTES.LANDLORD_APPLICATIONS },
-      { icon: CreditCard, label: 'Earnings', path: ROUTES.LANDLORD_EARNINGS },
+        { icon: Home, label: 'Home', path: ROUTES.HOME },
+        { icon: Building2, label: 'My Properties', path: ROUTES.LANDLORD_PROPERTIES },
+        { icon: FileText, label: 'Applications', path: ROUTES.LANDLORD_APPLICATIONS },
+        { icon: CreditCard, label: 'Earnings', path: ROUTES.LANDLORD_EARNINGS },
+      ]
+    }
+
+    if (role === 'handyman') {
+      return [
+        { icon: Home, label: 'Home', path: ROUTES.HOME },
+        { icon: HardHat, label: 'Handyman HQ', path: ROUTES.HANDYMAN_DASHBOARD },
+        { icon: Briefcase, label: 'Job Board', path: ROUTES.HANDYMAN_JOBS },
       ]
     }
 
@@ -119,14 +128,14 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
     return [
       { icon: Home, label: 'Home', path: ROUTES.HOME },
       { icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES },
-    { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
-  ]
+      { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
+    ]
   }
 
   const buildActivityItems = (role?: RoleType | null): ActivityItem[] => {
     const base: ActivityItem[] = [
-    { icon: MessageCircle, label: 'Messages', path: ROUTES.MESSAGING, badge: 2 },
-    { icon: Bell, label: 'Notifications', path: ROUTES.NOTIFICATIONS, badge: 5 },
+      { icon: MessageCircle, label: 'Messages', path: ROUTES.MESSAGING, badge: 2 },
+      { icon: Bell, label: 'Notifications', path: ROUTES.NOTIFICATIONS, badge: 5 },
     ]
 
     if (role === 'landlord') {
@@ -138,14 +147,21 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
       ]
     }
 
+    if (role === 'handyman') {
+      return [
+        ...base,
+        { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
+      ]
+    }
+
     if (role === 'tenant') {
       return [
         ...base,
-    { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
-    { icon: Heart, label: 'Favourites', path: ROUTES.FAVOURITES },
-    { icon: FileText, label: 'My Bookings', path: ROUTES.MY_BOOKINGS },
-    { icon: Briefcase, label: 'My Services', path: ROUTES.MY_SERVICES },
-  ]
+        { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
+        { icon: Heart, label: 'Favourites', path: ROUTES.FAVOURITES },
+        { icon: FileText, label: 'My Bookings', path: ROUTES.MY_BOOKINGS },
+        { icon: Briefcase, label: 'My Services', path: ROUTES.MY_SERVICES },
+      ]
     }
 
     return base
@@ -372,51 +388,88 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
 
               {/* Desktop - More Menu (Calendar, Favourites, Bookings, Services) */}
               {activityItems.length > 2 && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant={
-                        activityItems
-                          .slice(2)
-                          .some((item) => isActive(item.path))
-                          ? 'default'
-                          : 'ghost'
-                      }
-                      size="icon"
-                      className={cn(
-                        'hidden lg:flex bg-icon-bg hover:bg-primary/10 hover:text-primary transition-colors',
-                        activityItems.slice(2).some((item) => isActive(item.path)) &&
-                          'bg-primary/10 text-primary'
-                      )}
-                      aria-label="Workspace menu"
-                    >
-                      <LayoutGrid className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    {activityItems.slice(2).map((item) => {
-                      const isActiveItem = isActive(item.path)
+                <>
+                  {activityItems.slice(2).length === 1 ? (
+                    // Single item - show as icon button
+                    (() => {
+                      const singleItem = activityItems[2]
+                      const Icon = singleItem.icon
                       return (
-                        <DropdownMenuItem
-                          key={item.path}
-                          onClick={() => navigate(item.path)}
-                          className={cn(
-                            'cursor-pointer',
-                            isActiveItem && 'bg-primary/10 text-primary'
-                          )}
-                        >
-                          <item.icon className="h-4 w-4 mr-2" />
-                          {item.label}
-                          {item.badge && (
-                            <Badge className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs">
-                              {item.badge}
-                            </Badge>
-                          )}
-                        </DropdownMenuItem>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant={isActive(singleItem.path) ? 'default' : 'ghost'}
+                              size="icon"
+                              className={cn(
+                                'hidden lg:flex bg-icon-bg hover:bg-primary/10 hover:text-primary transition-colors relative',
+                                isActive(singleItem.path) && 'bg-primary/10 text-primary'
+                              )}
+                              onClick={() => navigate(singleItem.path)}
+                              aria-label={singleItem.label}
+                            >
+                              <Icon className="h-5 w-5" />
+                              {singleItem.badge && (
+                                <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs bg-primary text-primary-foreground">
+                                  {singleItem.badge}
+                                </Badge>
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{singleItem.label}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       )
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    })()
+                  ) : (
+                    // Multiple items - show as dropdown
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant={
+                            activityItems
+                              .slice(2)
+                              .some((item) => isActive(item.path))
+                              ? 'default'
+                              : 'ghost'
+                          }
+                          size="icon"
+                          className={cn(
+                            'hidden lg:flex bg-icon-bg hover:bg-primary/10 hover:text-primary transition-colors',
+                            activityItems.slice(2).some((item) => isActive(item.path)) &&
+                              'bg-primary/10 text-primary'
+                          )}
+                          aria-label="Workspace menu"
+                        >
+                          <LayoutGrid className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        {activityItems.slice(2).map((item) => {
+                          const isActiveItem = isActive(item.path)
+                          return (
+                            <DropdownMenuItem
+                              key={item.path}
+                              onClick={() => navigate(item.path)}
+                              className={cn(
+                                'cursor-pointer',
+                                isActiveItem && 'bg-primary/10 text-primary'
+                              )}
+                            >
+                              <item.icon className="h-4 w-4 mr-2" />
+                              {item.label}
+                              {item.badge && (
+                                <Badge className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs">
+                                  {item.badge}
+                                </Badge>
+                              )}
+                            </DropdownMenuItem>
+                          )
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </>
               )}
             </>
           )}

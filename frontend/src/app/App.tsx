@@ -11,6 +11,12 @@ import { PropertyDetailsPage, PropertyViewingPage } from '@/pages/property-detai
 import { ProfilePage } from '@/pages/profile'
 import { SettingsPage } from '@/pages/settings'
 import { ServicesPage, ServiceJourneyPage } from '@/pages/services'
+import {
+  HandymanDashboardPage,
+  HandymanJobsPage,
+  UpcomingRotaPage,
+  ViewAllAssignmentsPage,
+} from '@/pages/handyman'
 import { LoginPage } from '@/pages/auth/login'
 import { PasswordPage } from '@/pages/auth/password'
 import { SignupPage } from '@/pages/auth/signup'
@@ -143,6 +149,38 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
           element={
             <RoleGuard allowedRoles={['tenant', 'landlord']} redirectTo={ROUTES.HOME}>
               <MyServicesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HOME}>
+              <HandymanDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_JOBS}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HANDYMAN_DASHBOARD}>
+              <HandymanJobsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_UPCOMING_ROTA}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HANDYMAN_DASHBOARD}>
+              <UpcomingRotaPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_ASSIGNMENTS}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HANDYMAN_DASHBOARD}>
+              <ViewAllAssignmentsPage />
             </RoleGuard>
           }
         />

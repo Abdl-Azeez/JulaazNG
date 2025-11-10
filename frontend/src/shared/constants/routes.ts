@@ -31,6 +31,15 @@ export const ROUTES = {
   SERVICE_MAINTENANCE_PLANS: '/services/journey/maintenance-plans',
   SERVICE_VETTED_PARTNER: '/services/journey/vetted-partner',
   SERVICE_REQUEST: (serviceId: string) => `/services/journey/request?service=${serviceId}`,
+  HANDYMAN_DASHBOARD: '/handyman/dashboard',
+  HANDYMAN_JOBS: '/handyman/jobs',
+  HANDYMAN_JOB_CHECKLIST: '/handyman/checklist',
+  HANDYMAN_UPCOMING_ROTA: '/handyman/rota',
+  HANDYMAN_ASSIGNMENTS: '/handyman/assignments',
+  HANDYMAN_JOB_SHEET: (jobId: string) => `/handyman/jobs/${jobId}/sheet`,
+  HANDYMAN_JOB_BRIEF: (jobId: string) => `/handyman/jobs/${jobId}/brief`,
+  HANDYMAN_CLAIM_JOB: (jobId: string) => `/handyman/jobs/${jobId}/claim`,
+  HANDYMAN_PLAYBOOK: '/handyman/playbook',
   
   // Artisan routes
   ARTISANS: '/artisans',

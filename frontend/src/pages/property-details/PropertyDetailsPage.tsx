@@ -29,6 +29,7 @@ import { samplePropertyDetails } from './data/sample-property-details'
 import { cn } from '@/shared/lib/utils/cn'
 import type { PropertyDetail, MoveInItem } from '@/entities/property/model/types'
 import { ROUTES } from '@/shared/constants/routes'
+import toast from 'react-hot-toast'
 
 const formatCurrency = (value: number) =>
   `₦${new Intl.NumberFormat('en-NG', {
@@ -274,6 +275,7 @@ export function PropertyDetailsPage() {
   const shortletOffering = property.shortletOffering
   const moveInTotal = hasLongTerm ? totalMoveIn(property.moveInBreakdown) : 0
   const isLandlordRole = activeRole === 'landlord'
+  const canRequestViewing = !activeRole || activeRole === 'tenant'
 
   const handleRequestViewing = () => {
     if (!isAuthenticated) {
@@ -282,6 +284,11 @@ export function PropertyDetailsPage() {
       } else {
         setAuthModalOpen(true)
       }
+      return
+    }
+
+    if (activeRole && activeRole !== 'tenant') {
+      toast.error('Viewing requests are reserved for tenants.')
       return
     }
 
@@ -758,12 +765,19 @@ export function PropertyDetailsPage() {
                   </div>
                 </div>
                 {!isLandlordRole && (
+                  canRequestViewing ? (
                   <Button
                     className="rounded-xl w-full sm:w-auto sm:self-start"
                     onClick={handleRequestViewing}
                   >
                     Request Viewing
                   </Button>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Viewing requests are reserved for tenants. Reach out to the concierge team to coordinate a
+                      tour.
+                    </p>
+                  )
                 )}
               </div>
             </Card>

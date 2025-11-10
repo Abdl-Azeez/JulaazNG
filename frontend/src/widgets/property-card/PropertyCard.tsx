@@ -11,6 +11,8 @@ export function PropertyCard({ property, onRequestViewing, onShare, onSelect, la
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { activeRole } = useRoleStore()
   const isLandlordView = activeRole === 'landlord'
+  const isHandymanView = activeRole === 'handyman'
+  const canRequestViewing = !activeRole || activeRole === 'tenant'
   
   const formatPrice = (price: number) => {
     if (!price) return '₦0'
@@ -243,7 +245,7 @@ export function PropertyCard({ property, onRequestViewing, onShare, onSelect, la
             ${isRowLayout ? 'justify-start gap-3' : 'justify-between gap-2'}
           `}
         >
-          {!isLandlordView && (
+          {canRequestViewing && (
             <Button
               variant="ghost"
               size="icon"
@@ -261,7 +263,7 @@ export function PropertyCard({ property, onRequestViewing, onShare, onSelect, la
             </Button>
           )}
 
-          {isLandlordView ? (
+          {isLandlordView || isHandymanView ? (
             <Button
               onClick={(event) => {
                 event.stopPropagation()

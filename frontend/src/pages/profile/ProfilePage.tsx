@@ -111,6 +111,18 @@ export function ProfilePage() {
     }
   }, [profileData.isVerified])
 
+  // Scroll to background check section if hash is present
+  useEffect(() => {
+    if (window.location.hash === '#background-check') {
+      setTimeout(() => {
+        const element = document.getElementById('background-check')
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 300)
+    }
+  }, [])
+
   const handleLogout = async () => {
     setIsLoading(true)
     try {
@@ -227,24 +239,24 @@ export function ProfilePage() {
         return
       }
     } else {
-      if (!backgroundForm.monthlyIncome || Number(backgroundForm.monthlyIncome) <= 0) {
-        toast.error('Enter your estimated monthly income')
-        return
-      }
+    if (!backgroundForm.monthlyIncome || Number(backgroundForm.monthlyIncome) <= 0) {
+      toast.error('Enter your estimated monthly income')
+      return
+    }
 
-      if (!backgroundForm.occupation) {
-        toast.error('Tell us about your occupation')
-        return
-      }
+    if (!backgroundForm.occupation) {
+      toast.error('Tell us about your occupation')
+      return
+    }
 
-      if (!backgroundForm.employer) {
-        toast.error('Share your employer or business name')
-        return
-      }
+    if (!backgroundForm.employer) {
+      toast.error('Share your employer or business name')
+      return
+    }
 
-      if (!backgroundForm.employmentLength) {
-        toast.error('Let us know how long you have been employed')
-        return
+    if (!backgroundForm.employmentLength) {
+      toast.error('Let us know how long you have been employed')
+      return
       }
     }
 
@@ -496,7 +508,7 @@ export function ProfilePage() {
 
         {/* Background Check Section */}
         {!isEditing && (
-          <div className="space-y-6 pt-6 lg:pt-8">
+          <div id="background-check" className="space-y-6 pt-6 lg:pt-8">
             <h2 className="text-xl lg:text-2xl font-bold text-foreground">Background Check</h2>
 
             {/* Navigation Icons - Desktop Enhanced */}
@@ -705,72 +717,72 @@ export function ProfilePage() {
                       </>
                     ) : (
                       <>
-                        <div className="grid gap-4 sm:grid-cols-2">
-                          <div className="space-y-1.5">
-                            <Label htmlFor="bc-income" className="text-sm text-foreground">
-                              Monthly income (₦)
-                            </Label>
-                            <Input
-                              id="bc-income"
-                              type="number"
-                              min={50000}
-                              step={5000}
-                              value={backgroundForm.monthlyIncome}
-                              onChange={(event) => handleBackgroundInputChange('monthlyIncome', event.target.value)}
-                              placeholder="450000"
-                              className="h-11 rounded-xl"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <Label htmlFor="bc-occupation" className="text-sm text-foreground">
-                              Occupation / role
-                            </Label>
-                            <Input
-                              id="bc-occupation"
-                              value={backgroundForm.occupation}
-                              onChange={(event) => handleBackgroundInputChange('occupation', event.target.value)}
-                              placeholder="Product Designer"
-                              className="h-11 rounded-xl"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <Label htmlFor="bc-employer" className="text-sm text-foreground">
-                              Employer / business name
-                            </Label>
-                            <Input
-                              id="bc-employer"
-                              value={backgroundForm.employer}
-                              onChange={(event) => handleBackgroundInputChange('employer', event.target.value)}
-                              placeholder="Julaaz NG"
-                              className="h-11 rounded-xl"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <Label htmlFor="bc-employment-length" className="text-sm text-foreground">
-                              Length of employment
-                            </Label>
-                            <Input
-                              id="bc-employment-length"
-                              value={backgroundForm.employmentLength}
-                              onChange={(event) => handleBackgroundInputChange('employmentLength', event.target.value)}
-                              placeholder="2 years"
-                              className="h-11 rounded-xl"
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label htmlFor="bc-finances" className="text-sm text-foreground">
-                            Financial commitments or notes
-                          </Label>
-                          <textarea
-                            id="bc-finances"
-                            value={backgroundForm.financialCommitments}
-                            onChange={(event) => handleBackgroundInputChange('financialCommitments', event.target.value)}
-                            rows={3}
-                            className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            placeholder="Tell us about any loans, dependents, or other commitments"
-                          />
-                        </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="bc-income" className="text-sm text-foreground">
+                          Monthly income (₦)
+                        </Label>
+                        <Input
+                          id="bc-income"
+                          type="number"
+                          min={50000}
+                          step={5000}
+                          value={backgroundForm.monthlyIncome}
+                          onChange={(event) => handleBackgroundInputChange('monthlyIncome', event.target.value)}
+                          placeholder="450000"
+                          className="h-11 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="bc-occupation" className="text-sm text-foreground">
+                          Occupation / role
+                        </Label>
+                        <Input
+                          id="bc-occupation"
+                          value={backgroundForm.occupation}
+                          onChange={(event) => handleBackgroundInputChange('occupation', event.target.value)}
+                          placeholder="Product Designer"
+                          className="h-11 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="bc-employer" className="text-sm text-foreground">
+                          Employer / business name
+                        </Label>
+                        <Input
+                          id="bc-employer"
+                          value={backgroundForm.employer}
+                          onChange={(event) => handleBackgroundInputChange('employer', event.target.value)}
+                          placeholder="Julaaz NG"
+                          className="h-11 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="bc-employment-length" className="text-sm text-foreground">
+                          Length of employment
+                        </Label>
+                        <Input
+                          id="bc-employment-length"
+                          value={backgroundForm.employmentLength}
+                          onChange={(event) => handleBackgroundInputChange('employmentLength', event.target.value)}
+                          placeholder="2 years"
+                          className="h-11 rounded-xl"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="bc-finances" className="text-sm text-foreground">
+                        Financial commitments or notes
+                      </Label>
+                      <textarea
+                        id="bc-finances"
+                        value={backgroundForm.financialCommitments}
+                        onChange={(event) => handleBackgroundInputChange('financialCommitments', event.target.value)}
+                        rows={3}
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="Tell us about any loans, dependents, or other commitments"
+                      />
+                    </div>
                       </>
                     )}
                   </div>

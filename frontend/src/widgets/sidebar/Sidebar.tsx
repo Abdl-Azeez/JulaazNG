@@ -1,4 +1,4 @@
-import { X, Home, Building2, MessageCircle, Bell, Calendar, User, LogOut, Settings, Heart, FileText, Briefcase, Wrench, Zap, Droplet, Sparkles, Paintbrush, Clock, Receipt, CreditCard } from 'lucide-react'
+import { X, Home, Building2, MessageCircle, Bell, Calendar, User, LogOut, Settings, Heart, FileText, Briefcase, Wrench, Zap, Droplet, Sparkles, Paintbrush, Clock, Receipt, CreditCard, HardHat } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore, type RoleType } from '@/shared/store/role.store'
@@ -33,13 +33,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     return location.pathname.startsWith(path)
   }
 
+  const isHandyman = activeRole === 'handyman'
+
   const hideTenantFeatures =
-    activeRole === 'landlord' || location.pathname.includes('/landlord')
+    activeRole === 'landlord' ||
+    isHandyman ||
+    location.pathname.includes('/landlord')
 
   const publicMenuItems: MenuItem[] = [
     { icon: Home, label: 'Home', path: ROUTES.HOME },
     ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }]),
-    { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
+    ...(isHandyman ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
   ]
 
   const authenticatedMenuItems: MenuItem[] = [
@@ -52,7 +56,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   ]
 
   const filteredAuthenticatedMenuItems = hideTenantFeatures
-    ? authenticatedMenuItems.filter((item) => item.path !== ROUTES.MY_BOOKINGS)
+    ? authenticatedMenuItems.filter((item) => {
+        if (item.path === ROUTES.MY_BOOKINGS) return false
+        if ((activeRole === 'landlord' || isHandyman) && item.path === ROUTES.MY_SERVICES) return false
+        return true
+      })
     : authenticatedMenuItems
 
   const tenantMenuItems: MenuItem[] = [
@@ -93,6 +101,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: ROUTES.LANDLORD_EARNINGS,
       requiresAuth: true,
       roles: ['landlord'],
+    },
+  ]
+
+  const handymanMenuItems: MenuItem[] = [
+    {
+      icon: HardHat,
+      label: 'Handyman HQ',
+      path: ROUTES.HANDYMAN_DASHBOARD,
+      requiresAuth: true,
+      roles: ['handyman'],
+    },
+    {
+      icon: Briefcase,
+      label: 'Job Board',
+      path: ROUTES.HANDYMAN_JOBS,
+      requiresAuth: true,
+      roles: ['handyman'],
     },
   ]
 
@@ -228,37 +253,39 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Quick Services Chips */}
-          <div className="sidebar__section">
-            <h3 className="sidebar__section-title">Quick Services</h3>
-            <div className="grid grid-cols-2 gap-2 px-2">
-              {quickServices.map((service) => (
-                <button
-                  key={service.id}
-                  onClick={() => handleQuickServiceClick(service)}
-                  className="sidebar__quick-service"
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <service.icon className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-semibold text-foreground">{service.name}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-muted-foreground">
-                      From ₦{(service.priceFrom / 1000).toFixed(0)}K
-                    </span>
-                    {service.badge && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                        {service.badge}
+          {!isHandyman && (
+            <div className="sidebar__section">
+              <h3 className="sidebar__section-title">Quick Services</h3>
+              <div className="grid grid-cols-2 gap-2 px-2">
+                {quickServices.map((service) => (
+                  <button
+                    key={service.id}
+                    onClick={() => handleQuickServiceClick(service)}
+                    className="sidebar__quick-service"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <service.icon className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-semibold text-foreground">{service.name}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">
+                        From ₦{(service.priceFrom / 1000).toFixed(0)}K
                       </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Clock className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-[10px] text-muted-foreground">{service.responseTime}</span>
-                  </div>
-                </button>
-              ))}
+                      {service.badge && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                          {service.badge}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-[10px] text-muted-foreground">{service.responseTime}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Authenticated Items */}
           {isAuthenticated && (
@@ -286,6 +313,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="sidebar__section">
                   <h3 className="sidebar__section-title">Tenant</h3>
                   {tenantMenuItems.filter(shouldShowItem).map((item) => {
+                    const active = isActive(item.path)
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigation(item.path)}
+                        className={cn('sidebar__item', active && 'sidebar__item--active')}
+                      >
+                        <item.icon className="sidebar__item-icon" />
+                        <span className="sidebar__item-label">{item.label}</span>
+                        <div className="sidebar__item-shine" />
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {isHandyman && handymanMenuItems.some(shouldShowItem) && (
+                <div className="sidebar__section">
+                  <h3 className="sidebar__section-title">Handyman</h3>
+                  {handymanMenuItems.filter(shouldShowItem).map((item) => {
                     const active = isActive(item.path)
                     return (
                       <button
