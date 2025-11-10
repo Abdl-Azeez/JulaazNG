@@ -10,7 +10,7 @@ import { PropertiesPage } from '@/pages/properties'
 import { PropertyDetailsPage, PropertyViewingPage } from '@/pages/property-details'
 import { ProfilePage } from '@/pages/profile'
 import { SettingsPage } from '@/pages/settings'
-import { ServicesPage } from '@/pages/services'
+import { ServicesPage, ServiceJourneyPage } from '@/pages/services'
 import { LoginPage } from '@/pages/auth/login'
 import { PasswordPage } from '@/pages/auth/password'
 import { SignupPage } from '@/pages/auth/signup'
@@ -117,6 +117,7 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
         <Route path={ROUTES.SERVICES} element={<ServicesPage />} />
+        <Route path={ROUTES.SERVICE_JOURNEY(':journeySlug')} element={<ServiceJourneyPage />} />
         <Route path={ROUTES.MESSAGING} element={<MessagingPage />} />
         <Route path="/messaging/:conversationId" element={<MessagingPage />} />
         <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
@@ -140,7 +141,7 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
         <Route
           path={ROUTES.MY_SERVICES}
           element={
-            <RoleGuard allowedRoles={['tenant']} redirectTo={ROUTES.HOME}>
+            <RoleGuard allowedRoles={['tenant', 'landlord']} redirectTo={ROUTES.HOME}>
               <MyServicesPage />
             </RoleGuard>
           }

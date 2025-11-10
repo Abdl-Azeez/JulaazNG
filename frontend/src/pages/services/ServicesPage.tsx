@@ -18,36 +18,13 @@ import {
   trackServiceCardView,
   trackBookingInitiated,
 } from '@/shared/lib/analytics/service-analytics'
-import { Sparkles, ShieldCheck, Clock, ArrowRight, PhoneCall, BadgeCheck, Stars } from 'lucide-react'
+import { Sparkles, ShieldCheck, Clock, ArrowRight, PhoneCall, BadgeCheck } from 'lucide-react'
+import { howItWorksSteps } from './data/how-it-works'
 
 const badges = [
   { id: 'response', label: 'Under 90 min response', icon: Clock },
   { id: 'vetted', label: 'Vetted artisans only', icon: ShieldCheck },
   { id: 'guarantee', label: '14-day workmanship guarantee', icon: BadgeCheck },
-]
-
-const highlights = [
-  {
-    id: 'connect',
-    title: 'Tap + Match',
-    description:
-      'Tell us the task, upload photos or voice notes and get matched with the right artisan instantly.',
-    icon: Sparkles,
-  },
-  {
-    id: 'track',
-    title: 'Track + Review',
-    description:
-      'Watch job progress, approve milestones and release payments securely from the app.',
-    icon: Stars,
-  },
-  {
-    id: 'support',
-    title: 'Support + Scale',
-    description:
-      'Need long-term maintenance? Set recurring visits, get project managers and warranty coverage.',
-    icon: ShieldCheck,
-  },
 ]
 
 export function ServicesPage() {
@@ -155,7 +132,7 @@ export function ServicesPage() {
                 <Button
                   variant="outline"
                   className="rounded-[12px] h-12 px-6"
-                  onClick={() => navigate(`${ROUTES.SERVICES}?start=consultation`)}
+                  onClick={() => navigate(ROUTES.SERVICE_MAINTENANCE_PLANS)}
                 >
                   Explore maintenance plans
                 </Button>
@@ -233,7 +210,7 @@ export function ServicesPage() {
           <Button
             variant="ghost"
             className="rounded-full border border-border/60 px-4"
-            onClick={() => navigate(`${ROUTES.SERVICES}?start=onboarding`)}
+            onClick={() => navigate(ROUTES.SERVICE_VETTED_PARTNER)}
           >
             Become a vetted partner
             <ArrowRight className="h-4 w-4 ml-2" />
@@ -308,7 +285,7 @@ export function ServicesPage() {
                     className="mt-4 w-full rounded-xl border border-border/60"
                     onClick={() => {
                       handleServiceCardClick(service.id, service.title)
-                      navigate(`${ROUTES.SERVICES}?service=${service.id}`)
+                      navigate(ROUTES.SERVICE_REQUEST(service.id))
                     }}
                   >
                     Request this crew
@@ -323,7 +300,7 @@ export function ServicesPage() {
             <Card className="border-0 bg-surface/90 p-6 shadow-lg">
               <h3 className="text-lg font-semibold text-foreground">How it works</h3>
               <div className="mt-4 space-y-4">
-                {highlights.map(({ id, title, description, icon: Icon }) => (
+                {howItWorksSteps.map(({ id, title, description, icon: Icon }) => (
                   <div key={id} className="flex gap-3">
                     <div className="mt-1 rounded-2xl bg-primary/10 p-2 text-primary">
                       <Icon className="h-4 w-4" />

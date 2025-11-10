@@ -27,6 +27,10 @@ export const ROUTES = {
   SERVICE_PROVIDERS: (id: string) => `/services/providers/${id}`,
   SERVICE_BOOKINGS: '/services/bookings',
   MY_SERVICES: '/my-services',
+  SERVICE_JOURNEY: (slug: string) => `/services/journey/${slug}`,
+  SERVICE_MAINTENANCE_PLANS: '/services/journey/maintenance-plans',
+  SERVICE_VETTED_PARTNER: '/services/journey/vetted-partner',
+  SERVICE_REQUEST: (serviceId: string) => `/services/journey/request?service=${serviceId}`,
   
   // Artisan routes
   ARTISANS: '/artisans',

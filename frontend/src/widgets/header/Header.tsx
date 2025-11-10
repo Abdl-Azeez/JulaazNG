@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { ElementType } from 'react'
 import {
   Menu,
@@ -55,8 +55,8 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
   const { isAuthenticated } = useAuthStore()
   const { roles, activeRole, openRoleSwitcher } = useRoleStore()
   const [isVisible, setIsVisible] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
   const [isLandlordMenuOpen, setLandlordMenuOpen] = useState(false)
+  const lastScrollYRef = useRef(0)
 
   const isLandlordRoute = location.pathname.includes('/landlord')
   const effectiveRole: RoleType | null = isAuthenticated
@@ -74,32 +74,29 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
           .join(' ')
       : ''
 
-  // Auto-hide header on scroll (mobile only)
+  // Auto-hide header on scroll (applies to all breakpoints with adaptive thresholds)
   useEffect(() => {
     const controlHeader = () => {
       const currentScrollY = window.scrollY
-      
-      // Only apply on mobile (below lg breakpoint)
-      if (window.innerWidth >= 1024) {
-        setIsVisible(true)
-        return
-      }
+      const lastScrollY = lastScrollYRef.current
+      const isDesktop = window.innerWidth >= 1024
+      const threshold = isDesktop ? 80 : 100
 
       // Show header when scrolling up or at the top
       if (currentScrollY < lastScrollY || currentScrollY < 10) {
         setIsVisible(true)
-      } 
+      }
       // Hide header when scrolling down (but not if we're near the top)
-      else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      else if (currentScrollY > lastScrollY && currentScrollY > threshold) {
         setIsVisible(false)
       }
 
-      setLastScrollY(currentScrollY)
+      lastScrollYRef.current = currentScrollY
     }
 
-    window.addEventListener('scroll', controlHeader)
+    window.addEventListener('scroll', controlHeader, { passive: true })
     return () => window.removeEventListener('scroll', controlHeader)
-  }, [lastScrollY])
+  }, [])
 
   const buildNavItems = (role?: RoleType | null, includeLandlordNav = false): NavigationItem[] => {
     if (role === 'landlord' || includeLandlordNav) {
@@ -121,6 +118,7 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
 
     return [
       { icon: Home, label: 'Home', path: ROUTES.HOME },
+      { icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES },
     { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
   ]
   }
@@ -136,6 +134,7 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
         ...base,
         { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
         { icon: Heart, label: 'Favourites', path: ROUTES.FAVOURITES },
+        { icon: Briefcase, label: 'My Services', path: ROUTES.MY_SERVICES },
       ]
     }
 

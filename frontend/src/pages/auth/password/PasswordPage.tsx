@@ -29,7 +29,6 @@ export function PasswordPage() {
   const { setRoles, setActiveRole, openRoleSwitcher } = useRoleStore()
   const phone = searchParams.get('phone') || ''
   const email = searchParams.get('email') || ''
-  const legacyRoleParam = (searchParams.get('role') as RoleType | null) || null
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 

@@ -52,9 +52,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   ]
 
   const filteredAuthenticatedMenuItems = hideTenantFeatures
-    ? authenticatedMenuItems.filter(
-        (item) => item.path !== ROUTES.MY_BOOKINGS && item.path !== ROUTES.MY_SERVICES
-      )
+    ? authenticatedMenuItems.filter((item) => item.path !== ROUTES.MY_BOOKINGS)
     : authenticatedMenuItems
 
   const tenantMenuItems: MenuItem[] = [

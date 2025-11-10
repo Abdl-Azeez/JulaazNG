@@ -16,6 +16,7 @@ import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { useAuthStore } from '@/shared/store/auth.store'
+import { useRoleStore } from '@/shared/store/role.store'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
 import { LogoLoader } from '@/widgets/logo-loader'
@@ -24,6 +25,7 @@ import toast from 'react-hot-toast'
 export function ProfilePage() {
   const navigate = useNavigate()
   const { user, logout, isAuthenticated } = useAuthStore()
+  const { activeRole } = useRoleStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -69,12 +71,20 @@ export function ProfilePage() {
   const [backgroundStatus, setBackgroundStatus] = useState<'not_started' | 'submitted' | 'verified'>(
     profileData.isVerified ? 'verified' : 'not_started'
   )
+  const effectiveRole = activeRole ?? user?.role ?? null
+  const isHandyman =
+    effectiveRole === 'handyman' || effectiveRole === 'service_provider' || effectiveRole === 'artisan'
+
   const [backgroundForm, setBackgroundForm] = useState({
     monthlyIncome: '',
     occupation: '',
     employer: '',
     employmentLength: '',
     financialCommitments: '',
+    identityNumber: '',
+    competencyEvidence: '',
+    authenticityNotes: '',
+    workshopAddress: '',
   })
   const [documentFiles, setDocumentFiles] = useState<File[]>([])
   const [isSubmittingBackground, setIsSubmittingBackground] = useState(false)
@@ -196,24 +206,46 @@ export function ProfilePage() {
   const handleBackgroundSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!backgroundForm.monthlyIncome || Number(backgroundForm.monthlyIncome) <= 0) {
-      toast.error('Enter your estimated monthly income')
-      return
-    }
+    if (isHandyman) {
+      if (!backgroundForm.identityNumber.trim()) {
+        toast.error('Provide your government-issued ID details')
+        return
+      }
 
-    if (!backgroundForm.occupation) {
-      toast.error('Tell us about your occupation')
-      return
-    }
+      if (!backgroundForm.competencyEvidence.trim()) {
+        toast.error('Tell us about your trade competency or certifications')
+        return
+      }
 
-    if (!backgroundForm.employer) {
-      toast.error('Share your employer or business name')
-      return
-    }
+      if (!backgroundForm.authenticityNotes.trim()) {
+        toast.error('Share references or proof of past work to verify authenticity')
+        return
+      }
 
-    if (!backgroundForm.employmentLength) {
-      toast.error('Let us know how long you have been employed')
-      return
+      if (!backgroundForm.workshopAddress.trim()) {
+        toast.error('Tell us where your workshop is located')
+        return
+      }
+    } else {
+      if (!backgroundForm.monthlyIncome || Number(backgroundForm.monthlyIncome) <= 0) {
+        toast.error('Enter your estimated monthly income')
+        return
+      }
+
+      if (!backgroundForm.occupation) {
+        toast.error('Tell us about your occupation')
+        return
+      }
+
+      if (!backgroundForm.employer) {
+        toast.error('Share your employer or business name')
+        return
+      }
+
+      if (!backgroundForm.employmentLength) {
+        toast.error('Let us know how long you have been employed')
+        return
+      }
     }
 
     if (documentFiles.length === 0) {
@@ -238,6 +270,10 @@ export function ProfilePage() {
         employer: '',
         employmentLength: '',
         financialCommitments: '',
+        identityNumber: '',
+        competencyEvidence: '',
+        authenticityNotes: '',
+        workshopAddress: '',
       })
       toast.success('Background check verified!')
     } finally {
@@ -522,11 +558,19 @@ export function ProfilePage() {
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
                         <FileText className="mt-0.5 h-4 w-4 text-primary" />
-                        <span>Identity and employment documents securely stored.</span>
+                        <span>
+                          {isHandyman
+                            ? 'Identity and workshop details securely stored.'
+                            : 'Identity and employment documents securely stored.'}
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="mt-0.5 h-4 w-4 text-primary" />
-                        <span>Financial information reviewed by Julaaz compliance team.</span>
+                        <span>
+                          {isHandyman
+                            ? 'Trade competency evidence reviewed by the Julaaz service quality team.'
+                            : 'Financial information reviewed by Julaaz compliance team.'}
+                        </span>
                       </li>
                     </ul>
                   </div>
@@ -540,7 +584,9 @@ export function ProfilePage() {
                     <div className="flex-1 space-y-2 text-center lg:text-left">
                       <h3 className="text-lg lg:text-xl font-semibold text-foreground">Perform background check</h3>
                       <p className="text-sm text-muted-foreground">
-                        Provide a few extra details so we can confirm your identity and tenancy eligibility. We’ll only use this information for verification.
+                        {isHandyman
+                          ? 'Provide a few extra details so we can confirm your identity, trade competency and workshop authenticity. We’ll only use this information for verification.'
+                          : 'Provide a few extra details so we can confirm your identity and tenancy eligibility. We’ll only use this information for verification.'}
                       </p>
                     </div>
                   </div>
@@ -596,79 +642,145 @@ export function ProfilePage() {
                   </div>
 
                   <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Employment information</h4>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="bc-income" className="text-sm text-foreground">
-                          Monthly income (₦)
-                        </Label>
-                        <Input
-                          id="bc-income"
-                          type="number"
-                          min={50000}
-                          step={5000}
-                          value={backgroundForm.monthlyIncome}
-                          onChange={(event) => handleBackgroundInputChange('monthlyIncome', event.target.value)}
-                          placeholder="450000"
-                          className="h-11 rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="bc-occupation" className="text-sm text-foreground">
-                          Occupation / role
-                        </Label>
-                        <Input
-                          id="bc-occupation"
-                          value={backgroundForm.occupation}
-                          onChange={(event) => handleBackgroundInputChange('occupation', event.target.value)}
-                          placeholder="Product Designer"
-                          className="h-11 rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="bc-employer" className="text-sm text-foreground">
-                          Employer / business name
-                        </Label>
-                        <Input
-                          id="bc-employer"
-                          value={backgroundForm.employer}
-                          onChange={(event) => handleBackgroundInputChange('employer', event.target.value)}
-                          placeholder="Julaaz NG"
-                          className="h-11 rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="bc-employment-length" className="text-sm text-foreground">
-                          Length of employment
-                        </Label>
-                        <Input
-                          id="bc-employment-length"
-                          value={backgroundForm.employmentLength}
-                          onChange={(event) => handleBackgroundInputChange('employmentLength', event.target.value)}
-                          placeholder="2 years"
-                          className="h-11 rounded-xl"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="bc-finances" className="text-sm text-foreground">
-                        Financial commitments or notes
-                      </Label>
-                      <textarea
-                        id="bc-finances"
-                        value={backgroundForm.financialCommitments}
-                        onChange={(event) => handleBackgroundInputChange('financialCommitments', event.target.value)}
-                        rows={3}
-                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        placeholder="Tell us about any loans, dependents, or other commitments"
-                      />
-                    </div>
+                    <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                      {isHandyman ? 'Trade verification' : 'Employment information'}
+                    </h4>
+                    {isHandyman ? (
+                      <>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div className="space-y-1.5">
+                            <Label htmlFor="bc-identity" className="text-sm text-foreground">
+                              Identity details
+                            </Label>
+                            <Input
+                              id="bc-identity"
+                              value={backgroundForm.identityNumber}
+                              onChange={(event) => handleBackgroundInputChange('identityNumber', event.target.value)}
+                              placeholder="e.g. NIN: 12345678901 or Driver's Licence: ABC12345"
+                              className="h-11 rounded-xl"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              We only store this securely to confirm you are who you say you are.
+                            </p>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="bc-workshop" className="text-sm text-foreground">
+                              Workshop / office address
+                            </Label>
+                            <Input
+                              id="bc-workshop"
+                              value={backgroundForm.workshopAddress}
+                              onChange={(event) => handleBackgroundInputChange('workshopAddress', event.target.value)}
+                              placeholder="20, Iwaya Road, Yaba, Lagos"
+                              className="h-11 rounded-xl"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="bc-competency" className="text-sm text-foreground">
+                            Competency proof
+                          </Label>
+                          <textarea
+                            id="bc-competency"
+                            value={backgroundForm.competencyEvidence}
+                            onChange={(event) => handleBackgroundInputChange('competencyEvidence', event.target.value)}
+                            rows={3}
+                            className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            placeholder="List certifications, training, apprenticeships, or notable projects."
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="bc-authenticity" className="text-sm text-foreground">
+                            Authenticity & references
+                          </Label>
+                          <textarea
+                            id="bc-authenticity"
+                            value={backgroundForm.authenticityNotes}
+                            onChange={(event) => handleBackgroundInputChange('authenticityNotes', event.target.value)}
+                            rows={3}
+                            className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            placeholder="Share referees, portfolio links, workshop social media, or past client testimonials."
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div className="space-y-1.5">
+                            <Label htmlFor="bc-income" className="text-sm text-foreground">
+                              Monthly income (₦)
+                            </Label>
+                            <Input
+                              id="bc-income"
+                              type="number"
+                              min={50000}
+                              step={5000}
+                              value={backgroundForm.monthlyIncome}
+                              onChange={(event) => handleBackgroundInputChange('monthlyIncome', event.target.value)}
+                              placeholder="450000"
+                              className="h-11 rounded-xl"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="bc-occupation" className="text-sm text-foreground">
+                              Occupation / role
+                            </Label>
+                            <Input
+                              id="bc-occupation"
+                              value={backgroundForm.occupation}
+                              onChange={(event) => handleBackgroundInputChange('occupation', event.target.value)}
+                              placeholder="Product Designer"
+                              className="h-11 rounded-xl"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="bc-employer" className="text-sm text-foreground">
+                              Employer / business name
+                            </Label>
+                            <Input
+                              id="bc-employer"
+                              value={backgroundForm.employer}
+                              onChange={(event) => handleBackgroundInputChange('employer', event.target.value)}
+                              placeholder="Julaaz NG"
+                              className="h-11 rounded-xl"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="bc-employment-length" className="text-sm text-foreground">
+                              Length of employment
+                            </Label>
+                            <Input
+                              id="bc-employment-length"
+                              value={backgroundForm.employmentLength}
+                              onChange={(event) => handleBackgroundInputChange('employmentLength', event.target.value)}
+                              placeholder="2 years"
+                              className="h-11 rounded-xl"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="bc-finances" className="text-sm text-foreground">
+                            Financial commitments or notes
+                          </Label>
+                          <textarea
+                            id="bc-finances"
+                            value={backgroundForm.financialCommitments}
+                            onChange={(event) => handleBackgroundInputChange('financialCommitments', event.target.value)}
+                            rows={3}
+                            className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            placeholder="Tell us about any loans, dependents, or other commitments"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="space-y-3">
                     <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Required documents</h4>
                     <p className="text-xs text-muted-foreground">
-                      Valid ID (Driver's License, National ID, or Passport) • Proof of Income • Employment letter or contract. Upload PDF, JPG, or PNG files up to 10MB each.
+                      {isHandyman
+                        ? "Valid government ID • Trade certificate or apprenticeship letter • Photos of recent work or workshop • References. Upload PDF, JPG, or PNG files up to 10MB each."
+                        : "Valid ID (Driver's License, National ID, or Passport) • Proof of Income • Employment letter or contract. Upload PDF, JPG, or PNG files up to 10MB each."}
                     </p>
                     <div className="rounded-2xl border-2 border-dashed border-border bg-background/60 p-6 text-center">
                       <div className="flex flex-col items-center gap-3">
