@@ -56,6 +56,11 @@ export function PropertiesPage() {
   }
 
   const handleRequestViewing = (propertyId: string) => {
+    if (!isAuthenticated) {
+      setIsDrawerOpen(true)
+      return
+    }
+
     navigate(ROUTES.PROPERTY_BOOKING(propertyId))
   }
 

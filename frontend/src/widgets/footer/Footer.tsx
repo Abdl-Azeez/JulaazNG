@@ -6,6 +6,7 @@ import { cn } from '@/shared/lib/utils/cn'
 import { Link, useLocation } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
+import { useRoleStore } from '@/shared/store/role.store'
 
 interface FooterProps {
     className?: string
@@ -14,7 +15,11 @@ interface FooterProps {
 export function Footer({ className }: FooterProps) {
     const location = useLocation()
     const { user } = useAuthStore()
-    const isLandlord = user?.role === 'landlord' || location.pathname.startsWith('/landlord')
+    const { activeRole } = useRoleStore()
+    const isLandlord =
+        activeRole === 'landlord' ||
+        user?.role === 'landlord' ||
+        location.pathname.startsWith('/landlord')
 
     const isActiveLink = (path: string) => location.pathname === path
     return (

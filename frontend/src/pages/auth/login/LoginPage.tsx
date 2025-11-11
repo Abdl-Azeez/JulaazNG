@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
-import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
@@ -8,9 +7,19 @@ import { LoginBanner } from '@/widgets/login-banner'
 import { ROUTES } from '@/shared/constants/routes'
 import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
+import { sampleUsers } from '@/shared/data/sample-users'
+import {
+  Dialog,
+  DialogContent,
+} from '@/shared/ui/dialog'
 
 export function LoginPage() {
   const [isDesktop, setIsDesktop] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [inputValue, setInputValue] = useState('')
+  const [loginMethod, setLoginMethod] = useState<'email' | 'phone' | null>(null)
+  const [error, setError] = useState('')
 
   // Detect screen size
   useEffect(() => {
@@ -21,13 +30,10 @@ export function LoginPage() {
     window.addEventListener('resize', checkDesktop)
     return () => window.removeEventListener('resize', checkDesktop)
   }, [])
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const role = searchParams.get('role') || 'tenant'
-  const [userType, setUserType] = useState<'tenant' | 'landlord'>(role as 'tenant' | 'landlord')
-  const [inputValue, setInputValue] = useState('')
-  const [loginMethod, setLoginMethod] = useState<'email' | 'phone' | null>(null)
-  const [error, setError] = useState('')
+
+  // Check if we should show as modal (desktop) or full page
+  const shouldShowAsModal = isDesktop
+  const backgroundLocation = (location.state as { backgroundLocation?: Location })?.backgroundLocation
 
   // Detect login method based on first character
   useEffect(() => {
@@ -77,9 +83,9 @@ export function LoginPage() {
     if (!validateInput()) return
 
     if (loginMethod === 'email') {
-      navigate(`${ROUTES.LOGIN_PASSWORD}?email=${encodeURIComponent(inputValue)}&role=${userType}`)
+      navigate(`${ROUTES.LOGIN_PASSWORD}?email=${encodeURIComponent(inputValue)}`)
     } else if (loginMethod === 'phone') {
-      navigate(`${ROUTES.LOGIN_PASSWORD}?phone=${encodeURIComponent(inputValue)}&role=${userType}`)
+      navigate(`${ROUTES.LOGIN_PASSWORD}?phone=${encodeURIComponent(inputValue)}`)
     }
   }
 
@@ -95,57 +101,50 @@ export function LoginPage() {
     return 'Enter your email or phone number'
   }
 
+  const renderDemoCredentials = () => (
+    <div className="rounded-xl border border-dashed border-muted-foreground/40 bg-muted/30 p-4 text-sm">
+      <h2 className="font-semibold text-foreground mb-2">Demo Accounts</h2>
+      <ul className="space-y-2 text-muted-foreground">
+        {sampleUsers.map((demo) => (
+          <li key={demo.id} className="leading-snug">
+            <span className="font-medium text-foreground">{demo.name}</span> ·{' '}
+            <span>{demo.email}</span> · <span>{demo.password}</span>
+            <br />
+            <span className="capitalize text-xs">
+              Roles: {demo.roles.map((role) => role.type.replace(/_/g, ' ')).join(', ')}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+
   // Desktop Modal Layout
-  if (isDesktop) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md p-8 shadow-2xl">
-          <div className="flex justify-center mb-6">
-            <LogoSvg className="h-40 w-40 md:h-44 md:w-44 text-primary" />
-          </div>
-          
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-foreground text-center">
-              Login to your Account
-            </h1>
+  if (shouldShowAsModal) {
+    const loginContent = (
+      <div className="space-y-6">
+        <div className="flex justify-center mb-6">
+          <LogoSvg className="h-40 w-40 md:h-44 md:w-44 text-primary" />
+        </div>
+        
+        <h1 className="text-2xl font-bold text-foreground text-center">
+          Login to your Account
+        </h1>
 
-          {/* User Type Selection */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold text-foreground">Select User Type</Label>
-            <RadioGroup
-              value={userType}
-              onValueChange={(value) => setUserType(value as 'tenant' | 'landlord')}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2 flex-1">
-                <RadioGroupItem value="tenant" id="tenant" />
-                <Label htmlFor="tenant" className="font-normal cursor-pointer">
-                  Tenant
-                </Label>
+        {/* Email/Phone Input */}
+        <div className="space-y-2">
+          <Label htmlFor="login-input" className="text-sm font-semibold text-foreground">
+            {getFieldLabel()}
+          </Label>
+          <p className="text-xs text-muted-foreground">
+            You can sign in with your registered email address or mobile number.
+          </p>
+          {loginMethod === 'phone' ? (
+            <div className="flex gap-2">
+              <div className="flex items-center gap-2 px-3 border border-input rounded-lg bg-background">
+                <span className="text-2xl">🇳🇬</span>
+                <span className="text-sm font-medium">+234</span>
               </div>
-              <div className="flex items-center space-x-2 flex-1">
-                <RadioGroupItem value="landlord" id="landlord" />
-                <Label htmlFor="landlord" className="font-normal cursor-pointer">
-                  Landlord
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {/* Email/Phone Input */}
-          <div className="space-y-2">
-            <Label htmlFor="login-input" className="text-sm font-semibold text-foreground">
-              {getFieldLabel()}
-            </Label>
-            <p className="text-xs text-muted-foreground">
-              You can sign in with your registered email address or mobile number.
-            </p>
-            {loginMethod === 'phone' ? (
-              <div className="flex gap-2">
-                <div className="flex items-center gap-2 px-3 border border-input rounded-lg bg-background">
-                  <span className="text-2xl">🇳🇬</span>
-                  <span className="text-sm font-medium">+234</span>
-                </div>
               <Input
                 id="login-input"
                 type="tel"
@@ -157,47 +156,85 @@ export function LoginPage() {
                 }}
                 className={`flex-1 ${error ? 'border-destructive' : ''}`}
               />
-              </div>
-            ) : (
-              <Input
-                id="login-input"
-                type={loginMethod === 'email' ? 'email' : 'text'}
-                placeholder={getPlaceholder()}
-                value={inputValue}
-                onChange={handleInputChange}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleContinue()
-                }}
-                className={`w-full ${error ? 'border-destructive' : ''}`}
-              />
-            )}
-            {error && (
-              <p className="text-xs text-destructive">{error}</p>
-            )}
-          </div>
+            </div>
+          ) : (
+            <Input
+              id="login-input"
+              type={loginMethod === 'email' ? 'email' : 'text'}
+              placeholder={getPlaceholder()}
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleContinue()
+              }}
+              className={`w-full ${error ? 'border-destructive' : ''}`}
+            />
+          )}
+          {error && (
+            <p className="text-xs text-destructive">{error}</p>
+          )}
+        </div>
 
-          {/* Login Button */}
-          <Button
-            className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
-            onClick={handleContinue}
+        {/* Login Button */}
+        <Button
+          className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
+          onClick={handleContinue}
+        >
+          Continue
+        </Button>
+
+        {/* Sign Up Link */}
+        <p className="text-sm text-center text-muted-foreground">
+          Don't have an account?{' '}
+          <button
+            onClick={() => navigate(ROUTES.SIGNUP)}
+            className="font-semibold text-primary hover:underline"
           >
-            Continue
-          </Button>
+            Sign up
+          </button>
+        </p>
 
-          {/* Terms and Privacy */}
-          <p className="text-xs text-center text-muted-foreground">
-            By continuing you agree to the{' '}
-            <a href="#" className="font-bold underline">
-              Terms of Use
-            </a>{' '}
-            and{' '}
-            <a href="#" className="font-bold underline">
-              Privacy Policy
-            </a>
-          </p>
-          </div>
-        </Card>
+        {/* Terms and Privacy */}
+        <p className="text-xs text-center text-muted-foreground">
+          By continuing you agree to the{' '}
+          <a href="#" className="font-bold underline">
+            Terms of Use
+          </a>{' '}
+          and{' '}
+          <a href="#" className="font-bold underline">
+            Privacy Policy
+          </a>
+        </p>
+
+        {renderDemoCredentials()}
       </div>
+    )
+
+    return (
+      <Dialog 
+        open={true} 
+        onOpenChange={(open) => {
+          if (!open) {
+            // Navigate back to previous page or home
+            if (backgroundLocation) {
+              navigate(backgroundLocation.pathname + backgroundLocation.search, { replace: true })
+            } else {
+              navigate(ROUTES.HOME, { replace: true })
+            }
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto [&>button]:hidden">
+          {loginContent}
+        </DialogContent>
+        <style>{`
+          [data-radix-dialog-overlay] {
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            background-color: hsl(var(--foreground) / 0.5) !important;
+          }
+        `}</style>
+      </Dialog>
     )
   }
 
@@ -211,29 +248,6 @@ export function LoginPage() {
           <h1 className="text-2xl font-bold text-foreground text-center">
             Login to your Account
           </h1>
-
-          {/* User Type Selection */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold text-foreground">Select User Type</Label>
-            <RadioGroup
-              value={userType}
-              onValueChange={(value) => setUserType(value as 'tenant' | 'landlord')}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2 flex-1">
-                <RadioGroupItem value="tenant" id="tenant" />
-                <Label htmlFor="tenant" className="font-normal cursor-pointer">
-                  Tenant
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 flex-1">
-                <RadioGroupItem value="landlord" id="landlord" />
-                <Label htmlFor="landlord" className="font-normal cursor-pointer">
-                  Landlord
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
 
           {/* Email/Phone Input */}
           <div className="space-y-2">
@@ -287,6 +301,17 @@ export function LoginPage() {
             Continue
           </Button>
 
+          {/* Sign Up Link */}
+          <p className="text-sm text-center text-muted-foreground">
+            Don't have an account?{' '}
+            <button
+              onClick={() => navigate(ROUTES.SIGNUP)}
+              className="font-semibold text-primary hover:underline"
+            >
+              Sign up
+            </button>
+          </p>
+
           {/* Terms and Privacy */}
           <p className="text-xs text-center text-muted-foreground">
             By continuing you agree to the{' '}
@@ -298,6 +323,8 @@ export function LoginPage() {
               Privacy Policy
             </a>
           </p>
+
+          {renderDemoCredentials()}
         </div>
       </div>
     </div>

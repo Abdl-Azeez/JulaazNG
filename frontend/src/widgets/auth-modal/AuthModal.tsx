@@ -6,7 +6,6 @@ import {
   DialogHeader,
 } from '@/shared/ui/dialog'
 import { Button } from '@/shared/ui/button'
-import { cn } from '@/shared/lib/utils/cn'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -20,7 +19,6 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const baseState = { backgroundLocation: location, modal: true }
-  const [selectedRole, setSelectedRole] = useState<'landlord' | 'tenant' | null>(null)
   const [language, setLanguage] = useState('en')
 
   return (
@@ -33,34 +31,6 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
-          {/* Role Selection */}
-          <div className="space-y-3">
-            <Button
-              variant="outline"
-              className={cn(
-                'w-full h-14 justify-center bg-surface hover:bg-primary/80 rounded-xl text-base',
-                selectedRole === 'landlord' && 'border-primary border-2'
-              )}
-              onClick={() => setSelectedRole('landlord')}
-            >
-              <span className={selectedRole === 'landlord' ? 'font-semibold' : ''}>
-                Landlord
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className={cn(
-                'w-full h-14 justify-center bg-surface hover:bg-primary/80 rounded-xl text-base',
-                selectedRole === 'tenant' && 'border-primary border-2'
-              )}
-              onClick={() => setSelectedRole('tenant')}
-            >
-              <span className={selectedRole === 'tenant' ? 'font-semibold' : ''}>
-                Tenant
-              </span>
-            </Button>
-          </div>
-
           {/* Language Selection */}
           <Button
             variant="outline"
@@ -85,14 +55,11 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
             <Button
               className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-base font-semibold"
               onClick={() => {
-                if (selectedRole) {
-                  navigate(`${ROUTES.LOGIN}?role=${selectedRole}`, {
+                navigate(ROUTES.LOGIN, {
                     state: baseState,
                   })
                   onOpenChange(false)
-                }
               }}
-              disabled={!selectedRole}
             >
               Login
             </Button>
@@ -100,14 +67,11 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               variant="outline"
               className="w-full h-14 bg-surface hover:bg-primary/80 rounded-xl text-base border-primary font-semibold"
               onClick={() => {
-                if (selectedRole) {
-                  navigate(`${ROUTES.SIGNUP}?role=${selectedRole}`, {
+                navigate(ROUTES.SIGNUP, {
                     state: baseState,
                   })
                   onOpenChange(false)
-                }
               }}
-              disabled={!selectedRole}
             >
               Sign Up
             </Button>

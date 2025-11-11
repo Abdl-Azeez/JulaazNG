@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { AuthDrawer } from '@/widgets/auth-drawer'
-import { AuthModal } from '@/widgets/auth-modal'
+import { useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { ROUTES } from '@/shared/constants/routes'
 
 interface AuthDialogProps {
   open: boolean
@@ -8,26 +8,26 @@ interface AuthDialogProps {
 }
 
 /**
- * Smart authentication dialog that automatically switches between
- * drawer (mobile) and modal (desktop) based on screen size
+ * Smart authentication dialog that navigates directly to login page
+ * instead of showing a selection screen
  */
 export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
-  const [isDesktop, setIsDesktop] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 768)
+    if (open) {
+      // Pass current location as background so it shows behind the modal
+      navigate(ROUTES.LOGIN, {
+        state: { 
+          backgroundLocation: location,
+          modal: true 
+        }
+      })
+      onOpenChange(false)
     }
-    checkDesktop()
-    window.addEventListener('resize', checkDesktop)
-    return () => window.removeEventListener('resize', checkDesktop)
-  }, [])
+  }, [open, navigate, onOpenChange, location])
 
-  // Use modal on desktop, drawer on mobile
-  if (isDesktop) {
-    return <AuthModal open={open} onOpenChange={onOpenChange} />
-  }
-
-  return <AuthDrawer open={open} onOpenChange={onOpenChange} />
+  return null
 }
 

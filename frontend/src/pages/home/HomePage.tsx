@@ -60,6 +60,11 @@ export function HomePage() {
   }
 
   const handleRequestViewing = (propertyId: string) => {
+    if (!isAuthenticated) {
+      setIsAuthOpen(true)
+      return
+    }
+
     navigate(ROUTES.PROPERTY_BOOKING(propertyId))
   }
 

@@ -50,6 +50,15 @@ This project uses **Domain-Driven Design (DDD)** with **Clean Architecture** pri
 - **Documentation:** Compodoc
 - **API Testing:** Postman/Insomnia collections
 
+## 🔐 Multi-Role Authentication Expectations
+- Authentication responses must include the complete list of user roles (`roles: UserRole[]`) and the most recent `preferredRole`.
+- All protected routes expect clients to send `X-Active-Role` header containing one of the user's assigned roles; middleware should enforce the mapping between header and stored roles.
+- Seed script (`npm run prisma:seed`) provisions demo accounts:
+  - `tenant@julaaz.com` / `tenant123` → Tenant
+  - `landlord@julaaz.com` / `landlord123` → Landlord
+  - `hybrid@julaaz.com` / `hybrid123` → Tenant + Landlord
+- Update authorization guards to read the active role from the header rather than a single-role field.
+
 ## 📁 Project Structure
 
 ```

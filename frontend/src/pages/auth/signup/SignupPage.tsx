@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group'
 import { Button } from '@/shared/ui/button'
@@ -15,6 +15,8 @@ import { LoginBanner } from '@/widgets/login-banner'
 import { ROUTES } from '@/shared/constants/routes'
 import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
+import { Textarea } from '@/shared/ui/textarea'
+import { serviceCategories } from '@/pages/services/data/sample-services'
 
 export function SignupPage() {
   const [isDesktop, setIsDesktop] = useState(false)
@@ -31,7 +33,15 @@ export function SignupPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const role = searchParams.get('role') || 'tenant'
-  const [userType, setUserType] = useState<'tenant' | 'landlord'>(role as 'tenant' | 'landlord')
+
+  const availableUserTypes = ['tenant', 'landlord', 'handyman'] as const
+  type UserType = (typeof availableUserTypes)[number]
+
+  const defaultRole: UserType = availableUserTypes.includes(role as UserType)
+    ? (role as UserType)
+    : 'tenant'
+
+  const [userType, setUserType] = useState<UserType>(defaultRole)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
@@ -40,6 +50,10 @@ export function SignupPage() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [handymanJobType, setHandymanJobType] = useState('')
+  const [handymanExperienceYears, setHandymanExperienceYears] = useState('')
+  const [handymanWorkshopAddress, setHandymanWorkshopAddress] = useState('')
+  const [handymanWorkshopCity, setHandymanWorkshopCity] = useState('')
   const [errors, setErrors] = useState<{
     firstName?: string
     lastName?: string
@@ -49,7 +63,23 @@ export function SignupPage() {
     phone?: string
     password?: string
     confirmPassword?: string
+    handymanJobType?: string
+    handymanExperienceYears?: string
+    handymanWorkshopAddress?: string
+    handymanWorkshopCity?: string
   }>({})
+
+  const jobOptions = useMemo(
+    () =>
+      serviceCategories.flatMap((category) =>
+        category.services.map((service) => ({
+          id: service.id,
+          title: service.title,
+          category: category.name,
+        }))
+      ),
+    []
+  )
 
   const validateForm = () => {
     const newErrors: typeof errors = {}
@@ -101,6 +131,27 @@ export function SignupPage() {
       newErrors.confirmPassword = 'Passwords do not match'
     }
 
+    if (userType === 'handyman') {
+      if (!handymanJobType) {
+        newErrors.handymanJobType = 'Select your primary job type'
+      }
+
+      const experienceNumber = Number(handymanExperienceYears)
+      if (!handymanExperienceYears.trim()) {
+        newErrors.handymanExperienceYears = 'Share your years of experience'
+      } else if (Number.isNaN(experienceNumber) || experienceNumber < 1) {
+        newErrors.handymanExperienceYears = 'Experience must be at least 1 year'
+      }
+
+      if (!handymanWorkshopAddress.trim()) {
+        newErrors.handymanWorkshopAddress = 'Workshop address is required'
+      }
+
+      if (!handymanWorkshopCity.trim()) {
+        newErrors.handymanWorkshopCity = 'City / state is required'
+      }
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -121,6 +172,13 @@ export function SignupPage() {
         gender: gender,
         nationality: 'Nigeria', // Default to Nigeria based on +234 country code
       })
+
+      if (userType === 'handyman') {
+        params.set('jobType', handymanJobType)
+        params.set('experienceYears', handymanExperienceYears)
+        params.set('workshopAddress', handymanWorkshopAddress)
+        params.set('workshopCity', handymanWorkshopCity)
+      }
       navigate(`${ROUTES.VERIFY_OTP}?${params.toString()}`)
     }
   }
@@ -133,8 +191,24 @@ export function SignupPage() {
             <Label className="text-sm font-semibold text-foreground">Select User Type</Label>
             <RadioGroup
               value={userType}
-              onValueChange={(value) => setUserType(value as 'tenant' | 'landlord')}
-              className="flex gap-4"
+              onValueChange={(value) => {
+                const nextValue = value as UserType
+                setUserType(nextValue)
+                if (nextValue !== 'handyman') {
+                  setHandymanJobType('')
+                  setHandymanExperienceYears('')
+                  setHandymanWorkshopAddress('')
+                  setHandymanWorkshopCity('')
+                  setErrors((prev) => ({
+                    ...prev,
+                    handymanJobType: undefined,
+                    handymanExperienceYears: undefined,
+                    handymanWorkshopAddress: undefined,
+                    handymanWorkshopCity: undefined,
+                  }))
+                }
+              }}
+              className="flex flex-wrap gap-4"
             >
               <div className="flex items-center space-x-2 flex-1">
                 <RadioGroupItem value="tenant" id="signup-tenant" />
@@ -148,8 +222,115 @@ export function SignupPage() {
                   Landlord
                 </Label>
               </div>
+              <div className="flex items-center space-x-2 flex-1">
+                <RadioGroupItem value="handyman" id="signup-handyman" />
+                <Label htmlFor="signup-handyman" className="font-normal cursor-pointer">
+                  Handyman / Service Pro
+                </Label>
+              </div>
             </RadioGroup>
           </div>
+
+          {userType === 'handyman' && (
+            <div className="rounded-2xl border border-border/60 bg-muted/40 p-4 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">Handyman onboarding</h3>
+                <p className="text-xs text-muted-foreground">
+                  Help us match you with the right jobs. These details stay private and guide background screening.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-foreground">Primary job type</Label>
+                <Select
+                  value={handymanJobType}
+                  onValueChange={(value) => {
+                    setHandymanJobType(value)
+                    if (errors.handymanJobType) {
+                      setErrors((prev) => ({ ...prev, handymanJobType: undefined }))
+                    }
+                  }}
+                >
+                  <SelectTrigger className={errors.handymanJobType ? 'border-destructive' : ''}>
+                    <SelectValue placeholder="Select what you specialise in" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {jobOptions.map((job) => (
+                      <SelectItem key={job.id} value={job.title}>
+                        {job.title} • {job.category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.handymanJobType && (
+                  <p className="text-xs text-destructive">{errors.handymanJobType}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="handyman-experience" className="text-sm font-semibold text-foreground">
+                  Years of experience
+                </Label>
+                <Input
+                  id="handyman-experience"
+                  type="number"
+                  min={1}
+                  placeholder="e.g. 5"
+                  value={handymanExperienceYears}
+                  onChange={(event) => {
+                    setHandymanExperienceYears(event.target.value)
+                    if (errors.handymanExperienceYears) {
+                      setErrors((prev) => ({ ...prev, handymanExperienceYears: undefined }))
+                    }
+                  }}
+                  className={errors.handymanExperienceYears ? 'border-destructive' : ''}
+                />
+                {errors.handymanExperienceYears && (
+                  <p className="text-xs text-destructive">{errors.handymanExperienceYears}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="handyman-address" className="text-sm font-semibold text-foreground">
+                  Workshop address
+                </Label>
+                <Textarea
+                  id="handyman-address"
+                  rows={3}
+                  placeholder="Tell us where your workshop or office is located"
+                  value={handymanWorkshopAddress}
+                  onChange={(event) => {
+                    setHandymanWorkshopAddress(event.target.value)
+                    if (errors.handymanWorkshopAddress) {
+                      setErrors((prev) => ({ ...prev, handymanWorkshopAddress: undefined }))
+                    }
+                  }}
+                  className={errors.handymanWorkshopAddress ? 'border-destructive' : ''}
+                />
+                {errors.handymanWorkshopAddress && (
+                  <p className="text-xs text-destructive">{errors.handymanWorkshopAddress}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="handyman-city" className="text-sm font-semibold text-foreground">
+                  City / State
+                </Label>
+                <Input
+                  id="handyman-city"
+                  type="text"
+                  placeholder="e.g. Yaba, Lagos"
+                  value={handymanWorkshopCity}
+                  onChange={(event) => {
+                    setHandymanWorkshopCity(event.target.value)
+                    if (errors.handymanWorkshopCity) {
+                      setErrors((prev) => ({ ...prev, handymanWorkshopCity: undefined }))
+                    }
+                  }}
+                  className={errors.handymanWorkshopCity ? 'border-destructive' : ''}
+                />
+                {errors.handymanWorkshopCity && (
+                  <p className="text-xs text-destructive">{errors.handymanWorkshopCity}</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* First Name Input */}
           <div className="space-y-2">

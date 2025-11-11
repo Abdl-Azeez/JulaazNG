@@ -580,6 +580,84 @@ test: add unit tests for auth
 chore: update dependencies
 ```
 
+## 🔐 Refined Login UX Flow (Modern, Session-Aware)
+
+This app implements a session-aware, multi-role experience that removes role selection from the login screen and turns role management into a productivity feature.
+
+### UX Principles
+- **Contextual**: Roles feel like tools, not identities.
+- **Intelligent**: System suggests rather than asks.
+- **Seamless**: Maintains separate states for smooth transitions.
+- **Discoverable**: Users learn about capabilities of other roles.
+- **Secure**: Role isolation is preserved; awareness is allowed.
+- **Smooth**: No second login page.
+- **Fast**: Switch roles without full logout.
+- **Consistent**: Clear visual context per role, no mixed dashboards.
+
+### Flow
+1. **Login → Token with roles**
+   - User logs in once.
+   - Backend returns JWT/session containing all roles.
+2. **Auto-redirect or soft role selection**
+   - If only one role → auto-redirect to that role’s landing.
+   - If multiple roles → show a lightweight modal “Role Gateway” with role cards. Past behavior defaults to the last used role.
+3. **Session context**
+   - `activeRole` in a global store (Zustand) and persisted.
+   - API requests include `X-Active-Role` header for backend awareness.
+   - Layout, routes, and API adapt to `activeRole`.
+4. **Role switching**
+   - “Role” button in header opens the same modal.
+   - Selecting a role reinitializes app shell concerns (sidebar/routes) and shows a toast.
+5. **Persistent preferred role**
+   - Last used role is tracked and becomes the default suggestion.
+
+### Data model
+```ts
+type RoleType =
+  | 'tenant'
+  | 'landlord'
+  | 'service_provider'
+  | 'artisan'
+  | 'property_manager'
+  | 'admin'
+  | 'handyman'
+  | 'homerunner'
+
+interface UserRole {
+  type: RoleType
+  priority?: 'primary' | 'secondary'
+  lastUsed?: boolean
+}
+```
+
+### Developer integration
+- Global store:
+  - `src/shared/store/role.store.ts` exposes `roles`, `activeRole`, `setRoles`, `setActiveRole`, and `openRoleSwitcher`.
+- Role Gateway modal:
+  - `src/widgets/role-gateway/RoleGateway.tsx` is mounted at app root (`src/app/App.tsx`).
+  - Opens automatically if user has multiple roles and no `activeRole`, or on demand via header.
+- Header role switch:
+  - `src/widgets/header/Header.tsx` shows the current role and a “Role” button to switch.
+- API client:
+  - `src/shared/lib/api/client.ts` injects `Authorization` and `X-Active-Role` headers automatically.
+
+### Routing guidance
+- Map roles to landing routes in one place (see `RoleGateway` for examples).
+- For role-specific pages, derive visibility and navigation from `activeRole`.
+
+### Backend expectations
+- Include all user roles in the authentication payload.
+- Respect `X-Active-Role` on every request for authorization and scoping.
+
+### Demo accounts
+
+| Name | Roles | Email | Password | Phone |
+| --- | --- | --- | --- | --- |
+| Tosin Adeyemi | Tenant | `tenant@julaaz.com` | `tenant123` | `08010000001` |
+| Femi Ogunleye | Landlord | `landlord@julaaz.com` | `landlord123` | `08010000002` |
+| Chioma Nwosu | Tenant & Landlord | `hybrid@julaaz.com` | `hybrid123` | `08010000003` |
+
+
 ### Branch Naming
 - `feature/` - New features
 - `fix/` - Bug fixes

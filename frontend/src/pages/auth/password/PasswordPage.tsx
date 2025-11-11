@@ -8,6 +8,8 @@ import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
+import { useRoleStore, type UserRole, type RoleType } from '@/shared/store/role.store'
+import { findSampleUser } from '@/shared/data/sample-users'
 
 export function PasswordPage() {
   const [isDesktop, setIsDesktop] = useState(false)
@@ -24,9 +26,9 @@ export function PasswordPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { login } = useAuthStore()
+  const { setRoles, setActiveRole, openRoleSwitcher } = useRoleStore()
   const phone = searchParams.get('phone') || ''
   const email = searchParams.get('email') || ''
-  const role = searchParams.get('role') || 'tenant'
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
@@ -45,18 +47,73 @@ export function PasswordPage() {
   const handleContinue = () => {
     if (!validatePassword()) return
 
-    // Mock login - in real app, this would call the API
-    const mockUser = {
-      id: '1',
-      name: 'Abdulraheem Abdulsalam',
-      email: email || undefined,
-      phone: phone || undefined,
-      role: role as 'tenant' | 'landlord',
-      isVerified: true,
+    const identifier = email || phone
+    if (!identifier) {
+      setError('No email or phone provided')
+      return
     }
-    login(mockUser, 'mock-token')
-    // Navigate to home screen after login
+
+    const sampleUser = findSampleUser(identifier)
+
+    if (!sampleUser) {
+      setError('No matching account. Use one of the demo credentials.')
+      return
+    }
+
+    if (sampleUser.password !== password) {
+      setError('Incorrect password for this account.')
+      return
+    }
+
+    const preferredRole =
+      sampleUser.preferredRole ??
+      sampleUser.roles.find((r) => r.lastUsed)?.type ??
+      sampleUser.roles[0]?.type ??
+      'tenant'
+
+    login(
+      {
+        id: sampleUser.id,
+        name: sampleUser.name,
+        email: sampleUser.email,
+        phone: sampleUser.phone,
+        role: preferredRole,
+        roles: sampleUser.roles.map((r) => r.type),
+      isVerified: true,
+      },
+      `${sampleUser.id}-token`
+    )
+
+    const resolvedRoles: UserRole[] = sampleUser.roles.length
+      ? sampleUser.roles
+      : [
+          {
+            type: preferredRole,
+            priority: 'primary',
+            lastUsed: true,
+          },
+        ]
+
+    setRoles(resolvedRoles)
+
+    if (resolvedRoles.length === 1) {
+      const active = resolvedRoles[0].type
+      setActiveRole(active)
+      const roleToRoute: Record<RoleType, string> = {
+        tenant: ROUTES.HOME,
+        landlord: ROUTES.LANDLORD_PROPERTIES,
+        service_provider: ROUTES.MY_SERVICES,
+        artisan: ROUTES.MY_SERVICES,
+        property_manager: ROUTES.HOME,
+        admin: ROUTES.HOME,
+        handyman: ROUTES.HANDYMAN_DASHBOARD,
+        homerunner: ROUTES.MY_SERVICES,
+      }
+      navigate(roleToRoute[active] ?? ROUTES.HOME)
+    } else {
+      openRoleSwitcher()
     navigate(ROUTES.HOME)
+    }
   }
 
   // Desktop Modal Layout

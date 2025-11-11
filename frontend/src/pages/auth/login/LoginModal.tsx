@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
-import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import type { Location } from 'react-router-dom'
 import {
   Dialog,
   DialogContent,
 } from '@/shared/ui/dialog'
-import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
@@ -19,7 +18,6 @@ interface ModalState {
 }
 
 export function LoginModal() {
-  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const location = useLocation()
   const modalState = (location.state as ModalState | undefined) ?? undefined
@@ -35,8 +33,6 @@ export function LoginModal() {
     }
   }
 
-  const role = searchParams.get('role') || 'tenant'
-  const [userType, setUserType] = useState<'tenant' | 'landlord'>(role as 'tenant' | 'landlord')
   const [inputValue, setInputValue] = useState('')
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone' | null>(null)
   const [error, setError] = useState('')
@@ -91,11 +87,11 @@ export function LoginModal() {
     if (!validateInput()) return
 
     if (loginMethod === 'email') {
-      navigate(`${ROUTES.LOGIN_PASSWORD}?email=${encodeURIComponent(inputValue)}&role=${userType}`, {
+      navigate(`${ROUTES.LOGIN_PASSWORD}?email=${encodeURIComponent(inputValue)}`, {
         state: preserveState,
       })
     } else if (loginMethod === 'phone') {
-      navigate(`${ROUTES.LOGIN_PASSWORD}?phone=${encodeURIComponent(inputValue)}&role=${userType}`, {
+      navigate(`${ROUTES.LOGIN_PASSWORD}?phone=${encodeURIComponent(inputValue)}`, {
         state: preserveState,
       })
     }
@@ -126,29 +122,6 @@ export function LoginModal() {
             <h1 className="text-2xl font-bold text-foreground text-center">
               Login to your Account
             </h1>
-
-            {/* User Type Selection */}
-            <div className="space-y-3">
-              <Label className="text-sm font-semibold text-foreground">Select User Type</Label>
-              <RadioGroup
-                value={userType}
-                onValueChange={(value) => setUserType(value as 'tenant' | 'landlord')}
-                className="flex gap-4"
-              >
-                <div className="flex items-center space-x-2 flex-1">
-                  <RadioGroupItem value="tenant" id="modal-login-tenant" />
-                  <Label htmlFor="modal-login-tenant" className="font-normal cursor-pointer">
-                    Tenant
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 flex-1">
-                  <RadioGroupItem value="landlord" id="modal-login-landlord" />
-                  <Label htmlFor="modal-login-landlord" className="font-normal cursor-pointer">
-                    Landlord
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
 
             {/* Email/Phone Input */}
             <div className="space-y-2">

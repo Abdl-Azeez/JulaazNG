@@ -19,6 +19,8 @@ enum UserRole {
   PROPERTY_MANAGER
   ADMIN
   SUPER_ADMIN
+  HANDYMAN
+  HOMERUNNER
 }
 
 enum UserStatus {
@@ -30,17 +32,19 @@ enum UserStatus {
 
 // User Model
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  phone     String     @unique
-  password  String
-  firstName String
-  lastName  String
-  role      UserRole
-  status    UserStatus @default(PENDING_VERIFICATION)
+  id            String       @id @default(uuid())
+  email         String       @unique
+  phone         String       @unique
+  password      String
+  firstName     String
+  lastName      String
+  roles         UserRole[]   @default([])
+  preferredRole UserRole?
+  status        UserStatus   @default(PENDING_VERIFICATION)
+  lastLoginAt   DateTime?
   
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   @@map("users")
 }
