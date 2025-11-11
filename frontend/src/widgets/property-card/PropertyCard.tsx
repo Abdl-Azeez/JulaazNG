@@ -4,10 +4,15 @@ import { Card } from '@/shared/ui/card'
 import { Button } from '@/shared/ui/button'
 import type { PropertyCardProps } from '@/entities/property/model/types'
 import HouseIcon from '@/assets/icons/house.svg?react'
+import { useRoleStore } from '@/shared/store/role.store'
 
 export function PropertyCard({ property, onRequestViewing, onShare, onSelect, layout = 'grid' }: PropertyCardProps) {
   const images = property.images || [property.image]
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const { activeRole } = useRoleStore()
+  const isLandlordView = activeRole === 'landlord'
+  const isHandymanView = activeRole === 'handyman'
+  const canRequestViewing = !activeRole || activeRole === 'tenant'
   
   const formatPrice = (price: number) => {
     if (!price) return '₦0'
@@ -234,38 +239,62 @@ export function PropertyCard({ property, onRequestViewing, onShare, onSelect, la
           </>
         )}
         
-        <div className={`
-          flex items-center pt-1
-          ${isRowLayout ? 'justify-start gap-3' : 'justify-between gap-2'}
-        `}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`
-              bg-icon-bg text-foreground hover:bg-primary/10 hover:text-primary shrink-0 rounded-[10px] transition-colors
-              ${isRowLayout ? 'h-10 w-10' : 'h-9 w-9'}
-            `}
-            onClick={(event) => {
-              event.stopPropagation()
-              onShare?.(property.id)
-            }}
-            aria-label="Share property"
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={(event) => {
-              event.stopPropagation()
-              onRequestViewing?.(property.id)
-            }}
-            className={`
-              rounded-[10px] flex-1
-              ${isRowLayout ? 'h-10 px-8 text-sm' : 'h-9 px-2 text-xs'}
-            `}
-            size="sm"
-          >
-            Request Viewing
-          </Button>
+        <div
+          className={`
+            flex items-center pt-1
+            ${isRowLayout ? 'justify-start gap-3' : 'justify-between gap-2'}
+          `}
+        >
+          {canRequestViewing && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`
+                bg-icon-bg text-foreground hover:bg-primary/10 hover:text-primary shrink-0 rounded-[10px] transition-colors
+                ${isRowLayout ? 'h-10 w-10' : 'h-9 w-9'}
+              `}
+              onClick={(event) => {
+                event.stopPropagation()
+                onShare?.(property.id)
+              }}
+              aria-label="Share property"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
+          )}
+
+          {isLandlordView || isHandymanView ? (
+            <Button
+              onClick={(event) => {
+                event.stopPropagation()
+                onSelect?.(property.id)
+              }}
+              className={`
+                rounded-[10px] flex-1
+                ${isRowLayout ? 'h-10 px-8 text-sm' : 'h-9 px-2 text-xs'}
+              `}
+              size="sm"
+              variant="outline"
+              aria-label="View property details"
+            >
+              View Details
+            </Button>
+          ) : (
+            <Button
+              onClick={(event) => {
+                event.stopPropagation()
+                onRequestViewing?.(property.id)
+              }}
+              className={`
+                rounded-[10px] flex-1
+                ${isRowLayout ? 'h-10 px-8 text-sm' : 'h-9 px-2 text-xs'}
+              `}
+              size="sm"
+              aria-label="Request viewing"
+            >
+              Request Viewing
+            </Button>
+          )}
         </div>
       </div>
     </Card>

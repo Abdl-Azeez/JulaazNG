@@ -32,6 +32,7 @@ JulaazNG is a mobile-first web application that serves as Nigeria's premier prop
 - **Themes & Responsiveness:** Six Nigerian-inspired themes (Naija Fresh, Eko Luxe, Arewa Calm, Ụlọ Oma, Rainy 9ja, Ajébo Blend) with improved icon/footer visibility, desktop layouts, hover states, loaders, and tooltips for an elevated experience. All colors use theme variables for flexibility.
 - **Info Pages & Footer:** Eight static content pages (About, Landlord FAQ, Sitemap, Buildings, Terms, Cookies, Disclaimer, Contact) with Framer Motion animations, role-based visibility (Landlord FAQ hidden for non-landlords), active link tracking, and creative Contact Support button with shimmer effects.
 - **Background Check & Verification:** Profile page includes detailed background check form with pre-filled personal info, financial/occupation questions, document upload, and admin verification flow with "verified" badge.
+- **Role-Aware Authentication & Demo Accounts:** Session-aware login flow storing all user roles, intelligent role switching via Role Gateway modal, header role selector, `X-Active-Role` propagation to the backend, and published demo credentials for Tenant, Landlord, and dual-role testers.
 - **Documentation:** Booking management, service management, landlord flows, background check, and shortlet support captured in PRD with updated sections ensuring stakeholder alignment.
 - **Next Milestone:** Backend API development (authentication, property CRUD, booking management, payment processing, messaging, notifications, admin workflows).
 
@@ -308,6 +309,12 @@ Projected Annual Revenue: ₦800,000,000+ (~$1.71M)
   - OTP verification
   - Social login (Google, Facebook)
   - Multi-factor authentication for payments
+  - Multi-role session handling (JWT carries roles array, frontend stores `activeRole`, backend respects `X-Active-Role`)
+  - Role Gateway modal enables seamless role switching without logout, with header entry point
+  - Demo credentials for QA/UAT:
+    - Tenant: `tenant@julaaz.com` / `tenant123`
+    - Landlord: `landlord@julaaz.com` / `landlord123`
+    - Tenant + Landlord: `hybrid@julaaz.com` / `hybrid123`
 
 - **Profile Management**
   - Personal information

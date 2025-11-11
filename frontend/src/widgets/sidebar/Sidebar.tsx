@@ -1,6 +1,7 @@
-import { X, Home, Building2, MessageCircle, Bell, Calendar, User, LogOut, Settings, Heart, FileText, Briefcase, Wrench, Zap, Droplet, Sparkles, Paintbrush, Clock, Receipt, CreditCard } from 'lucide-react'
+import { X, Home, Building2, MessageCircle, Bell, Calendar, User, LogOut, Settings, Heart, FileText, Briefcase, Wrench, Zap, Droplet, Sparkles, Paintbrush, Clock, Receipt, CreditCard, HardHat } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/shared/store/auth.store'
+import { useRoleStore, type RoleType } from '@/shared/store/role.store'
 import { ROUTES } from '@/shared/constants/routes'
 import { cn } from '@/shared/lib/utils/cn'
 import { trackServiceEvent } from '@/shared/lib/analytics/service-analytics'
@@ -16,13 +17,14 @@ interface MenuItem {
   label: string
   path: string
   requiresAuth?: boolean
-  roles?: ('tenant' | 'landlord' | 'artisan')[]
+  roles?: RoleType[]
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated, user } = useAuthStore()
+  const { isAuthenticated } = useAuthStore()
+  const { activeRole } = useRoleStore()
 
   const isActive = (path: string) => {
     if (path === ROUTES.HOME) {
@@ -31,13 +33,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     return location.pathname.startsWith(path)
   }
 
-  const hideTenantFeatures = user?.role === 'landlord' || location.pathname.includes('/landlord')
+  const isHandyman = activeRole === 'handyman'
+
+  const hideTenantFeatures =
+    activeRole === 'landlord' ||
+    isHandyman ||
+    location.pathname.includes('/landlord')
 
   const publicMenuItems: MenuItem[] = [
     { icon: Home, label: 'Home', path: ROUTES.HOME },
-    // Hide tenant 'Properties' menu for landlords
-    ...(!hideTenantFeatures ? [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }] : []),
-    { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
+    ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }]),
+    ...(isHandyman ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
   ]
 
   const authenticatedMenuItems: MenuItem[] = [
@@ -50,20 +56,69 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   ]
 
   const filteredAuthenticatedMenuItems = hideTenantFeatures
-    ? authenticatedMenuItems.filter(
-        (item) => item.path !== ROUTES.MY_BOOKINGS && item.path !== ROUTES.MY_SERVICES
-      )
+    ? authenticatedMenuItems.filter((item) => {
+        if (item.path === ROUTES.MY_BOOKINGS) return false
+        if ((activeRole === 'landlord' || isHandyman) && item.path === ROUTES.MY_SERVICES) return false
+        return true
+      })
     : authenticatedMenuItems
 
   const tenantMenuItems: MenuItem[] = [
-    { icon: Receipt, label: 'Agreements', path: ROUTES.AGREEMENTS, requiresAuth: true, roles: ['tenant'] },
-    { icon: CreditCard, label: 'Payments', path: ROUTES.PAYMENTS, requiresAuth: true, roles: ['tenant'] },
+    {
+      icon: Receipt,
+      label: 'Agreements',
+      path: ROUTES.AGREEMENTS,
+      requiresAuth: true,
+      roles: ['tenant'],
+    },
+    {
+      icon: CreditCard,
+      label: 'Payments',
+      path: ROUTES.PAYMENTS,
+      requiresAuth: true,
+      roles: ['tenant'],
+    },
   ]
 
   const landlordMenuItems: MenuItem[] = [
-    { icon: Building2, label: 'My Properties', path: ROUTES.LANDLORD_PROPERTIES, requiresAuth: true, roles: ['landlord'] },
-    { icon: FileText, label: 'Applications', path: ROUTES.LANDLORD_APPLICATIONS, requiresAuth: true, roles: ['landlord'] },
-    { icon: CreditCard, label: 'Earnings', path: ROUTES.LANDLORD_EARNINGS, requiresAuth: true, roles: ['landlord'] },
+    {
+      icon: Building2,
+      label: 'My Properties',
+      path: ROUTES.LANDLORD_PROPERTIES,
+      requiresAuth: true,
+      roles: ['landlord'],
+    },
+    {
+      icon: FileText,
+      label: 'Applications',
+      path: ROUTES.LANDLORD_APPLICATIONS,
+      requiresAuth: true,
+      roles: ['landlord'],
+    },
+    {
+      icon: CreditCard,
+      label: 'Earnings',
+      path: ROUTES.LANDLORD_EARNINGS,
+      requiresAuth: true,
+      roles: ['landlord'],
+    },
+  ]
+
+  const handymanMenuItems: MenuItem[] = [
+    {
+      icon: HardHat,
+      label: 'Handyman HQ',
+      path: ROUTES.HANDYMAN_DASHBOARD,
+      requiresAuth: true,
+      roles: ['handyman'],
+    },
+    {
+      icon: Briefcase,
+      label: 'Job Board',
+      path: ROUTES.HANDYMAN_JOBS,
+      requiresAuth: true,
+      roles: ['handyman'],
+    },
   ]
 
   const bottomMenuItems: MenuItem[] = [
@@ -134,14 +189,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const shouldShowItem = (item: MenuItem) => {
     if (item.requiresAuth && !isAuthenticated) return false
-    if (item.roles && user?.role && !item.roles.includes(user.role as any)) return false
+    if (item.roles && activeRole && !item.roles.includes(activeRole)) return false
     return true
   }
 
   return (
     <>
       {/* Backdrop */}
-      <div
+      <button
+        type="button"
         className={cn(
           'fixed inset-0 bg-foreground/40 backdrop-blur-sm z-40 transition-opacity duration-300',
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -150,8 +206,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         onKeyDown={(e) => {
           if (e.key === 'Escape') onClose()
         }}
-        role="button"
-        tabIndex={0}
         aria-label="Close sidebar"
       />
 
@@ -199,6 +253,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Quick Services Chips */}
+          {!isHandyman && (
           <div className="sidebar__section">
             <h3 className="sidebar__section-title">Quick Services</h3>
             <div className="grid grid-cols-2 gap-2 px-2">
@@ -230,6 +285,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               ))}
             </div>
           </div>
+          )}
 
           {/* Authenticated Items */}
           {isAuthenticated && (
@@ -253,7 +309,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </div>
 
               {/* Role-specific Items */}
-              {user?.role === 'tenant' && tenantMenuItems.some(shouldShowItem) && (
+              {activeRole === 'tenant' && tenantMenuItems.some(shouldShowItem) && (
                 <div className="sidebar__section">
                   <h3 className="sidebar__section-title">Tenant</h3>
                   {tenantMenuItems.filter(shouldShowItem).map((item) => {
@@ -273,7 +329,27 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
               )}
 
-              {user?.role === 'landlord' && landlordMenuItems.some(shouldShowItem) && (
+              {isHandyman && handymanMenuItems.some(shouldShowItem) && (
+                <div className="sidebar__section">
+                  <h3 className="sidebar__section-title">Handyman</h3>
+                  {handymanMenuItems.filter(shouldShowItem).map((item) => {
+                    const active = isActive(item.path)
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigation(item.path)}
+                        className={cn('sidebar__item', active && 'sidebar__item--active')}
+                      >
+                        <item.icon className="sidebar__item-icon" />
+                        <span className="sidebar__item-label">{item.label}</span>
+                        <div className="sidebar__item-shine" />
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {activeRole === 'landlord' && landlordMenuItems.some(shouldShowItem) && (
                 <div className="sidebar__section">
                   <h3 className="sidebar__section-title">Landlord</h3>
                   {landlordMenuItems.filter(shouldShowItem).map((item) => {

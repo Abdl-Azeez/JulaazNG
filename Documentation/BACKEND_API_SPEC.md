@@ -43,7 +43,8 @@
   password: string (hashed)
   dateOfBirth: Date
   gender: enum ['male', 'female', 'other']
-  role: enum ['tenant', 'landlord', 'admin', 'service_provider', 'artisan']
+  roles: enum[] ['tenant', 'landlord', 'admin', 'service_provider', 'artisan', 'property_manager', 'handyman', 'homerunner']
+  preferredRole: enum ['tenant', 'landlord', 'admin', 'service_provider', 'artisan', 'property_manager', 'handyman', 'homerunner']
   profilePicture: string (URL)
   isEmailVerified: boolean (default: false)
   isPhoneVerified: boolean (default: false)
@@ -55,6 +56,8 @@
   lastLoginAt: DateTime
 }
 ```
+
+> **Active Role Context:** Every authenticated request must include `X-Active-Role` header with one of the user's assigned roles. The backend validates that the header value exists in `roles` before authorizing the request, ensuring multi-role users can switch contexts without re-authentication.
 
 #### **Properties**
 ```typescript

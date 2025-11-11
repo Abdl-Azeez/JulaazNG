@@ -4,12 +4,19 @@ import type { Location } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { SplashScreen } from '@/widgets/splash-screen'
+import { RoleGuard } from '@/common/guards/RoleGuard'
 import { HomePage } from '@/pages/home'
 import { PropertiesPage } from '@/pages/properties'
 import { PropertyDetailsPage, PropertyViewingPage } from '@/pages/property-details'
 import { ProfilePage } from '@/pages/profile'
 import { SettingsPage } from '@/pages/settings'
-import { ServicesPage } from '@/pages/services'
+import { ServicesPage, ServiceJourneyPage } from '@/pages/services'
+import {
+  HandymanDashboardPage,
+  HandymanJobsPage,
+  UpcomingRotaPage,
+  ViewAllAssignmentsPage,
+} from '@/pages/handyman'
 import { LoginPage } from '@/pages/auth/login'
 import { PasswordPage } from '@/pages/auth/password'
 import { SignupPage } from '@/pages/auth/signup'
@@ -38,6 +45,7 @@ import { LoginModal } from '@/pages/auth/login/LoginModal'
 import { SignupModal } from '@/pages/auth/signup/SignupModal'
 import { PasswordModal } from '@/pages/auth/password/PasswordModal'
 import { VerifyOtpModal } from '@/pages/auth/verify-otp/VerifyOtpModal'
+import { RoleGateway } from '@/widgets/role-gateway/RoleGateway'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -84,9 +92,30 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
     <>
       <Routes location={routesLocation}>
         <Route path={ROUTES.HOME} element={<HomePage />} />
-        <Route path={ROUTES.PROPERTIES} element={<PropertiesPage />} />
-        <Route path="/properties/:id" element={<PropertyDetailsPage />} />
-        <Route path="/properties/:id/booking" element={<PropertyViewingPage />} />
+        <Route
+          path={ROUTES.PROPERTIES}
+          element={
+            <RoleGuard disallowedRoles={['landlord']} allowUnauthenticated redirectTo={ROUTES.HOME}>
+              <PropertiesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/properties/:id"
+          element={
+            <RoleGuard allowUnauthenticated redirectTo={ROUTES.HOME}>
+              <PropertyDetailsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/properties/:id/booking"
+          element={
+            <RoleGuard allowedRoles={['tenant']} redirectTo={ROUTES.HOME}>
+              <PropertyViewingPage />
+            </RoleGuard>
+          }
+        />
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.LOGIN_PASSWORD} element={<PasswordPage />} />
         <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
@@ -94,22 +123,139 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
         <Route path={ROUTES.SERVICES} element={<ServicesPage />} />
+        <Route path={ROUTES.SERVICE_JOURNEY(':journeySlug')} element={<ServiceJourneyPage />} />
         <Route path={ROUTES.MESSAGING} element={<MessagingPage />} />
         <Route path="/messaging/:conversationId" element={<MessagingPage />} />
         <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
         <Route path={ROUTES.EVENTS} element={<EventsPage />} />
-        <Route path={ROUTES.FAVOURITES} element={<FavouritesPage />} />
-        <Route path={ROUTES.MY_BOOKINGS} element={<MyBookingsPage />} />
-        <Route path={ROUTES.MY_SERVICES} element={<MyServicesPage />} />
-        <Route path={ROUTES.AGREEMENTS} element={<AgreementsPage />} />
-        <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
-        <Route path={ROUTES.LANDLORD_PROPERTIES} element={<LandlordPropertiesPage />} />
-        <Route path={ROUTES.LANDLORD_PROPERTY_CREATE} element={<LandlordPropertyCreatePage />} />
-        <Route path="/landlord/properties/:id" element={<LandlordPropertyDetailsPage />} />
-        <Route path={ROUTES.LANDLORD_APPLICATIONS} element={<LandlordApplicationsPage />} />
-        <Route path={ROUTES.LANDLORD_EARNINGS} element={<LandlordEarningsPage />} />
-        <Route path="/landlord/properties/:id/insights" element={<LandlordPropertyInsightsPage />} />
-        <Route path="/landlord/properties/:id/manage" element={<LandlordPropertyManagePage />} />
+        <Route
+          path={ROUTES.FAVOURITES}
+          element={
+            <RoleGuard allowedRoles={['tenant', 'landlord']} redirectTo={ROUTES.HOME}>
+              <FavouritesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.MY_BOOKINGS}
+          element={
+            <RoleGuard allowedRoles={['tenant']} redirectTo={ROUTES.HOME}>
+              <MyBookingsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.MY_SERVICES}
+          element={
+            <RoleGuard allowedRoles={['tenant', 'landlord']} redirectTo={ROUTES.HOME}>
+              <MyServicesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HOME}>
+              <HandymanDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_JOBS}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HANDYMAN_DASHBOARD}>
+              <HandymanJobsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_UPCOMING_ROTA}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HANDYMAN_DASHBOARD}>
+              <UpcomingRotaPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HANDYMAN_ASSIGNMENTS}
+          element={
+            <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HANDYMAN_DASHBOARD}>
+              <ViewAllAssignmentsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.AGREEMENTS}
+          element={
+            <RoleGuard allowedRoles={['tenant']} redirectTo={ROUTES.HOME}>
+              <AgreementsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.PAYMENTS}
+          element={
+            <RoleGuard allowedRoles={['tenant']} redirectTo={ROUTES.HOME}>
+              <PaymentsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.LANDLORD_PROPERTIES}
+          element={
+            <RoleGuard allowedRoles={['landlord']} redirectTo={ROUTES.HOME}>
+              <LandlordPropertiesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.LANDLORD_PROPERTY_CREATE}
+          element={
+            <RoleGuard allowedRoles={['landlord']} redirectTo={ROUTES.HOME}>
+              <LandlordPropertyCreatePage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/landlord/properties/:id"
+          element={
+            <RoleGuard allowedRoles={['landlord']} redirectTo={ROUTES.HOME}>
+              <LandlordPropertyDetailsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.LANDLORD_APPLICATIONS}
+          element={
+            <RoleGuard allowedRoles={['landlord']} redirectTo={ROUTES.HOME}>
+              <LandlordApplicationsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.LANDLORD_EARNINGS}
+          element={
+            <RoleGuard allowedRoles={['landlord']} redirectTo={ROUTES.HOME}>
+              <LandlordEarningsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/landlord/properties/:id/insights"
+          element={
+            <RoleGuard allowedRoles={['landlord']} redirectTo={ROUTES.HOME}>
+              <LandlordPropertyInsightsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/landlord/properties/:id/manage"
+          element={
+            <RoleGuard allowedRoles={['landlord']} redirectTo={ROUTES.HOME}>
+              <LandlordPropertyManagePage />
+            </RoleGuard>
+          }
+        />
         <Route path={ROUTES.ABOUT} element={<AboutPage />} />
         <Route path={ROUTES.LANDLORD_FAQ} element={<LandlordFaqPage />} />
         <Route path={ROUTES.SITEMAP} element={<SitemapPage />} />
@@ -187,6 +333,7 @@ function App() {
       <BrowserRouter>
         <ScrollToTop />
         <AppRoutes showSplash={showSplash} isMobile={isMobile} onSplashComplete={handleSplashComplete} />
+        <RoleGateway />
         <Toaster
           position="top-right"
           toastOptions={{

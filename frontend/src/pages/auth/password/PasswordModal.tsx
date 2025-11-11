@@ -11,6 +11,8 @@ import { Label } from '@/shared/ui/label'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
+import { useRoleStore, type RoleType, type UserRole } from '@/shared/store/role.store'
+import { findSampleUser } from '@/shared/data/sample-users'
 
 interface ModalState {
   backgroundLocation?: Location
@@ -37,9 +39,9 @@ export function PasswordModal() {
 
   const phone = searchParams.get('phone') || ''
   const email = searchParams.get('email') || ''
-  const role = searchParams.get('role') || 'tenant'
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const { setRoles, setActiveRole, openRoleSwitcher } = useRoleStore()
 
   const validatePassword = () => {
     if (!password.trim()) {
@@ -56,22 +58,86 @@ export function PasswordModal() {
   const handleContinue = () => {
     if (!validatePassword()) return
 
-    const mockUser = {
-      id: '1',
-      name: 'Abdulraheem Abdulsalam',
-      email: email || undefined,
-      phone: phone || undefined,
-      role: role as 'tenant' | 'landlord',
-      isVerified: true,
+    const identifier = email || phone
+    if (!identifier) {
+      setError('No email or phone provided')
+      return
     }
-    login(mockUser, 'mock-token')
 
+    const sampleUser = findSampleUser(identifier)
+
+    if (!sampleUser) {
+      setError('No matching account. Use one of the demo credentials.')
+      return
+    }
+
+    if (sampleUser.password !== password) {
+      setError('Incorrect password for this account.')
+      return
+    }
+
+    const preferredRole =
+      sampleUser.preferredRole ??
+      sampleUser.roles.find((r) => r.lastUsed)?.type ??
+      sampleUser.roles[0]?.type ??
+      'tenant'
+
+    login(
+      {
+        id: sampleUser.id,
+        name: sampleUser.name,
+        email: sampleUser.email,
+        phone: sampleUser.phone,
+        role: preferredRole,
+        roles: sampleUser.roles.map((r) => r.type),
+        isVerified: true,
+      },
+      `${sampleUser.id}-token`
+    )
+
+    const resolvedRoles: UserRole[] = sampleUser.roles.length
+      ? sampleUser.roles
+      : [
+          {
+            type: preferredRole,
+            priority: 'primary',
+            lastUsed: true,
+          },
+        ]
+
+    setRoles(resolvedRoles)
+
+    if (resolvedRoles.length === 1) {
+      const active = resolvedRoles[0].type
+      setActiveRole(active)
+      const roleToRoute: Record<RoleType, string> = {
+        tenant: ROUTES.HOME,
+        landlord: ROUTES.LANDLORD_PROPERTIES,
+        service_provider: ROUTES.MY_SERVICES,
+        artisan: ROUTES.MY_SERVICES,
+        property_manager: ROUTES.HOME,
+        admin: ROUTES.HOME,
+        handyman: ROUTES.MY_SERVICES,
+        homerunner: ROUTES.MY_SERVICES,
+    }
+      const targetRoute = roleToRoute[active] ?? ROUTES.HOME
+      
+      if (backgroundLocation) {
+        navigate(backgroundLocation.pathname + backgroundLocation.search + backgroundLocation.hash, {
+          replace: true,
+        })
+      } else {
+        navigate(targetRoute)
+      }
+    } else {
+      openRoleSwitcher()
     if (backgroundLocation) {
       navigate(backgroundLocation.pathname + backgroundLocation.search + backgroundLocation.hash, {
         replace: true,
       })
     } else {
       navigate(ROUTES.HOME)
+      }
     }
   }
 

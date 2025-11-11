@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Heart, Grid3x3, List, Search, MapPin, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -12,6 +12,7 @@ import { LogoLoader } from '@/widgets/logo-loader'
 import { sampleFavourites } from './data/sample-favourites'
 import { Favourite } from '@/shared/types/activity.types'
 import { useAuthStore } from '@/shared/store/auth.store'
+import { useRoleStore } from '@/shared/store/role.store'
 import { ROUTES } from '@/shared/constants/routes'
 import { Card, CardContent } from '@/shared/ui/card'
 import { cn } from '@/shared/lib/utils'
@@ -22,6 +23,7 @@ type FilterType = 'all' | 'property' | 'service' | 'provider'
 export function FavouritesPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuthStore()
+  const { activeRole } = useRoleStore()
   const [favourites, setFavourites] = useState(sampleFavourites)
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [filter, setFilter] = useState<FilterType>('all')
@@ -30,8 +32,15 @@ export function FavouritesPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const filteredFavourites = favourites.filter(fav => {
-    const matchesFilter = filter === 'all' || fav.type === filter
+  const visibleFavourites = favourites.filter((fav) =>
+    activeRole === 'landlord' ? fav.type !== 'property' : true
+  )
+
+  const effectiveFilter =
+    activeRole === 'landlord' && filter === 'property' ? 'all' : filter
+
+  const filteredFavourites = visibleFavourites.filter((fav) => {
+    const matchesFilter = effectiveFilter === 'all' || fav.type === effectiveFilter
     const matchesSearch = fav.item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       fav.item.description?.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesFilter && matchesSearch
@@ -70,13 +79,33 @@ export function FavouritesPage() {
   }
 
   // Calculate counts from original favourites array, not filtered
-  const favouritesByType = favourites.reduce((acc, fav) => {
+  const favouritesByType = visibleFavourites.reduce((acc, fav) => {
     if (!acc[fav.type]) {
       acc[fav.type] = []
     }
     acc[fav.type].push(fav)
     return acc
   }, {} as Record<string, Favourite[]>)
+
+  const availableFilters: { label: string; value: FilterType }[] =
+    activeRole === 'landlord'
+      ? [
+          { label: 'All', value: 'all' },
+          { label: 'Services', value: 'service' },
+          { label: 'Providers', value: 'provider' },
+        ]
+      : [
+          { label: 'All', value: 'all' },
+          { label: 'Properties', value: 'property' },
+          { label: 'Services', value: 'service' },
+          { label: 'Providers', value: 'provider' },
+        ]
+
+  useEffect(() => {
+    if (activeRole === 'landlord' && filter === 'property') {
+      setFilter('all')
+    }
+  }, [activeRole, filter])
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -88,7 +117,9 @@ export function FavouritesPage() {
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <div>
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">Favourites</h1>
-              <p className="text-xs md:text-sm text-muted-foreground mt-1">{favourites.length} saved items</p>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1">
+                {visibleFavourites.length} saved items
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -123,50 +154,24 @@ export function FavouritesPage() {
 
           {/* Filter Tabs */}
           <div className="flex gap-2 lg:gap-3 overflow-x-auto pb-2">
+            {availableFilters.map(({ label, value }) => (
             <Button
-              variant={filter === 'all' ? 'default' : 'ghost'}
+                key={value}
+                variant={effectiveFilter === value ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => setFilter('all')}
+                onClick={() => setFilter(value)}
               className={cn(
-                "rounded-full shrink-0 lg:px-6 transition-colors",
-                filter !== 'all' && 'text-foreground border border-border hover:border-primary/50 hover:text-primary hover:bg-primary/10'
+                  'rounded-full shrink-0 lg:px-6 transition-colors',
+                  effectiveFilter !== value &&
+                    'text-foreground border border-border hover:border-primary/50 hover:text-primary hover:bg-primary/10'
               )}
             >
-              All ({favourites.length})
+                {label}{' '}
+                {value === 'all'
+                  ? `(${visibleFavourites.length})`
+                  : `(${favouritesByType[value]?.length || 0})`}
             </Button>
-            <Button
-              variant={filter === 'property' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setFilter('property')}
-              className={cn(
-                "rounded-full shrink-0 lg:px-6 transition-colors",
-                filter !== 'property' && 'text-foreground border border-border hover:border-primary/50 hover:text-primary hover:bg-primary/10'
-              )}
-            >
-              Properties ({favouritesByType.property?.length || 0})
-            </Button>
-            <Button
-              variant={filter === 'service' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setFilter('service')}
-              className={cn(
-                "rounded-full shrink-0 lg:px-6 transition-colors",
-                filter !== 'service' && 'text-foreground border border-border hover:border-primary/50 hover:text-primary hover:bg-primary/10'
-              )}
-            >
-              Services ({favouritesByType.service?.length || 0})
-            </Button>
-            <Button
-              variant={filter === 'provider' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setFilter('provider')}
-              className={cn(
-                "rounded-full shrink-0 lg:px-6 transition-colors",
-                filter !== 'provider' && 'text-foreground border border-border hover:border-primary/50 hover:text-primary hover:bg-primary/10'
-              )}
-            >
-              Providers ({favouritesByType.provider?.length || 0})
-            </Button>
+            ))}
           </div>
         </div>
       </header>
