@@ -5,10 +5,11 @@ import { Footer } from '@/widgets/footer'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
-import { Calendar, ChevronLeft, ChevronRight, MapPin, Phone, Clock, User } from 'lucide-react'
+import { Calendar, ChevronLeft, ChevronRight, MapPin, Phone, Clock, User, ArrowLeft } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
+import { JobSheetDrawer } from '../components'
 
 const rotaData = [
   {
@@ -88,8 +89,8 @@ export function UpcomingRotaPage() {
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [currentWeek, setCurrentWeek] = useState(0)
-
-console.log('currentWeek', currentWeek)
+  const [isJobSheetOpen, setIsJobSheetOpen] = useState(false)
+  const [selectedJobId, setSelectedJobId] = useState<string | undefined>()
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -99,10 +100,20 @@ console.log('currentWeek', currentWeek)
         <section className="border-b border-border/60 bg-gradient-to-br from-primary/5 via-background to-background">
           <div className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 py-10 lg:py-14">
             <div className="flex flex-wrap items-center justify-between gap-6">
-              <div className="space-y-3">
-                <Badge className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
-                  Upcoming Rota
-                </Badge>
+              <div className="space-y-3 flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-xl -ml-2"
+                    onClick={() => navigate(ROUTES.HANDYMAN_DASHBOARD)}
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <Badge className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
+                    Upcoming Rota
+                  </Badge>
+                </div>
                 <h1 className="text-3xl lg:text-4xl font-bold text-foreground">Your Schedule</h1>
                 <p className="text-muted-foreground max-w-2xl">
                   View and manage your upcoming assignments. Confirm attendance and update your availability.
@@ -190,7 +201,15 @@ console.log('currentWeek', currentWeek)
                       </div>
                     </div>
                     <div className="flex flex-col lg:items-end gap-2">
-                      <Button className="rounded-xl h-10 px-4 text-sm">View Details</Button>
+                      <Button 
+                        className="rounded-xl h-10 px-4 text-sm"
+                        onClick={() => {
+                          setSelectedJobId(job.id)
+                          setIsJobSheetOpen(true)
+                        }}
+                      >
+                        View Details
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -202,6 +221,11 @@ console.log('currentWeek', currentWeek)
 
       <Footer />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <JobSheetDrawer 
+        open={isJobSheetOpen} 
+        onOpenChange={setIsJobSheetOpen}
+        jobId={selectedJobId}
+      />
     </div>
   )
 }

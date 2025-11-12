@@ -7,7 +7,7 @@ import { cn } from '@/shared/lib/utils/cn'
 import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore, type RoleType } from '@/shared/store/role.store'
-import { Home, Building2, Wrench, ShieldCheck } from 'lucide-react'
+import { Home, Building2, Wrench, ShieldCheck, Sparkles, Hammer } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 type RoleMeta = {
@@ -30,18 +30,6 @@ const roleCatalog: Record<RoleType, RoleMeta> = {
     icon: Building2,
     to: ROUTES.LANDLORD_PROPERTIES,
   },
-  service_provider: {
-    label: 'Service Provider',
-    description: 'Manage service bookings and offers',
-    icon: Wrench,
-    to: ROUTES.MY_SERVICES,
-  },
-  artisan: {
-    label: 'Artisan',
-    description: 'Get matched and deliver artisan jobs',
-    icon: Wrench,
-    to: ROUTES.MY_SERVICES,
-  },
   property_manager: {
     label: 'Property Manager',
     description: 'Manage properties on behalf of landlords',
@@ -56,9 +44,21 @@ const roleCatalog: Record<RoleType, RoleMeta> = {
   },
   handyman: {
     label: 'Handyman',
-    description: 'Accept and complete handyman requests',
+    description: 'Complete maintenance and repair jobs',
+    icon: Hammer,
+    to: ROUTES.HANDYMAN_DASHBOARD,
+  },
+  service_provider: {
+    label: 'Service Provider',
+    description: 'Offer cleaning, moving, and concierge services',
+    icon: Sparkles,
+    to: ROUTES.HANDYMAN_DASHBOARD,
+  },
+  artisan: {
+    label: 'Artisan',
+    description: 'Skilled trades: electrical, plumbing, carpentry',
     icon: Wrench,
-    to: ROUTES.MY_SERVICES,
+    to: ROUTES.HANDYMAN_DASHBOARD,
   },
   homerunner: {
     label: 'Homerunner',

@@ -78,16 +78,44 @@ export function EventsPage() {
   }
 
   const handleEventClick = (event: Event) => {
-    // Navigate to appropriate page based on event type
-    if (event.type === 'viewing' && event.relatedTo?.type === 'property') {
-      // Navigate to My Bookings page (property bookings)
-      navigate(ROUTES.MY_BOOKINGS)
-    } else if (event.type === 'service' && event.relatedTo?.type === 'service') {
-      // Navigate to My Services page
-      navigate(ROUTES.MY_SERVICES)
-    } else if (event.type === 'payment') {
-      // Navigate to Payments page
-      navigate(ROUTES.PAYMENTS)
+    // Navigate to appropriate page based on event type and related data
+    switch (event.type) {
+      case 'viewing':
+        if (event.relatedTo?.type === 'property' && event.relatedTo?.id) {
+          // Navigate to property details if we have the property ID
+          navigate(ROUTES.PROPERTY_DETAILS(event.relatedTo.id))
+        } else {
+          // Fallback to My Bookings page
+          navigate(ROUTES.MY_BOOKINGS)
+        }
+        break
+      case 'service':
+        if (event.relatedTo?.type === 'service') {
+          navigate(ROUTES.MY_SERVICES)
+        } else {
+          navigate(ROUTES.MY_SERVICES)
+        }
+        break
+      case 'payment':
+        // Navigate to Payments page or My Bookings for payment-related events
+        if (event.relatedTo?.type === 'booking' && event.relatedTo?.id) {
+          navigate(ROUTES.MY_BOOKINGS)
+        } else {
+          navigate(ROUTES.PAYMENTS || ROUTES.MY_BOOKINGS)
+        }
+        break
+      case 'maintenance':
+        // Navigate to property details or My Services
+        if (event.relatedTo?.type === 'property' && event.relatedTo?.id) {
+          navigate(ROUTES.PROPERTY_DETAILS(event.relatedTo.id))
+        } else {
+          navigate(ROUTES.MY_SERVICES)
+        }
+        break
+      default:
+        // Default navigation - could go to events detail page or home
+        navigate(ROUTES.HOME)
+        break
     }
   }
 

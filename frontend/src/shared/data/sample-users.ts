@@ -76,6 +76,26 @@ export const sampleUsers: SampleUser[] = [
     ],
     preferredRole: 'handyman',
   },
+  {
+    id: 'tenant-handyman-001',
+    name: 'Emeka Okoro',
+    email: 'tenant-handyman@julaaz.com',
+    phone: '08010000005',
+    password: 'tenant-handyman123',
+    roles: [
+      {
+        type: 'tenant',
+        priority: 'primary',
+        lastUsed: true,
+      },
+      {
+        type: 'handyman',
+        priority: 'secondary',
+        lastUsed: false,
+      },
+    ],
+    preferredRole: 'tenant',
+  },
 ]
 
 export const findSampleUser = (identifier: string) => {

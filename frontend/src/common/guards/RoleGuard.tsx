@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRoleStore, type RoleType } from '@/shared/store/role.store'
 import { ROUTES } from '@/shared/constants/routes'
-import toast from 'react-hot-toast'
 
 interface RoleGuardProps {
   readonly children: React.ReactNode
@@ -10,6 +9,18 @@ interface RoleGuardProps {
   readonly disallowedRoles?: RoleType[]
   readonly redirectTo?: string
   readonly allowUnauthenticated?: boolean
+}
+
+// Map roles to their default dashboard routes
+const roleToDashboard: Record<RoleType, string> = {
+  tenant: ROUTES.HOME,
+  landlord: ROUTES.LANDLORD_PROPERTIES,
+  service_provider: ROUTES.HANDYMAN_DASHBOARD,
+  artisan: ROUTES.HANDYMAN_DASHBOARD,
+  property_manager: ROUTES.HOME,
+  admin: ROUTES.HOME,
+  handyman: ROUTES.HANDYMAN_DASHBOARD,
+  homerunner: ROUTES.HOME,
 }
 
 export function RoleGuard({
@@ -27,9 +38,10 @@ export function RoleGuard({
     (allowedRoles && activeRole && !allowedRoles.includes(activeRole))
 
   useEffect(() => {
-    if (isBlocked) {
-      toast.error(`This page is not accessible in ${activeRole} mode`)
-      navigate(redirectTo ?? ROUTES.HOME, { replace: true })
+    if (isBlocked && activeRole) {
+      // Use custom redirectTo if provided, otherwise use role-specific dashboard
+      const targetRoute = redirectTo ?? roleToDashboard[activeRole] ?? ROUTES.HOME
+      navigate(targetRoute, { replace: true })
     }
   }, [activeRole, disallowedRoles, allowedRoles, isBlocked, navigate, redirectTo])
 

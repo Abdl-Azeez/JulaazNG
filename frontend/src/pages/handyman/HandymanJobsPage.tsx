@@ -25,6 +25,9 @@ import {
   ClaimJobDrawer,
   PlaybookDrawer,
 } from './components'
+import { ResponsiveDrawer } from './components/ResponsiveDrawer'
+import { Label } from '@/shared/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 
 const jobCategories = [
   { id: 'all', label: 'All jobs' },
@@ -75,7 +78,14 @@ export function HandymanJobsPage() {
   const [isJobBriefOpen, setIsJobBriefOpen] = useState(false)
   const [isClaimJobOpen, setIsClaimJobOpen] = useState(false)
   const [isPlaybookOpen, setIsPlaybookOpen] = useState(false)
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false)
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>()
+  const [advancedFilters, setAdvancedFilters] = useState({
+    payoutRange: 'all',
+    distance: 'all',
+    urgency: 'all',
+    dateRange: 'all',
+  })
 
   const handleProfileClick = () => {
     navigate(ROUTES.PROFILE)
@@ -144,7 +154,11 @@ export function HandymanJobsPage() {
                 />
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               </div>
-              <Button variant="outline" className="rounded-xl h-11 px-4 flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="rounded-xl h-11 px-4 flex items-center gap-2"
+                onClick={() => setIsAdvancedFiltersOpen(true)}
+              >
                 <Filter className="h-4 w-4" />
                 Advanced filters
               </Button>
@@ -282,6 +296,129 @@ export function HandymanJobsPage() {
         jobId={selectedJobId}
       />
       <PlaybookDrawer open={isPlaybookOpen} onOpenChange={setIsPlaybookOpen} />
+      <ResponsiveDrawer
+        open={isAdvancedFiltersOpen}
+        onOpenChange={setIsAdvancedFiltersOpen}
+        title="Advanced Filters"
+        side="bottom"
+      >
+        <div className="space-y-6 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="payout-range" className="text-sm font-semibold">
+              Payout Range
+            </Label>
+            <Select
+              value={advancedFilters.payoutRange}
+              onValueChange={(value) =>
+                setAdvancedFilters((prev) => ({ ...prev, payoutRange: value }))
+              }
+            >
+              <SelectTrigger id="payout-range" className="rounded-xl h-11">
+                <SelectValue placeholder="Select payout range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All ranges</SelectItem>
+                <SelectItem value="0-50000">₦0 - ₦50,000</SelectItem>
+                <SelectItem value="50000-100000">₦50,000 - ₦100,000</SelectItem>
+                <SelectItem value="100000-200000">₦100,000 - ₦200,000</SelectItem>
+                <SelectItem value="200000+">₦200,000+</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="distance" className="text-sm font-semibold">
+              Distance
+            </Label>
+            <Select
+              value={advancedFilters.distance}
+              onValueChange={(value) =>
+                setAdvancedFilters((prev) => ({ ...prev, distance: value }))
+              }
+            >
+              <SelectTrigger id="distance" className="rounded-xl h-11">
+                <SelectValue placeholder="Select distance" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any distance</SelectItem>
+                <SelectItem value="0-5">Within 5 km</SelectItem>
+                <SelectItem value="5-10">5 - 10 km</SelectItem>
+                <SelectItem value="10-20">10 - 20 km</SelectItem>
+                <SelectItem value="20+">20+ km</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="urgency" className="text-sm font-semibold">
+              Urgency Level
+            </Label>
+            <Select
+              value={advancedFilters.urgency}
+              onValueChange={(value) =>
+                setAdvancedFilters((prev) => ({ ...prev, urgency: value }))
+              }
+            >
+              <SelectTrigger id="urgency" className="rounded-xl h-11">
+                <SelectValue placeholder="Select urgency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All urgency levels</SelectItem>
+                <SelectItem value="emergency">Emergency only</SelectItem>
+                <SelectItem value="urgent">Urgent</SelectItem>
+                <SelectItem value="normal">Normal</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="date-range" className="text-sm font-semibold">
+              Date Range
+            </Label>
+            <Select
+              value={advancedFilters.dateRange}
+              onValueChange={(value) =>
+                setAdvancedFilters((prev) => ({ ...prev, dateRange: value }))
+              }
+            >
+              <SelectTrigger id="date-range" className="rounded-xl h-11">
+                <SelectValue placeholder="Select date range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any date</SelectItem>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="tomorrow">Tomorrow</SelectItem>
+                <SelectItem value="this-week">This week</SelectItem>
+                <SelectItem value="next-week">Next week</SelectItem>
+                <SelectItem value="this-month">This month</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t border-border/60">
+            <Button
+              variant="outline"
+              className="flex-1 rounded-xl h-11"
+              onClick={() => {
+                setAdvancedFilters({
+                  payoutRange: 'all',
+                  distance: 'all',
+                  urgency: 'all',
+                  dateRange: 'all',
+                })
+              }}
+            >
+              Reset
+            </Button>
+            <Button
+              className="flex-1 rounded-xl h-11"
+              onClick={() => setIsAdvancedFiltersOpen(false)}
+            >
+              Apply Filters
+            </Button>
+          </div>
+        </div>
+      </ResponsiveDrawer>
     </div>
   )
 }

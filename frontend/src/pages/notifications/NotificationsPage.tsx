@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Check, Trash2, MoreVertical } from 'lucide-react'
+import { Bell, Check, Trash2, MoreVertical, Settings, Trash } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/shared/ui/button'
@@ -8,6 +8,14 @@ import { cn } from '@/shared/lib/utils/cn'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/shared/ui/dropdown-menu'
+import toast from 'react-hot-toast'
 import {
   CalendarCheck,
   MessageCircle,
@@ -118,6 +126,25 @@ export function NotificationsPage() {
     setNotifications(prev => prev.filter(notif => notif.id !== id))
   }
 
+  const handleDeleteAllRead = () => {
+    const readCount = notifications.filter(n => n.status === 'read').length
+    if (readCount === 0) {
+      toast.error('No read notifications to delete')
+      return
+    }
+    setNotifications(prev => prev.filter(notif => notif.status !== 'read'))
+    toast.success(`Deleted ${readCount} read notification${readCount !== 1 ? 's' : ''}`)
+  }
+
+  const handleDeleteAll = () => {
+    if (notifications.length === 0) {
+      toast.error('No notifications to delete')
+      return
+    }
+    setNotifications([])
+    toast.success('All notifications deleted')
+  }
+
   const handleMenuClick = () => {
     setIsSidebarOpen(true)
   }
@@ -132,8 +159,54 @@ export function NotificationsPage() {
 
   const handleNotificationClick = (notification: Notification) => {
     handleMarkAsRead(notification.id)
+    
+    // Navigate based on notification type and data
     if (notification.actionUrl) {
       navigate(notification.actionUrl)
+      return
+    }
+
+    // Fallback navigation based on notification type
+    switch (notification.type) {
+      case 'booking_confirmed':
+      case 'viewing_scheduled':
+        if (notification.data?.bookingId) {
+          navigate(ROUTES.MY_BOOKINGS)
+        } else if (notification.data?.propertyId) {
+          navigate(ROUTES.PROPERTY_DETAILS(notification.data.propertyId))
+        } else {
+          navigate(ROUTES.MY_BOOKINGS)
+        }
+        break
+      case 'payment_received':
+      case 'payment_reminder':
+      case 'rent_due':
+        navigate(ROUTES.PAYMENTS || ROUTES.MY_BOOKINGS)
+        break
+      case 'message_received':
+        if (notification.data?.conversationId) {
+          navigate(ROUTES.MESSAGING_CHAT(notification.data.conversationId))
+        } else {
+          navigate(ROUTES.MESSAGING)
+        }
+        break
+      case 'service_booked':
+      case 'service_completed':
+        navigate(ROUTES.MY_SERVICES)
+        break
+      case 'property_matched':
+        navigate(ROUTES.PROPERTIES)
+        break
+      case 'review_request':
+        navigate(ROUTES.MY_SERVICES)
+        break
+      case 'document_approved':
+      case 'document_rejected':
+        navigate(`${ROUTES.PROFILE}#verification`)
+        break
+      default:
+        // Do nothing if no action available
+        break
     }
   }
 
@@ -162,9 +235,51 @@ export function NotificationsPage() {
                   Mark all read
                 </Button>
               )}
-              <Button variant="ghost" size="icon" className="bg-icon-bg text-foreground hover:bg-primary/10 hover:text-primary transition-colors">
-                <MoreVertical className="h-5 w-5" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="bg-icon-bg text-foreground hover:bg-primary/10 hover:text-primary transition-colors">
+                    <MoreVertical className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 rounded-2xl border-border/60">
+                  <DropdownMenuItem
+                    className="gap-2 cursor-pointer"
+                    onClick={handleMarkAllAsRead}
+                    disabled={unreadCount === 0}
+                  >
+                    <Check className="h-4 w-4" />
+                    Mark all as read
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                    onClick={handleDeleteAllRead}
+                    disabled={notifications.filter(n => n.status === 'read').length === 0}
+                  >
+                    <Trash className="h-4 w-4" />
+                    Delete all read
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                    onClick={handleDeleteAll}
+                    disabled={notifications.length === 0}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete all
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="gap-2 cursor-pointer"
+                    onClick={() => {
+                      // Navigate to notification settings if available
+                      toast('Notification settings coming soon');
+                    }}
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
