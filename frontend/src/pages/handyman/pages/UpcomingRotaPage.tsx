@@ -92,6 +92,8 @@ export function UpcomingRotaPage() {
   const [isJobSheetOpen, setIsJobSheetOpen] = useState(false)
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>()
 
+console.log(currentWeek)
+  
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header onMenuClick={() => setIsSidebarOpen(true)} className="lg:shadow-sm" />
