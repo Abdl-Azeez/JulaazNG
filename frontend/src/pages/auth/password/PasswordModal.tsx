@@ -148,9 +148,9 @@ export function PasswordModal() {
       }
     }}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-6">
-        <div className="flex flex-col items-center gap-6">
-          <LogoSvg className="h-40 w-40 md:h-44 md:w-44 text-primary" />
-          <div className="w-full space-y-6">
+        <div className="flex flex-col items-center">
+          <LogoSvg className="h-40 w-40 md:h-44 md:w-44 text-primary -mt-16" />
+          <div className="w-full space-y-6 -mt-8">
             <h1 className="text-2xl font-bold text-foreground text-center">
               Enter Password
             </h1>
