@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
+import { Input } from '@/shared/ui/input'
 import { LogoLoader } from '@/widgets/logo-loader'
 import { Header } from '@/widgets/header'
 import { Footer } from '@/widgets/footer'
@@ -18,7 +19,7 @@ import {
   trackServiceCardView,
   trackBookingInitiated,
 } from '@/shared/lib/analytics/service-analytics'
-import { Sparkles, ShieldCheck, Clock, ArrowRight, PhoneCall, BadgeCheck } from 'lucide-react'
+import { Sparkles, ShieldCheck, Clock, ArrowRight, PhoneCall, BadgeCheck, Search } from 'lucide-react'
 import { howItWorksSteps } from './data/how-it-works'
 
 const badges = [
@@ -35,6 +36,7 @@ export function ServicesPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [selectedCategoryId, setSelectedCategoryId] = useState(serviceCategories[0].id)
   const [isBooking, setIsBooking] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Track page view on mount
   useEffect(() => {
@@ -53,6 +55,40 @@ export function ServicesPage() {
     () => serviceCategories.find((category) => category.id === selectedCategoryId) ?? serviceCategories[0],
     [selectedCategoryId]
   )
+
+  // Filter services based on search query - search across all categories
+  const filteredServices = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim()
+    
+    // If no search query, return services from selected category with consistent structure
+    if (!query) {
+      return selectedCategory.services.map(service => ({
+        service,
+        category: selectedCategory
+      }))
+    }
+    
+    // Search through all categories
+    const results: Array<{
+      service: typeof selectedCategory.services[0]
+      category: typeof selectedCategory
+    }> = []
+    
+    serviceCategories.forEach((category) => {
+      category.services.forEach((service) => {
+        if (
+          service.title.toLowerCase().includes(query) ||
+          service.summary.toLowerCase().includes(query) ||
+          category.name.toLowerCase().includes(query) ||
+          category.description.toLowerCase().includes(query)
+        ) {
+          results.push({ service, category })
+        }
+      })
+    })
+    
+    return results
+  }, [selectedCategory, searchQuery])
 
   const handleCategoryChange = (categoryId: string) => {
     const category = serviceCategories.find(c => c.id === categoryId)
@@ -217,6 +253,23 @@ export function ServicesPage() {
           </Button>
         </div>
 
+        {/* Search Bar */}
+        <div className="space-y-2">
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              placeholder="Search for services... (e.g., plumbing, painting, cleaning, electrical)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 pr-4 h-12 rounded-xl border border-border/60 bg-surface/80 backdrop-blur-sm shadow-sm focus:shadow-md focus:border-primary/50 transition-all text-foreground"
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            💡 Tip: Search by service name, category, or description to quickly find what you need
+          </p>
+        </div>
+
         <div className="flex flex-wrap gap-3">
           {serviceCategories.map(({ id, name }) => {
             const isActive = id === selectedCategoryId
@@ -237,62 +290,101 @@ export function ServicesPage() {
         </div>
 
         <motion.div
-          key={selectedCategory.id}
+          key={searchQuery.trim() ? 'search' : selectedCategory.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]"
         >
           <Card className="border-0 bg-surface/80 backdrop-blur p-6 shadow-xl">
-            <div
-              className={`rounded-3xl bg-gradient-to-br ${selectedCategory.color} p-1 mb-6`}
-            >
-              <div className="rounded-[28px] bg-background/80 p-6">
-                <div className="flex items-center gap-3">
-                  <selectedCategory.icon className="h-10 w-10 text-primary" />
-                  <div>
-                    <h3 className="text-xl font-semibold">{selectedCategory.name}</h3>
-                    <p className="text-sm text-muted-foreground">{selectedCategory.description}</p>
+            {searchQuery.trim() ? (
+              <div className="rounded-3xl bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 p-1 mb-6">
+                <div className="rounded-[28px] bg-background/80 p-6">
+                  <div className="flex items-center gap-3">
+                    <Search className="h-10 w-10 text-primary" />
+                    <div>
+                      <h3 className="text-xl font-semibold">Search Results</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Found {filteredServices.length} service{filteredServices.length !== 1 ? 's' : ''} matching "{searchQuery}"
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div
+                className={`rounded-3xl bg-gradient-to-br ${selectedCategory.color} p-1 mb-6`}
+              >
+                <div className="rounded-[28px] bg-background/80 p-6">
+                  <div className="flex items-center gap-3">
+                    <selectedCategory.icon className="h-10 w-10 text-primary" />
+                    <div>
+                      <h3 className="text-xl font-semibold">{selectedCategory.name}</h3>
+                      <p className="text-sm text-muted-foreground">{selectedCategory.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {selectedCategory.services.map((service) => (
-                <motion.div
-                  key={service.id}
-                  whileHover={{ translateY: -4 }}
-                  className="rounded-2xl border border-border/60 bg-background/80 p-5 shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-lg font-semibold text-foreground">
-                      {service.title}
-                    </h4>
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                      From ₦{service.priceFrom.toLocaleString()}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                    {service.summary}
+              {filteredServices.length > 0 ? (
+                filteredServices.map((item) => {
+                  const { service, category } = item
+                  
+                  return (
+                    <motion.div
+                      key={`${category.id}-${service.id}`}
+                      whileHover={{ translateY: -4 }}
+                      className="rounded-2xl border border-border/60 bg-background/80 p-5 shadow-sm"
+                    >
+                      {searchQuery.trim() && (
+                        <div className="mb-2">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                            <category.icon className="h-3 w-3" />
+                            {category.name}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-lg font-semibold text-foreground">
+                          {service.title}
+                        </h4>
+                        <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                          From ₦{service.priceFrom.toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                        {service.summary}
+                      </p>
+                      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="font-medium">{service.rating}★ satisfaction</span>
+                        <span>{service.jobsCompleted.toLocaleString()} jobs completed</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        className="mt-4 w-full rounded-xl border border-border/60"
+                        onClick={() => {
+                          handleServiceCardClick(service.id, service.title)
+                          navigate(ROUTES.SERVICE_REQUEST(service.id))
+                        }}
+                      >
+                        Request this crew
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </motion.div>
+                  )
+                })
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-muted-foreground mb-2">
+                    No services found matching "{searchQuery}"
                   </p>
-                  <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="font-medium">{service.rating}★ satisfaction</span>
-                    <span>{service.jobsCompleted.toLocaleString()} jobs completed</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    className="mt-4 w-full rounded-xl border border-border/60"
-                    onClick={() => {
-                      handleServiceCardClick(service.id, service.title)
-                      navigate(ROUTES.SERVICE_REQUEST(service.id))
-                    }}
-                  >
-                    Request this crew
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </motion.div>
-              ))}
+                  <p className="text-sm text-muted-foreground">
+                    Try a different search term or browse the categories above
+                  </p>
+                </div>
+              )}
             </div>
           </Card>
 
