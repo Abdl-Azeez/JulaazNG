@@ -63,9 +63,24 @@ export const ROUTES = {
   
   // Admin routes
   ADMIN: '/admin',
+  ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_USERS: '/admin/users',
   ADMIN_PROPERTIES: '/admin/properties',
+  ADMIN_SERVICES: '/admin/services',
+  ADMIN_APPROVALS: '/admin/approvals',
   ADMIN_ANALYTICS: '/admin/analytics',
+  ADMIN_PAYMENTS: '/admin/payments',
+  ADMIN_DISPUTES: '/admin/disputes',
+  ADMIN_SETTINGS: '/admin/settings',
+  
+  // Homerunner routes
+  HOMERUNNER_DASHBOARD: '/homerunner/dashboard',
+  HOMERUNNER_INSPECTIONS: '/homerunner/inspections',
+  HOMERUNNER_VIEWINGS: '/homerunner/viewings',
+  HOMERUNNER_EARNINGS: '/homerunner/earnings',
+  HOMERUNNER_SCHEDULE: '/homerunner/schedule',
+  HOMERUNNER_INSPECTION_DETAILS: (id: string) => `/homerunner/inspections/${id}`,
+  HOMERUNNER_VIEWING_DETAILS: (id: string) => `/homerunner/viewings/${id}`,
   
   // Activity routes
   MESSAGING: '/messaging',
