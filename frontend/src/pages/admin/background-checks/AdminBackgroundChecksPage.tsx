@@ -19,7 +19,6 @@ import {
   ArrowLeft,
   Search,
   Filter,
-  MoreVertical,
   FileText,
   CheckCircle,
   XCircle,
@@ -27,7 +26,6 @@ import {
   User,
   Eye,
   Download,
-  AlertTriangle,
   Loader2,
   Building2,
   Briefcase,
@@ -181,7 +179,6 @@ export function AdminBackgroundChecksPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<BackgroundCheck['status'] | 'all'>('all')
   const [roleFilter, setRoleFilter] = useState<BackgroundCheck['userRole'] | 'all'>('all')
-  const [selectedCheck, setSelectedCheck] = useState<BackgroundCheck | null>(null)
   const [backgroundChecks, setBackgroundChecks] = useState<BackgroundCheck[]>(sampleBackgroundChecks)
   const [currentPage, setCurrentPage] = useState(1)
   const [viewingDocument, setViewingDocument] = useState<{

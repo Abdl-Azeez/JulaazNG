@@ -8,6 +8,7 @@ import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import { Label } from '@/shared/ui/label'
 import { Textarea } from '@/shared/ui/textarea'
+import { Input } from '@/shared/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -36,11 +37,15 @@ import {
   TrendingUp,
   ArrowRight,
   Send,
+  Search,
+  X,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
 import { sampleViewings, type PropertyViewing } from './data/sample-homerunner-data'
+import { useMessagingStore } from '@/shared/store/messaging.store'
+import { useAuthStore } from '@/shared/store/auth.store'
 import toast from 'react-hot-toast'
 
 type FilterStatus = 'all' | 'scheduled' | 'confirmed' | 'completed'
@@ -59,6 +64,7 @@ export function HomerunnerViewingsPage() {
   )
   const [messageViewing, setMessageViewing] = useState<PropertyViewing | null>(null)
   const [messageBody, setMessageBody] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
   const ITEMS_PER_PAGE = 3
 
   const statusOptions: PropertyViewing['status'][] = [
@@ -82,8 +88,18 @@ export function HomerunnerViewingsPage() {
   }
 
   const filteredViewings = viewings.filter((viewing) => {
-    if (filterStatus === 'all') return true
-    return viewing.status === filterStatus
+    // Status filter
+    const matchesStatus = filterStatus === 'all' || viewing.status === filterStatus
+    
+    // Search filter
+    const matchesSearch = !searchTerm.trim() || 
+      viewing.propertyTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      viewing.tenantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      viewing.landlordName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      viewing.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      viewing.tenantPhone.includes(searchTerm)
+    
+    return matchesStatus && matchesSearch
   })
 
   const statusCounts = {
@@ -110,6 +126,16 @@ export function HomerunnerViewingsPage() {
 
   const handleFilterChange = (status: FilterStatus) => {
     setFilterStatus(status)
+    setCurrentPage(1)
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+    setCurrentPage(1)
+  }
+
+  const clearSearch = () => {
+    setSearchTerm('')
     setCurrentPage(1)
   }
 
@@ -146,9 +172,132 @@ export function HomerunnerViewingsPage() {
     setMessageBody('Hello! Just a quick reminder that I am en route for our viewing. See you soon.')
   }
 
+  const conversations = useMessagingStore((state) => state.conversations)
+  const addConversation = useMessagingStore((state) => state.addConversation)
+  const addMessage = useMessagingStore((state) => state.addMessage)
+  const { user } = useAuthStore()
+
   const handleSendMessage = () => {
-    if (!messageViewing) return
-    toast.success(`Message sent to ${messageViewing.tenantName}.`)
+    if (!messageViewing || !user) return
+
+    // Find existing conversation by propertyId (created when tenant requested viewing)
+    // The conversation context should have the propertyId
+    let existingConversation = conversations.find(
+      (conv) =>
+        conv.context?.propertyId === messageViewing.propertyId &&
+        conv.type === 'group' &&
+        conv.participants.includes('julaaz-admin')
+    )
+
+    // If conversation exists but homerunner is not a participant, add them
+    if (existingConversation && !existingConversation.participants.includes(user.id)) {
+      const updatedConversation = {
+        ...existingConversation,
+        participants: [...existingConversation.participants, user.id],
+        participantDetails: [
+          ...(existingConversation.participantDetails || []),
+          {
+            id: user.id,
+            name: user.name || 'Homerunner',
+            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name || 'Homerunner')}`,
+          },
+        ],
+      }
+      addConversation(updatedConversation, [])
+      existingConversation = updatedConversation
+    }
+
+    const conversationId = existingConversation?.id || `viewing-${messageViewing.propertyId}-${Date.now()}`
+
+    if (existingConversation) {
+      // Add message to existing conversation
+      const message = {
+        id: `msg-${Date.now()}`,
+        conversationId,
+        senderId: user.id,
+        recipientId: 'group',
+        type: 'text' as const,
+        content: messageBody,
+        status: 'sent' as const,
+        createdAt: new Date(),
+      }
+      addMessage(conversationId, message)
+      toast.success(`Message sent to ${messageViewing.tenantName}.`)
+      navigate(ROUTES.MESSAGING_CHAT(conversationId))
+    } else {
+      // Create new group conversation with tenant, landlord, admin, and homerunner
+      const conversation = {
+        id: conversationId,
+        participants: [
+          `tenant-${messageViewing.propertyId}`,
+          `landlord-${messageViewing.propertyId}`,
+          'julaaz-admin',
+          user.id,
+        ],
+        type: 'group' as const,
+        context: {
+          propertyId: messageViewing.propertyId,
+          bookingId: `viewing-${messageViewing.id}`,
+        },
+        status: 'active' as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastMessage: {
+          id: `msg-${Date.now()}`,
+          conversationId,
+          senderId: user.id,
+          recipientId: 'group',
+          type: 'text' as const,
+          content: messageBody,
+          status: 'sent' as const,
+          createdAt: new Date(),
+        },
+        unreadCount: {},
+        participantDetails: [
+          {
+            id: conversationId,
+            name: `${messageViewing.propertyTitle} Viewing`,
+            avatar: messageViewing.propertyImage,
+          },
+          {
+            id: `landlord-${messageViewing.propertyId}`,
+            name: messageViewing.landlordName,
+            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(messageViewing.landlordName)}`,
+          },
+          {
+            id: 'julaaz-admin',
+            name: 'Julaaz Support',
+            avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Julaaz%20Support',
+          },
+          {
+            id: user.id,
+            name: user.name || 'Homerunner',
+            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name || 'Homerunner')}`,
+          },
+          {
+            id: `tenant-${messageViewing.propertyId}`,
+            name: messageViewing.tenantName,
+            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(messageViewing.tenantName)}`,
+          },
+        ],
+      }
+
+      const initialMessage = {
+        id: `msg-${Date.now()}`,
+        conversationId,
+        senderId: user.id,
+        recipientId: 'group',
+        type: 'text' as const,
+        content: messageBody,
+        status: 'sent' as const,
+        createdAt: new Date(),
+      }
+
+      addConversation(conversation, [initialMessage])
+      toast.success(`Message sent to ${messageViewing.tenantName}.`)
+      navigate(ROUTES.MESSAGING_CHAT(conversationId))
+    }
+
     setMessageViewing(null)
     setMessageBody('')
   }
@@ -227,23 +376,46 @@ export function HomerunnerViewingsPage() {
           </div>
         </section>
 
-        {/* Filters */}
+        {/* Search and Filters */}
         <section className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 py-6">
-          <div className="flex flex-wrap gap-2">
-            {(['all', 'scheduled', 'confirmed', 'completed'] as FilterStatus[]).map((status) => (
-              <button
-                key={status}
-                onClick={() => handleFilterChange(status)}
-                className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium transition-all',
-                  filterStatus === status
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)} ({statusCounts[status]})
-              </button>
-            ))}
+          <div className="space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by property, tenant, landlord, location, or phone..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10 pr-10 rounded-xl h-11"
+              />
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Status Filters */}
+            <div className="flex flex-wrap gap-2">
+              {(['all', 'scheduled', 'confirmed', 'completed'] as FilterStatus[]).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => handleFilterChange(status)}
+                  className={cn(
+                    'px-4 py-2 rounded-full text-sm font-medium transition-all',
+                    filterStatus === status
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)} ({statusCounts[status]})
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -310,7 +482,7 @@ export function HomerunnerViewingsPage() {
                               }}
                               variant="ghost"
                               size="sm"
-                              className="h-6 px-2 text-xs text-amber-600 hover:bg-amber-500/15 dark:hover:bg-amber-950/30"
+                              className="h-6 px-2 text-xs text-amber-600 hover:bg-amber-500/15 hover:text-amber-700 dark:hover:bg-amber-950/30 dark:hover:text-amber-500"
                             />
                           </div>
                           <p className="text-sm font-medium flex items-center gap-2">
@@ -337,7 +509,7 @@ export function HomerunnerViewingsPage() {
                               }}
                               variant="ghost"
                               size="sm"
-                              className="h-6 px-2 text-xs text-amber-600 hover:bg-amber-500/15 dark:hover:bg-amber-950/30"
+                              className="h-6 px-2 text-xs text-amber-600 hover:bg-amber-500/15 hover:text-amber-700 dark:hover:bg-amber-950/30 dark:hover:text-amber-500"
                             />
                           </div>
                           <p className="text-sm font-medium flex items-center gap-2">

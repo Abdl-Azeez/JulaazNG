@@ -934,13 +934,13 @@ export function PropertyDetailsPage() {
             reportType="property"
             reportedEntity={{
               id: property.id,
-              name: property.title,
+              name: property.name,
               type: 'property',
             }}
             relatedTo={property ? {
               type: 'property',
               id: property.id,
-              title: property.title,
+              title: property.name,
             } : undefined}
             onReportSubmit={handleReportSubmit}
           />

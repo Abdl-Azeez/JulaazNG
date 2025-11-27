@@ -15,7 +15,6 @@ import {
   Edit,
   Trash2,
   Ban,
-  User,
 } from 'lucide-react'
 import HouseIcon from '@/assets/icons/house.svg?react'
 import { Button } from '@/shared/ui/button'

@@ -15,8 +15,6 @@ import {
   DollarSign,
   Calendar,
   Download,
-  ArrowUpRight,
-  ArrowDownRight,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'

@@ -28,6 +28,9 @@ import {
   Camera,
   FileText,
   User,
+  Upload,
+  X,
+  Video,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
@@ -50,6 +53,7 @@ export function HomerunnerInspectionsPage() {
   )
   const [inspectionStep, setInspectionStep] = useState(0)
   const [inspectionNotes, setInspectionNotes] = useState('')
+  const [inspectionMedia, setInspectionMedia] = useState<File[]>([])
   const ITEMS_PER_PAGE = 3
 
   const inspectionSteps = [
@@ -102,13 +106,14 @@ export function HomerunnerInspectionsPage() {
   }
 
   const openInspectionFlow = (inspection: PropertyInspection) => {
-    const nextInspection =
+    const nextInspection: PropertyInspection =
       inspection.status === 'completed'
         ? inspection
-        : { ...inspection, status: 'in_progress' }
+        : { ...inspection, status: 'in_progress' as const }
     setSelectedInspection(nextInspection)
     setInspectionStep(0)
     setInspectionNotes(inspection.notes || '')
+    setInspectionMedia([])
     setInspections((prev) =>
       prev.map((item) =>
         item.id === inspection.id && item.status !== 'completed'
@@ -122,9 +127,31 @@ export function HomerunnerInspectionsPage() {
     setSelectedInspection(null)
     setInspectionNotes('')
     setInspectionStep(0)
+    setInspectionMedia([])
+  }
+
+  const handleMediaUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    const validFiles = files.filter((file) => {
+      const isImage = file.type.startsWith('image/')
+      const isVideo = file.type.startsWith('video/')
+      const maxSize = 50 * 1024 * 1024 // 50MB
+      return (isImage || isVideo) && file.size <= maxSize
+    })
+    setInspectionMedia((prev) => [...prev, ...validFiles])
+  }
+
+  const removeMedia = (index: number) => {
+    setInspectionMedia((prev) => prev.filter((_, i) => i !== index))
   }
 
   const handleInspectionAdvance = () => {
+    // Step 2 (capture evidence) requires media upload
+    if (inspectionStep === 1 && inspectionMedia.length === 0) {
+      toast.error('Please upload at least one image or video as evidence before proceeding.')
+      return
+    }
+
     if (inspectionStep < inspectionSteps.length - 1) {
       setInspectionStep((prev) => prev + 1)
       return
@@ -329,7 +356,7 @@ export function HomerunnerInspectionsPage() {
                             }}
                             variant="ghost"
                             size="sm"
-                            className="h-6 px-2 text-xs text-amber-600 hover:bg-amber-500/15 dark:hover:bg-amber-950/30"
+                            className="h-6 px-2 text-xs text-amber-600 hover:bg-amber-500/15 hover:text-amber-700 dark:hover:bg-amber-950/30 dark:hover:text-amber-500"
                           />
                         </div>
                         <span className="inline-flex items-center gap-1 text-muted-foreground">
@@ -434,14 +461,14 @@ export function HomerunnerInspectionsPage() {
           }
         }}
       >
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Inspection workflow</DialogTitle>
             <DialogDescription>
               {selectedInspection?.propertyTitle} • {selectedInspection?.location}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             <div className="rounded-xl border border-border/60 p-3 text-sm">
               <div className="flex items-center justify-between">
                 <p className="font-semibold text-foreground">
@@ -482,8 +509,75 @@ export function HomerunnerInspectionsPage() {
                 </div>
               ))}
             </div>
+
+            {/* Step 2: Media Upload */}
+            {inspectionStep === 1 && (
+              <div className="space-y-3">
+                <Label>Media Evidence (Required)</Label>
+                <div className="border-2 border-dashed border-border/60 rounded-xl p-6 text-center">
+                  <input
+                    type="file"
+                    id="inspection-media"
+                    multiple
+                    accept="image/*,video/*"
+                    onChange={handleMediaUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="inspection-media"
+                    className="cursor-pointer flex flex-col items-center gap-2"
+                  >
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Upload className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Upload images or videos</p>
+                      <p className="text-xs text-muted-foreground">Max 50MB per file. Images and videos accepted.</p>
+                    </div>
+                  </label>
+                </div>
+                {inspectionMedia.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {inspectionMedia.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <div className="aspect-video rounded-lg bg-muted flex items-center justify-center overflow-hidden">
+                          {file.type.startsWith('image/') ? (
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Evidence ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                              <Video className="h-8 w-8" />
+                              <span className="text-xs">{file.name}</span>
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeMedia(index)}
+                          className="absolute top-1 right-1 h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {inspectionMedia.length === 0 && (
+                  <p className="text-xs text-amber-600 bg-amber-500/10 p-2 rounded-lg">
+                    ⚠️ At least one image or video is required to proceed to the next step.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Notes Section (shown in all steps, required in final step) */}
             <div className="space-y-2">
-              <Label htmlFor="inspection-notes">Notes / findings</Label>
+              <Label htmlFor="inspection-notes">
+                Notes / findings {inspectionStep === inspectionSteps.length - 1 && '(Required)'}
+              </Label>
               <Textarea
                 id="inspection-notes"
                 placeholder="Highlight any key observation, pending maintenance, or landlord feedback..."
@@ -495,14 +589,15 @@ export function HomerunnerInspectionsPage() {
               </p>
             </div>
           </div>
-          <DialogFooter className="pt-2">
+          <DialogFooter className="pt-2 border-t border-border/60 mt-4 shrink-0">
             <Button variant="ghost" onClick={handleInspectionBack}>
               {inspectionStep === 0 ? 'Cancel' : 'Previous step'}
             </Button>
             <Button
               onClick={handleInspectionAdvance}
               disabled={
-                inspectionStep === inspectionSteps.length - 1 && inspectionNotes.trim().length < 10
+                (inspectionStep === 1 && inspectionMedia.length === 0) ||
+                (inspectionStep === inspectionSteps.length - 1 && inspectionNotes.trim().length < 10)
               }
             >
               {inspectionStep === inspectionSteps.length - 1 ? 'Submit report' : 'Next step'}

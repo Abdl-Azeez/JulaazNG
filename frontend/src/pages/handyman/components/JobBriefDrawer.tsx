@@ -88,7 +88,7 @@ export function JobBriefDrawer({ open, onOpenChange, jobId, onClaim }: JobBriefD
               }}
               reportType="customer"
               relatedTo={{
-                type: 'service',
+                type: 'service_booking',
                 id: jobBriefData.id,
                 title: jobBriefData.title,
               }}

@@ -561,7 +561,7 @@ export function MyServicesPage() {
                     relatedTo={{
                       type: 'service_booking',
                       id: selectedBooking.id,
-                      title: selectedBooking.serviceName,
+                      title: selectedBooking.service.name,
                     }}
                     variant="outline"
                     size="sm"

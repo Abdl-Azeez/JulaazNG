@@ -6,7 +6,6 @@ import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import {
-  Clock,
   Building2,
   Users,
   Wrench,
@@ -16,9 +15,7 @@ import {
   CheckCircle2,
   XCircle,
   Search,
-  Filter,
   Sparkles,
-  ShieldCheck,
 } from 'lucide-react'
 import { Input } from '@/shared/ui/input'
 import { cn } from '@/shared/lib/utils/cn'

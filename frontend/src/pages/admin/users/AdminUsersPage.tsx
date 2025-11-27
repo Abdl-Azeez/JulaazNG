@@ -43,10 +43,8 @@ import {
   Home,
   Calendar,
   Upload,
-  X,
   AlertCircle,
   Download,
-  ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'

@@ -21,7 +21,6 @@ import {
   Filter,
   MoreVertical,
   TrendingUp,
-  TrendingDown,
   ArrowUpRight,
   ArrowDownRight,
   CheckCircle,

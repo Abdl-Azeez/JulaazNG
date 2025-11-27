@@ -8,11 +8,8 @@ import { Badge } from '@/shared/ui/badge'
 import {
   Users,
   Building2,
-  Calendar,
   DollarSign,
-  TrendingUp,
   ArrowUpRight,
-  ArrowRight,
   ShieldCheck,
   AlertTriangle,
   CheckCircle2,

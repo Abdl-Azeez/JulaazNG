@@ -19,17 +19,12 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
-  Ban,
   Edit,
   Trash2,
   ExternalLink,
   ChevronLeft,
   ChevronRight,
   Image as ImageIcon,
-  Calendar,
-  DollarSign,
-  TrendingUp,
-  Droplet,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
@@ -50,8 +45,6 @@ import home5 from '@/assets/images/home5.jpg'
 import home6 from '@/assets/images/home6.jpg'
 import home7 from '@/assets/images/home7.jpg'
 import home8 from '@/assets/images/home8.jpg'
-import { Bed, Bath, Car } from 'lucide-react'
-import HouseIcon from '@/assets/icons/house.svg?react'
 
 interface Property {
   id: string

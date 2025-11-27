@@ -293,13 +293,13 @@ export function HomerunnerDashboardPage() {
         </section>
 
         {/* Main Content Grid */}
-        <section className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 pb-8 lg:pb-12">
-          <div className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
-            {/* Today's Schedule */}
-            <div className="space-y-6">
+        <section className="container mx-auto max-w-7xl px-4 lg:px-6 xl:px-8 pb-8 lg:pb-12">
+          <div className="grid gap-4 lg:gap-4 lg:grid-cols-3">
+            {/* Left Side - Takes 2 columns */}
+            <div className="lg:col-span-2 space-y-4">
               {/* Inspections */}
               <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm">
-                <div className="p-5 border-b border-border/50 flex items-center justify-between">
+                <div className="p-4 border-b border-border/50 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center">
                       <ClipboardCheck className="h-5 w-5" />
@@ -325,7 +325,7 @@ export function HomerunnerDashboardPage() {
                   {sampleInspections.slice(0, 3).map((inspection) => (
                     <div
                       key={inspection.id}
-                      className="p-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6"
+                      className="p-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4"
                     >
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center gap-2">
@@ -385,7 +385,7 @@ export function HomerunnerDashboardPage() {
 
               {/* Viewings */}
               <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm">
-                <div className="p-5 border-b border-border/50 flex items-center justify-between">
+                <div className="p-4 border-b border-border/50 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
                       <Eye className="h-5 w-5" />
@@ -411,7 +411,7 @@ export function HomerunnerDashboardPage() {
                   {sampleViewings.slice(0, 3).map((viewing) => (
                     <div
                       key={viewing.id}
-                      className="p-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6"
+                      className="p-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4"
                     >
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center gap-2">
@@ -463,12 +463,50 @@ export function HomerunnerDashboardPage() {
                   ))}
                 </div>
               </Card>
+
+              {/* Elite Status - Moved to left side to balance layout */}
+              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-amber-500" />
+                  <h2 className="text-lg font-semibold text-foreground">Elite Status</h2>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Complete these tasks to maintain your "Julaaz Elite Homerunner" status and
+                  get priority access to high-value properties.
+                </p>
+                <div className="space-y-2">
+                  {[
+                    { id: 'response', title: 'Quick response time', desc: 'Accept inspections within 2 hours', completed: true },
+                    { id: 'rating', title: 'Maintain 4.5+ rating', desc: 'From landlords and tenants', completed: true },
+                    { id: 'conversion', title: '30%+ conversion rate', desc: 'Viewings to signed leases', completed: true },
+                    { id: 'training', title: 'Complete monthly training', desc: 'Property inspection best practices', completed: false },
+                  ].map((item) => (
+                    <div
+                      key={item.id}
+                      className={cn(
+                        'rounded-lg border px-2.5 py-2 text-xs flex items-start gap-2',
+                        item.completed ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border bg-background'
+                      )}
+                    >
+                      {item.completed ? (
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                      ) : (
+                        <Clock className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground text-xs">{item.title}</p>
+                        <p className="text-[10px] text-muted-foreground leading-tight">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
             </div>
 
-            {/* Side Panel */}
-            <div className="space-y-6">
+            {/* Side Panel - Takes 1 column */}
+            <div className="space-y-4">
               {/* Commission Tracker */}
-              <Card className="rounded-2xl border border-border/60 bg-gradient-to-br from-emerald-500/10 via-background to-background shadow-sm p-5 space-y-4">
+              <Card className="rounded-2xl border border-border/60 bg-gradient-to-br from-emerald-500/10 via-background to-background shadow-sm p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-emerald-600" />
                   <h2 className="text-lg font-semibold text-foreground">
@@ -509,7 +547,7 @@ export function HomerunnerDashboardPage() {
               </Card>
 
               {/* Agenda Snapshot */}
-              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
+              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-4 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                     <CalendarCheck className="h-5 w-5" />
@@ -552,8 +590,8 @@ export function HomerunnerDashboardPage() {
                 </Button>
               </Card>
 
-              {/* Quick Actions */}
-              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
+              {/* Navigation & Instant Tools Combined */}
+              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-4 space-y-4">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-primary" />
                   <h2 className="text-lg font-semibold text-foreground">Navigation</h2>
@@ -561,111 +599,65 @@ export function HomerunnerDashboardPage() {
                 <div className="space-y-2">
                   <Button
                     variant="outline"
-                    className="w-full justify-between rounded-xl h-12"
+                    className="w-full justify-between rounded-xl h-10 text-sm"
                     onClick={() => navigate(ROUTES.HOMERUNNER_INSPECTIONS)}
                   >
                     <span className="flex items-center gap-2">
                       <ClipboardCheck className="h-4 w-4 text-blue-600" />
-                      Pending Inspections
+                      Inspections
                     </span>
-                    <Badge className="rounded-full bg-blue-500/10 text-blue-600">
+                    <Badge className="rounded-full bg-blue-500/10 text-blue-600 text-xs">
                       {sampleInspections.filter((i) => i.status === 'pending').length}
                     </Badge>
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full justify-between rounded-xl h-12"
+                    className="w-full justify-between rounded-xl h-10 text-sm"
                     onClick={() => navigate(ROUTES.HOMERUNNER_VIEWINGS)}
                   >
                     <span className="flex items-center gap-2">
                       <Eye className="h-4 w-4 text-purple-600" />
-                      Scheduled Viewings
+                      Viewings
                     </span>
-                    <Badge className="rounded-full bg-purple-500/10 text-purple-600">
+                    <Badge className="rounded-full bg-purple-500/10 text-purple-600 text-xs">
                       {sampleViewings.filter((v) => v.status === 'scheduled').length}
                     </Badge>
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full justify-between rounded-xl h-12"
+                    className="w-full justify-between rounded-xl h-10 text-sm"
                     onClick={() => navigate(ROUTES.HOMERUNNER_EARNINGS)}
                   >
                     <span className="flex items-center gap-2">
                       <Wallet className="h-4 w-4 text-emerald-600" />
-                      View Earnings
+                      Earnings
                     </span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
-              </Card>
-
-              {/* Instant Tools */}
-              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold text-foreground">Instant tools</h2>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Use these shortcuts to keep landlords, tenants, and support teams in the loop.
-                </p>
-                <div className="grid gap-3">
-                  {quickActionShortcuts.map((action) => {
-                    const Icon = action.icon
-                    return (
-                      <button
-                        key={action.id}
-                        type="button"
-                        className="flex items-start gap-3 rounded-2xl border border-border/60 p-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                        onClick={() => handleOpenAction(action)}
-                      >
-                        <span className={cn('h-10 w-10 rounded-xl flex items-center justify-center', action.accent)}>
-                          <Icon className="h-5 w-5" />
-                        </span>
-                        <div>
-                          <p className="text-sm font-semibold text-foreground">{action.title}</p>
-                          <p className="text-xs text-muted-foreground">{action.description}</p>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </Card>
-
-              {/* Performance Tips */}
-              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5 text-amber-500" />
-                  <h2 className="text-lg font-semibold text-foreground">Elite Status</h2>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Complete these tasks to maintain your "Julaaz Elite Homerunner" status and
-                  get priority access to high-value properties.
-                </p>
-                <div className="space-y-3">
-                  {[
-                    { id: 'response', title: 'Quick response time', desc: 'Accept inspections within 2 hours', completed: true },
-                    { id: 'rating', title: 'Maintain 4.5+ rating', desc: 'From landlords and tenants', completed: true },
-                    { id: 'conversion', title: '30%+ conversion rate', desc: 'Viewings to signed leases', completed: true },
-                    { id: 'training', title: 'Complete monthly training', desc: 'Property inspection best practices', completed: false },
-                  ].map((item) => (
-                    <div
-                      key={item.id}
-                      className={cn(
-                        'rounded-xl border px-3 py-2 text-sm flex items-start gap-3',
-                        item.completed ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border bg-background'
-                      )}
-                    >
-                      {item.completed ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5" />
-                      ) : (
-                        <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      )}
-                      <div>
-                        <p className="font-medium text-foreground">{item.title}</p>
-                        <p className="text-xs text-muted-foreground">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="pt-3 border-t border-border/60">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <h3 className="text-sm font-semibold text-foreground">Quick actions</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {quickActionShortcuts.slice(0, 4).map((action) => {
+                      const Icon = action.icon
+                      return (
+                        <button
+                          key={action.id}
+                          type="button"
+                          className="flex flex-col items-center gap-1.5 rounded-xl border border-border/60 p-2.5 text-center hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                          onClick={() => handleOpenAction(action)}
+                        >
+                          <span className={cn('h-8 w-8 rounded-lg flex items-center justify-center', action.accent)}>
+                            <Icon className="h-4 w-4" />
+                          </span>
+                          <p className="text-[10px] font-medium text-foreground leading-tight">{action.title}</p>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </Card>
             </div>
