@@ -1,10 +1,21 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { Footer } from '@/widgets/footer'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
+import { Input } from '@/shared/ui/input'
+import { Textarea } from '@/shared/ui/textarea'
+import { Label } from '@/shared/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/dialog'
 import {
   Calendar,
   ClipboardCheck,
@@ -19,8 +30,16 @@ import {
   Clock,
   ArrowRight,
   Building2,
-  Star,
+  MessageCircle,
+  BellRing,
+  Route,
+  NotebookPen,
+  ShieldCheck,
+  Send,
+  Sparkles,
+  CalendarCheck,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
@@ -29,14 +48,107 @@ import {
   sampleViewings,
   sampleEarnings,
   performanceStats,
+  sampleScheduleItems,
+  type HomerunnerScheduleItem,
 } from './data/sample-homerunner-data'
+import toast from 'react-hot-toast'
+
+type QuickAction = {
+  id: string
+  title: string
+  description: string
+  ctaLabel: string
+  placeholder: string
+  referenceLabel: string
+  icon: LucideIcon
+  accent: string
+}
+
+const quickActionShortcuts: QuickAction[] = [
+  {
+    id: 'log-inspection',
+    title: 'Log inspection note',
+    description: 'Capture a quick highlight for landlords',
+    ctaLabel: 'Save note',
+    placeholder: 'e.g. Fixed loose cabinet hinge in the kitchen...',
+    referenceLabel: 'Property / landlord contact',
+    icon: ClipboardCheck,
+    accent: 'bg-emerald-500/10 text-emerald-600',
+  },
+  {
+    id: 'share-update',
+    title: 'Send tenant update',
+    description: 'Share next steps or arrival times',
+    ctaLabel: 'Send message',
+    placeholder: 'Let tenant know what to expect...',
+    referenceLabel: 'Tenant name or phone',
+    icon: MessageCircle,
+    accent: 'bg-purple-500/10 text-purple-600',
+  },
+  {
+    id: 'schedule-reminder',
+    title: 'Set follow-up reminder',
+    description: 'Stay on track with quick reminders',
+    ctaLabel: 'Schedule reminder',
+    placeholder: 'Reminder details and time...',
+    referenceLabel: 'Reminder time / channel',
+    icon: BellRing,
+    accent: 'bg-amber-500/10 text-amber-600',
+  },
+  {
+    id: 'share-route',
+    title: 'Share route with team',
+    description: 'Drop a pin so support can assist',
+    ctaLabel: 'Share route',
+    placeholder: 'Paste map link or directions...',
+    referenceLabel: 'Route or location link',
+    icon: Route,
+    accent: 'bg-blue-500/10 text-blue-600',
+  },
+]
+
+const scheduleTypeStyles: Record<
+  HomerunnerScheduleItem['type'],
+  { label: string; badgeClass: string }
+> = {
+  inspection: { label: 'Inspection', badgeClass: 'bg-emerald-500/10 text-emerald-600' },
+  viewing: { label: 'Viewing', badgeClass: 'bg-purple-500/10 text-purple-600' },
+  training: { label: 'Training', badgeClass: 'bg-blue-500/10 text-blue-600' },
+  follow_up: { label: 'Follow-up', badgeClass: 'bg-amber-500/10 text-amber-600' },
+}
 
 export function HomerunnerDashboardPage() {
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false)
+  const [activeAction, setActiveAction] = useState<QuickAction | null>(null)
+  const [actionForm, setActionForm] = useState({ reference: '', notes: '' })
 
   const handleProfileClick = () => {
     navigate(ROUTES.PROFILE)
+  }
+
+  const todaysAgenda = useMemo(() => sampleScheduleItems.slice(0, 3), [])
+  const highPriorityCount = useMemo(
+    () => sampleScheduleItems.filter((item) => item.priority === 'high').length,
+    []
+  )
+
+  const handleOpenAction = (action: QuickAction) => {
+    setActionForm({ reference: '', notes: '' })
+    setActiveAction(action)
+  }
+
+  const handleActionSubmit = () => {
+    if (!activeAction) return
+    const reference = actionForm.reference.trim()
+    toast.success(
+      reference
+        ? `${activeAction.title} logged for ${reference}`
+        : `${activeAction.title} saved!`
+    )
+    setActionForm({ reference: '', notes: '' })
+    setActiveAction(null)
   }
 
   const todayInspections = sampleInspections.filter((i) =>
@@ -84,11 +196,27 @@ export function HomerunnerDashboardPage() {
                   <Button
                     variant="outline"
                     className="rounded-xl h-11 px-5 flex items-center gap-2"
-                    onClick={() => navigate(ROUTES.HOMERUNNER_SCHEDULE)}
+                    onClick={() => setIsScheduleDialogOpen(true)}
                   >
                     <Calendar className="h-4 w-4" />
                     My schedule
                   </Button>
+                  <Button
+                    variant="secondary"
+                    className="rounded-xl h-11 px-5 flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary/20"
+                    onClick={() => handleOpenAction(quickActionShortcuts[0])}
+                  >
+                    <NotebookPen className="h-4 w-4" />
+                    Quick update
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-500/10 px-3 py-2 rounded-2xl w-full lg:w-auto">
+                  <Sparkles className="h-4 w-4" />
+                  <span>
+                    {highPriorityCount > 0
+                      ? `${highPriorityCount} high priority task${highPriorityCount > 1 ? 's' : ''} need attention today.`
+                      : 'Keep the streak going — no urgent tasks pending!'}
+                  </span>
                 </div>
               </div>
 
@@ -380,11 +508,55 @@ export function HomerunnerDashboardPage() {
                 </p>
               </Card>
 
+              {/* Agenda Snapshot */}
+              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                    <CalendarCheck className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Today's agenda</h2>
+                    <p className="text-xs text-muted-foreground">
+                      {todaysAgenda.length} upcoming task{todaysAgenda.length !== 1 ? 's' : ''} in queue
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {todaysAgenda.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl border border-border/60 hover:border-primary/40 transition-colors p-3"
+                    >
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <Badge className={cn('rounded-full px-3 py-0.5 text-[11px]', scheduleTypeStyles[item.type].badgeClass)}>
+                          {scheduleTypeStyles[item.type].label}
+                        </Badge>
+                        <span className="text-muted-foreground">{item.time}</span>
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground inline-flex items-center gap-1 mt-1">
+                        <MapPin className="h-3.5 w-3.5 text-primary" />
+                        {item.location}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.details}</p>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  variant="ghost"
+                  className="rounded-xl w-full justify-between text-sm"
+                  onClick={() => setIsScheduleDialogOpen(true)}
+                >
+                  Open detailed schedule
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Card>
+
               {/* Quick Actions */}
               <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold text-foreground">Quick Actions</h2>
+                  <h2 className="text-lg font-semibold text-foreground">Navigation</h2>
                 </div>
                 <div className="space-y-2">
                   <Button
@@ -427,10 +599,42 @@ export function HomerunnerDashboardPage() {
                 </div>
               </Card>
 
+              {/* Instant Tools */}
+              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  <h2 className="text-lg font-semibold text-foreground">Instant tools</h2>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Use these shortcuts to keep landlords, tenants, and support teams in the loop.
+                </p>
+                <div className="grid gap-3">
+                  {quickActionShortcuts.map((action) => {
+                    const Icon = action.icon
+                    return (
+                      <button
+                        key={action.id}
+                        type="button"
+                        className="flex items-start gap-3 rounded-2xl border border-border/60 p-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                        onClick={() => handleOpenAction(action)}
+                      >
+                        <span className={cn('h-10 w-10 rounded-xl flex items-center justify-center', action.accent)}>
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">{action.title}</p>
+                          <p className="text-xs text-muted-foreground">{action.description}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </Card>
+
               {/* Performance Tips */}
               <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-amber-500" />
+                  <ShieldCheck className="h-5 w-5 text-amber-500" />
                   <h2 className="text-lg font-semibold text-foreground">Elite Status</h2>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -470,6 +674,108 @@ export function HomerunnerDashboardPage() {
       </main>
 
       <Footer />
+      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Today&apos;s Playbook</DialogTitle>
+            <DialogDescription>
+              Keep track of every landlord touch point, tenant viewing, and training session in one view.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto space-y-4 pr-1">
+            {sampleScheduleItems.map((item) => (
+              <div
+                key={item.id}
+                className="rounded-2xl border border-border/60 p-4 space-y-2"
+              >
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <Badge className={cn('rounded-full px-3 py-0.5 text-[11px]', scheduleTypeStyles[item.type].badgeClass)}>
+                      {scheduleTypeStyles[item.type].label}
+                    </Badge>
+                    {item.priority && (
+                      <span className={cn('text-xs font-semibold', item.priority === 'high' ? 'text-red-500' : 'text-amber-600')}>
+                        {item.priority.toUpperCase()} priority
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-muted-foreground">{item.time}</span>
+                </div>
+                <p className="text-base font-semibold text-foreground">{item.title}</p>
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  {item.location}
+                </p>
+                <p className="text-sm text-muted-foreground">{item.details}</p>
+              </div>
+            ))}
+          </div>
+          <DialogFooter className="pt-2">
+            <Button variant="secondary" onClick={() => setIsScheduleDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(activeAction)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveAction(null)
+            setActionForm({ reference: '', notes: '' })
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{activeAction?.title}</DialogTitle>
+            <DialogDescription>{activeAction?.description}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="action-reference">{activeAction?.referenceLabel}</Label>
+              <Input
+                id="action-reference"
+                placeholder="e.g. Mr Musa (+234 80..)"
+                value={actionForm.reference}
+                onChange={(event) =>
+                  setActionForm((prev) => ({ ...prev, reference: event.target.value }))
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="action-notes">Details</Label>
+              <Textarea
+                id="action-notes"
+                placeholder={activeAction?.placeholder}
+                value={actionForm.notes}
+                onChange={(event) => setActionForm((prev) => ({ ...prev, notes: event.target.value }))}
+              />
+            </div>
+          </div>
+          <DialogFooter className="pt-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setActiveAction(null)
+                setActionForm({ reference: '', notes: '' })
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="gap-2"
+              onClick={handleActionSubmit}
+              disabled={!actionForm.reference.trim() || !actionForm.notes.trim()}
+            >
+              <Send className="h-4 w-4" />
+              {activeAction?.ctaLabel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </div>
   )

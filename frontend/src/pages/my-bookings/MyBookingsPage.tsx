@@ -21,6 +21,7 @@ import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { Footer } from '@/widgets/footer'
+import { ReportButton } from '@/widgets/report-button'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -578,7 +579,26 @@ export function MyBookingsPage() {
 
               {/* Landlord Info */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-foreground">Landlord</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-foreground">Landlord</h3>
+                  <ReportButton
+                    reportedEntity={{
+                      id: selectedBooking.landlordId,
+                      name: selectedBooking.landlord.name,
+                      type: 'user',
+                      role: 'landlord',
+                    }}
+                    reportType="landlord"
+                    relatedTo={{
+                      type: 'property',
+                      id: selectedBooking.propertyId,
+                      title: selectedBooking.property.name,
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                  />
+                </div>
                 <div className="flex items-center gap-3">
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={selectedBooking.landlord.avatar} />

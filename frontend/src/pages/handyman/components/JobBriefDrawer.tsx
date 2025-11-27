@@ -1,4 +1,5 @@
 import { ResponsiveDrawer } from './ResponsiveDrawer'
+import { ReportButton } from '@/widgets/report-button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -76,7 +77,26 @@ export function JobBriefDrawer({ open, onOpenChange, jobId, onClaim }: JobBriefD
 
         {/* Job Details */}
         <Card className="p-4 rounded-xl border border-border/60">
-          <h4 className="text-sm font-semibold mb-3 text-foreground">Job Details</h4>
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-semibold text-foreground">Job Details</h4>
+            <ReportButton
+              reportedEntity={{
+                id: jobBriefData.id + '-client',
+                name: jobBriefData.location || 'Client',
+                type: 'user',
+                role: 'customer',
+              }}
+              reportType="customer"
+              relatedTo={{
+                type: 'service',
+                id: jobBriefData.id,
+                title: jobBriefData.title,
+              }}
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+            />
+          </div>
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
               <Calendar className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />

@@ -27,10 +27,27 @@ export interface PropertyViewing {
   landlordName: string
   location: string
   scheduledFor: string
-  status: 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'no_show' | 'cancelled'
+  status:
+    | 'scheduled'
+    | 'confirmed'
+    | 'in_progress'
+    | 'completed'
+    | 'no_show'
+    | 'cancelled'
+    | 'rented'
   earnAmount: number
   commissionPotential: number // Commission if tenant signs
   notes?: string
+}
+
+export interface HomerunnerScheduleItem {
+  id: string
+  title: string
+  time: string
+  type: 'inspection' | 'viewing' | 'training' | 'follow_up'
+  location: string
+  details: string
+  priority?: 'high' | 'medium' | 'low'
 }
 
 export interface HomerunnerEarnings {
@@ -155,6 +172,43 @@ export const sampleViewings: PropertyViewing[] = [
     status: 'scheduled',
     earnAmount: 5000,
     commissionPotential: 45000,
+  },
+]
+
+export const sampleScheduleItems: HomerunnerScheduleItem[] = [
+  {
+    id: 'sch-001',
+    title: 'Confirm keys with Lekki landlord',
+    time: 'Today • 12:30 PM',
+    type: 'follow_up',
+    location: 'Lekki Phase 1',
+    details: 'Call Mrs. Okonkwo before inspection to pick up smart lock code.',
+    priority: 'high',
+  },
+  {
+    id: 'sch-002',
+    title: 'Magodo viewing with Chukwuemeka',
+    time: 'Today • 4:30 PM',
+    type: 'viewing',
+    location: 'Magodo GRA Phase 2',
+    details: 'Tenant prefers evening slots. Bring extra brochure.',
+  },
+  {
+    id: 'sch-003',
+    title: 'Upload Yaba inspection photos',
+    time: 'Tomorrow • 9:00 AM',
+    type: 'inspection',
+    location: 'Julaaz HQ Portal',
+    details: 'Ensure damages are tagged before submission.',
+    priority: 'medium',
+  },
+  {
+    id: 'sch-004',
+    title: 'Monthly quality training',
+    time: 'Friday • 11:00 AM',
+    type: 'training',
+    location: 'Virtual (Google Meet)',
+    details: 'Facilitator: Julaaz Academy. Join 5 mins early.',
   },
 ]
 
