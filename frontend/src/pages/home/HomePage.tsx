@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LayoutGrid, List, ShieldCheck, ConciergeBell, Sparkles } from 'lucide-react'
+import { LayoutGrid, List, ShieldCheck, Sparkles, Wrench, Home, Building2, CheckCircle2, Star, ArrowRight, Users, Clock, CreditCard } from 'lucide-react'
 import { Header } from '@/widgets/header'
 import { Footer } from '@/widgets/footer'
 import { SearchBar } from '@/widgets/search-bar'
@@ -120,44 +120,103 @@ export function HomePage() {
                   {/* Title with Gradient */}
                   <h1 className="text-center mb-4 animate-fade-in-up">
                     <span className="block text-4xl font-black bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent mb-2">
-                      Live the Julaaz
+                      Your Complete Home
                     </span>
                     <span className="block text-4xl font-black bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient-x">
-                      Lifestyle
+                      Solution Platform
                     </span>
                   </h1>
 
                   <p className="text-center text-base text-muted-foreground leading-relaxed mb-8 px-4 animate-fade-in-up animation-delay-200">
-                    Serviced shortlets, annual leases, and trusted home services built for Nigerians.
+                    Find your perfect rental, book trusted services, and connect with skilled artisans—all in one place. Nigeria's most trusted property and home services platform.
                   </p>
+
+                  {/* Service Categories - Quick Access */}
+                  <div className="grid grid-cols-2 gap-2 px-2 mb-6 animate-fade-in-up animation-delay-200">
+                    {[
+                      {
+                        icon: Home,
+                        title: 'Rentals',
+                        subtitle: 'Shortlet & Annual',
+                        color: 'from-blue-500/20 to-blue-500/5',
+                        borderColor: 'border-blue-500/30',
+                        iconColor: 'text-blue-600',
+                        onClick: () => navigate(ROUTES.PROPERTIES),
+                      },
+                      {
+                        icon: Sparkles,
+                        title: 'Services',
+                        subtitle: 'Cleaning & Moving',
+                        color: 'from-purple-500/20 to-purple-500/5',
+                        borderColor: 'border-purple-500/30',
+                        iconColor: 'text-purple-600',
+                        onClick: () => navigate(ROUTES.SERVICES),
+                      },
+                      {
+                        icon: Wrench,
+                        title: 'Artisans',
+                        subtitle: 'Plumbing & Electrical',
+                        color: 'from-amber-500/20 to-amber-500/5',
+                        borderColor: 'border-amber-500/30',
+                        iconColor: 'text-amber-600',
+                        onClick: () => navigate(ROUTES.SERVICES),
+                      },
+                      {
+                        icon: Building2,
+                        title: 'Management',
+                        subtitle: 'Property Care',
+                        color: 'from-emerald-500/20 to-emerald-500/5',
+                        borderColor: 'border-emerald-500/30',
+                        iconColor: 'text-emerald-600',
+                        onClick: () => navigate(ROUTES.SERVICES),
+                      },
+                    ].map((service) => (
+                      <button
+                        key={service.title}
+                        onClick={service.onClick}
+                        className={`group relative overflow-hidden p-4 rounded-xl bg-gradient-to-br ${service.color} backdrop-blur-xl border ${service.borderColor} shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300`}
+                      >
+                        <div className="flex flex-col items-center gap-2">
+                          <div className={`h-10 w-10 rounded-full bg-white/50 flex items-center justify-center ${service.iconColor}`}>
+                            <service.icon className="h-5 w-5" />
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm font-bold text-foreground">{service.title}</div>
+                            <div className="text-xs text-muted-foreground">{service.subtitle}</div>
+                          </div>
+                        </div>
+                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                      </button>
+                    ))}
+                  </div>
 
                   {/* Feature Cards with Glassmorphism */}
                   <div className="space-y-3 px-2 mb-8">
                     {[
                       {
                         icon: ShieldCheck,
-                        title: 'Verified rentals',
-                        desc: 'Flexible shortlets and annual leases vetted by Julaaz agents before they go live.',
+                        title: 'Verified & Trusted',
+                        desc: 'Every property and service provider is vetted by our team. Background checks, verified listings, and secure payments.',
                         gradient: 'from-primary/20 to-primary/5',
                         delay: '300',
                       },
                       {
-                        icon: ConciergeBell,
-                        title: 'On-demand services',
-                        desc: 'Book cleaners, movers, and artisans in minutes with transparent pricing.',
+                        icon: Clock,
+                        title: 'Book in Minutes',
+                        desc: 'From property viewings to service appointments—schedule everything instantly with real-time availability.',
                         gradient: 'from-accent/20 to-accent/5',
                         delay: '400',
                       },
                       {
-                        icon: Sparkles,
-                        title: 'Fully furnished comfort',
-                        desc: 'Arrive to stocked kitchens, fibre internet, and concierge support for every stay.',
-                        gradient: 'from-primary/15 to-accent/10',
+                        icon: CreditCard,
+                        title: 'Transparent Pricing',
+                        desc: 'No hidden fees. See exact costs upfront with secure payment processing and instant receipts.',
+                        gradient: 'from-emerald-500/20 to-emerald-500/5',
                         delay: '500',
                       },
-                    ].map((feature, idx) => (
+                    ].map((feature) => (
                       <div
-                        key={idx}
+                        key={feature.title}
                         className={`group relative overflow-hidden animate-fade-in-up animation-delay-${feature.delay}`}
                       >
                         {/* Hover Gradient Background */}
@@ -190,6 +249,24 @@ export function HomePage() {
                     ))}
                   </div>
 
+                  {/* Trust Indicators */}
+                  <div className="flex items-center justify-center gap-4 px-4 mb-6 animate-fade-in-up animation-delay-400">
+                    <div className="flex items-center gap-1.5">
+                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                      <span className="text-xs font-semibold text-foreground">4.9/5</span>
+                    </div>
+                    <div className="h-4 w-px bg-border" />
+                    <div className="flex items-center gap-1.5">
+                      <Users className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-semibold text-foreground">10K+ Users</span>
+                    </div>
+                    <div className="h-4 w-px bg-border" />
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      <span className="text-xs font-semibold text-foreground">Verified</span>
+                    </div>
+                  </div>
+
                   {/* CTA Buttons with 3D Effect */}
                   <div className="flex flex-col gap-3 px-4 animate-fade-in-up animation-delay-600">
                     <button
@@ -204,8 +281,9 @@ export function HomePage() {
                       
                       {/* Button Content */}
                       <span className="relative flex items-center justify-center gap-2 text-base font-bold text-primary-foreground">
-                        <span>Browse homes</span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                        <Home className="h-5 w-5" />
+                        <span>Find Your Perfect Home</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                       </span>
                     </button>
 
@@ -218,8 +296,9 @@ export function HomePage() {
                       
                       {/* Button Content */}
                       <span className="relative flex items-center justify-center gap-2 text-base font-bold text-primary">
-                        <Sparkles className="h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
-                        <span>Explore services</span>
+                        <Sparkles className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                        <span>Book Home Services</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                       </span>
                     </button>
                   </div>
@@ -230,31 +309,98 @@ export function HomePage() {
               <div className="hidden lg:block">
                 <div className="grid lg:grid-cols-2 gap-12 xl:gap-16 items-center">
                   <div className="space-y-6">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                      <span>🏠</span>
-                      <span>Your Trusted Property Platform</span>
+                    <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/20 via-primary/10 to-accent/20 px-4 py-2 text-sm font-medium text-primary border border-primary/30">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                      </span>
+                      <span>Nigeria's #1 Complete Home Solution Platform</span>
                     </div>
                     <h1 className="text-5xl xl:text-6xl font-bold text-foreground leading-tight">
-                      Find Your Perfect
-                      <span className="block text-primary">Home in Nigeria</span>
+                      Everything You Need
+                      {' '}
+                      <span className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                        For Your Home
+                      </span>
                     </h1>
                     <p className="text-lg xl:text-xl text-muted-foreground leading-relaxed">
-                      Discover verified properties, trusted services, and professional artisans all in one place. 
-                      Your journey to finding the perfect rental starts here.
+                      From finding your perfect rental to booking trusted services and connecting with skilled artisans—all in one trusted platform.
+                      {' '}
+                      <span className="font-semibold text-foreground">Your complete home solution starts here.</span>
                     </p>
-                    <div className="flex flex-wrap gap-4 pt-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <div className="h-2 w-2 rounded-full bg-primary" />
-                        <span>1,000+ Verified Properties</span>
+                    
+                    {/* Service Quick Links */}
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                      {[
+                        { icon: Home, label: 'Rentals', desc: 'Shortlet & Annual', route: ROUTES.PROPERTIES, color: 'from-blue-500/20 to-blue-500/5 border-blue-500/30' },
+                        { icon: Sparkles, label: 'Services', desc: 'Cleaning & Moving', route: ROUTES.SERVICES, color: 'from-purple-500/20 to-purple-500/5 border-purple-500/30' },
+                        { icon: Wrench, label: 'Artisans', desc: 'Plumbing & Electrical', route: ROUTES.SERVICES, color: 'from-amber-500/20 to-amber-500/5 border-amber-500/30' },
+                        { icon: Building2, label: 'Management', desc: 'Property Care', route: ROUTES.SERVICES, color: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30' },
+                      ].map((service) => (
+                        <button
+                          key={service.label}
+                          onClick={() => navigate(service.route)}
+                          className={`group p-4 rounded-xl bg-gradient-to-br ${service.color} border backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] text-left`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="h-10 w-10 rounded-lg bg-white/50 flex items-center justify-center text-primary shrink-0">
+                              <service.icon className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm text-foreground">{service.label}</div>
+                              <div className="text-xs text-muted-foreground">{service.desc}</div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Trust Indicators */}
+                    <div className="flex items-center gap-6 pt-2">
+                      <div className="flex items-center gap-2">
+                        <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                        <div>
+                          <div className="text-sm font-bold text-foreground">4.9/5</div>
+                          <div className="text-xs text-muted-foreground">Rating</div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <div className="h-2 w-2 rounded-full bg-primary" />
-                        <span>200+ Service Providers</span>
+                      <div className="h-12 w-px bg-border" />
+                      <div className="flex items-center gap-2">
+                        <Users className="h-5 w-5 text-primary" />
+                        <div>
+                          <div className="text-sm font-bold text-foreground">10K+</div>
+                          <div className="text-xs text-muted-foreground">Active Users</div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <div className="h-2 w-2 rounded-full bg-primary" />
-                        <span>Secure Payments</span>
+                      <div className="h-12 w-px bg-border" />
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                        <div>
+                          <div className="text-sm font-bold text-foreground">100%</div>
+                          <div className="text-xs text-muted-foreground">Verified</div>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* CTA Buttons */}
+                    <div className="flex gap-4 pt-4">
+                      <Button
+                        onClick={() => navigate(ROUTES.PROPERTIES)}
+                        size="lg"
+                        className="h-12 px-6 rounded-xl bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary transition-all shadow-lg"
+                      >
+                        <Home className="h-4 w-4 mr-2" />
+                        Find Properties
+                      </Button>
+                      <Button
+                        onClick={() => navigate(ROUTES.SERVICES)}
+                        variant="outline"
+                        size="lg"
+                        className="h-12 px-6 rounded-xl border-2"
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Book Services
+                      </Button>
                     </div>
                   </div>
                   <div className="relative">
