@@ -16,6 +16,7 @@ import { findSampleUser } from '@/shared/data/sample-users'
 
 interface ModalState {
   backgroundLocation?: Location
+  intendedDestination?: string
   modal?: boolean
 }
 
@@ -25,6 +26,7 @@ export function PasswordModal() {
   const location = useLocation()
   const modalState = (location.state as ModalState | undefined) ?? undefined
   const backgroundLocation = modalState?.backgroundLocation
+  const intendedDestination = modalState?.intendedDestination
   const { login } = useAuthStore()
 
   const handleClose = () => {
@@ -107,6 +109,12 @@ export function PasswordModal() {
 
     setRoles(resolvedRoles)
 
+    // Get intended destination from state or sessionStorage
+    const finalIntendedDestination = intendedDestination || sessionStorage.getItem('intendedDestination')
+    if (finalIntendedDestination) {
+      sessionStorage.removeItem('intendedDestination')
+    }
+
     if (resolvedRoles.length === 1) {
       const active = resolvedRoles[0].type
       setActiveRole(active)
@@ -120,23 +128,24 @@ export function PasswordModal() {
         handyman: ROUTES.HANDYMAN_DASHBOARD,
         homerunner: ROUTES.HOMERUNNER_DASHBOARD,
     }
-      const targetRoute = roleToRoute[active] ?? ROUTES.HOME
       
-      if (backgroundLocation) {
-        navigate(backgroundLocation.pathname + backgroundLocation.search + backgroundLocation.hash, {
-          replace: true,
-        })
+      // For admin, homerunner, and handyman, always go to their dashboard
+      const forceDashboardRoles: RoleType[] = ['admin', 'homerunner', 'handyman']
+      if (forceDashboardRoles.includes(active)) {
+        navigate(roleToRoute[active] ?? ROUTES.HOME, { replace: true })
+      } else if (finalIntendedDestination && active === 'tenant') {
+        // For tenants, navigate to intended destination if available
+        navigate(finalIntendedDestination, { replace: true })
       } else {
-        navigate(targetRoute)
+        navigate(roleToRoute[active] ?? ROUTES.HOME, { replace: true })
       }
     } else {
       openRoleSwitcher()
-    if (backgroundLocation) {
-      navigate(backgroundLocation.pathname + backgroundLocation.search + backgroundLocation.hash, {
-        replace: true,
-      })
-    } else {
-      navigate(ROUTES.HOME)
+      // For multi-role users, check if there's an intended destination
+      if (finalIntendedDestination) {
+        navigate(finalIntendedDestination, { replace: true })
+      } else {
+        navigate(ROUTES.HOME, { replace: true })
       }
     }
   }

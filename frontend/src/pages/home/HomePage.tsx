@@ -71,6 +71,9 @@ export function HomePage() {
 
   const handleRequestViewing = (propertyId: string) => {
     if (!isAuthenticated) {
+      // Store the intended destination (booking page) for post-login redirect
+      const bookingUrl = ROUTES.PROPERTY_BOOKING(propertyId)
+      sessionStorage.setItem('intendedDestination', bookingUrl)
       setIsAuthOpen(true)
       return
     }

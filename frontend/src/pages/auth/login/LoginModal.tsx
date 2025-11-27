@@ -14,6 +14,7 @@ import { ROUTES } from '@/shared/constants/routes'
 
 interface ModalState {
   backgroundLocation?: Location
+  intendedDestination?: string
   modal?: boolean
 }
 
@@ -82,17 +83,22 @@ export function LoginModal() {
   }
 
   const preserveState = modalState ? { ...modalState } : backgroundLocation ? { backgroundLocation, modal: true } : undefined
+  // Also check sessionStorage for intended destination
+  const intendedDestinationFromStorage = sessionStorage.getItem('intendedDestination')
+  const finalState = intendedDestinationFromStorage 
+    ? { ...preserveState, intendedDestination: intendedDestinationFromStorage }
+    : preserveState
 
   const handleContinue = () => {
     if (!validateInput()) return
 
     if (loginMethod === 'email') {
       navigate(`${ROUTES.LOGIN_PASSWORD}?email=${encodeURIComponent(inputValue)}`, {
-        state: preserveState,
+        state: finalState,
       })
     } else if (loginMethod === 'phone') {
       navigate(`${ROUTES.LOGIN_PASSWORD}?phone=${encodeURIComponent(inputValue)}`, {
-        state: preserveState,
+        state: finalState,
       })
     }
   }

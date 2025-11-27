@@ -279,10 +279,16 @@ export function PropertyDetailsPage() {
 
   const handleRequestViewing = () => {
     if (!isAuthenticated) {
+      // Store the intended destination (booking page) for post-login redirect
+      const bookingUrl = ROUTES.PROPERTY_BOOKING(property.id)
       if (window.innerWidth < 1024) {
         setIsDrawerOpen(true)
+        // Store intended destination in sessionStorage for mobile drawer
+        sessionStorage.setItem('intendedDestination', bookingUrl)
       } else {
         setAuthModalOpen(true)
+        // Store intended destination in sessionStorage for desktop modal
+        sessionStorage.setItem('intendedDestination', bookingUrl)
       }
       return
     }
@@ -859,6 +865,7 @@ export function PropertyDetailsPage() {
             setIsDrawerOpen(open)
             setAuthModalOpen(open)
           }}
+          intendedDestination={property ? ROUTES.PROPERTY_BOOKING(property.id) : undefined}
         />
     </div>
   )

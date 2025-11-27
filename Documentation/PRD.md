@@ -24,7 +24,7 @@ JulaazNG is a mobile-first web application that serves as Nigeria's premier prop
 - Property Listings: 1,000+ verified properties within 3 months
 - Service Provider Network: 200+ verified providers
 
-### 1.5 Status Update — November 2025
+### 1.5 Status Update — December 2025
 - **Tenant Frontend Experience:** Complete end-to-end UI/UX for tenants across splash, onboarding, authentication (login/signup/OTP), home, properties, property details, viewing scheduler, favourites, messaging, notifications, calendar, profile, settings, agreements, and payments.
 - **Booking & Services Dashboards:** My Bookings and My Services pages deliver status-driven timelines, provider/landlord contact actions, and modal details for rental and service engagements.
 - **Shortlet & Viewing Enhancements:** Property cards highlight annual vs. shortlet offerings; viewing flow captures move-in, budget, tenancy duration, and seeds messaging threads.
@@ -33,7 +33,16 @@ JulaazNG is a mobile-first web application that serves as Nigeria's premier prop
 - **Info Pages & Footer:** Eight static content pages (About, Landlord FAQ, Sitemap, Buildings, Terms, Cookies, Disclaimer, Contact) with Framer Motion animations, role-based visibility (Landlord FAQ hidden for non-landlords), active link tracking, and creative Contact Support button with shimmer effects.
 - **Background Check & Verification:** Profile page includes detailed background check form with pre-filled personal info, financial/occupation questions, document upload, and admin verification flow with "verified" badge.
 - **Role-Aware Authentication & Demo Accounts:** Session-aware login flow storing all user roles, intelligent role switching via Role Gateway modal, header role selector, `X-Active-Role` propagation to the backend, and published demo credentials for Tenant, Landlord, and dual-role testers.
-- **Documentation:** Booking management, service management, landlord flows, background check, and shortlet support captured in PRD with updated sections ensuring stakeholder alignment.
+- **Admin Dashboard Enhancements (December 2025):**
+  - **Analytics Page:** Interactive revenue and user growth charts with hover tooltips displaying exact values, pixel-based chart rendering for reliable display.
+  - **Users Page:** Paginated and sortable user table, comprehensive user details with role-specific statistics, background check document viewing/downloading, direct messaging integration, user creation functionality, and full user lifecycle management.
+  - **Properties Page:** Paginated property listings with image sliders, dedicated admin property details page mirroring tenant view, functional action buttons (view, view listing, edit, suspend, delete), and property approval workflows.
+  - **Services Page:** Paginated service listings with functional action buttons (view details, edit, suspend, delete), service approval workflows, and public page navigation.
+  - **Payments Page:** Paginated and sortable payments table, payment details view, refund initiation with confirmation, payment approval/rejection workflows, and receipt download.
+  - **Disputes Page:** Paginated disputes listing, comprehensive case management, group chat creation for dispute parties, clickable message badges for chat history, document management with 2x2 grid layout, and improved document card UI.
+  - **Background Checks Page:** Paginated listings, document viewing with dedicated viewer, improved document card visibility with larger icons and better hover states, document approval/rejection workflows, and progress tracking.
+- **Messaging Integration:** Admin can create direct chats from user details and group chats from disputes, with conversation titles following "Admin - {user name}" or "Admin - {dispute reference}" format.
+- **Documentation:** Booking management, service management, landlord flows, background check, shortlet support, and comprehensive admin dashboard features captured in PRD with updated sections ensuring stakeholder alignment.
 - **Next Milestone:** Backend API development (authentication, property CRUD, booking management, payment processing, messaging, notifications, admin workflows).
 
 ---
@@ -2023,25 +2032,64 @@ Chatbot: OpenAI Assistants API LangChain (custom logic)
 
 ### 10.2 Admin Functional Areas
 
-#### 10.2.1 User Management
+#### 10.2.1 Analytics Dashboard
+- **Real-time Analytics**
+  - Monthly revenue and user growth charts with interactive tooltips
+  - Key performance indicators (KPIs) with visual indicators
+  - Revenue breakdown by category (rentals, services, commissions)
+  - User growth trends and acquisition metrics
+  - Chart bars display exact values on hover
+
+#### 10.2.2 User Management
 - **User Directory**
+  - Paginated user listing with sorting capabilities
   - Search and filter users by role, status, location
+  - Sort by name, email, role, status, registration date
   - Bulk actions (verify, suspend, delete)
   - User activity history
   - Communication logs
 
+- **User Details & Actions**
+  - Comprehensive user profile view with role-specific statistics
+  - For tenants: View properties viewed, viewing requests, current rentals, shortlets used
+  - For landlords: View property listings, earnings, applications received
+  - Background check integration with document viewing and downloading
+  - Admin can approve/reject background check documents
+  - Admin can upload documents on behalf of users
+  - Direct messaging integration - "Send Message" creates chat in messaging page
+  - User status management (suspend, reactivate, ban, delete)
+  - Add User functionality - create users of any role including admin
+
 - **Verification Management**
-  - Document review queue
-  - Approval/rejection workflows
+  - Document review queue with inline viewing
+  - Approval/rejection workflows with document preview
   - Bulk verification actions
   - Verification analytics
 
-#### 10.2.2 Property Oversight
+#### 10.2.3 Property Oversight
 - **Property Management**
-  - Property listing queue
-  - Approval workflows
+  - Paginated property listing (supports thousands of properties)
+  - Image slider on property cards (similar to tenant view)
+  - Property listing queue with status filters
+  - Approval workflows (approve, reject, suspend, reactivate)
   - Quality assurance checks
   - Property performance metrics
+
+- **Property Details (Admin View)**
+  - Dedicated admin property details page mirroring tenant view
+  - Full property information with image gallery slider
+  - Property specifications, amenities, location details
+  - Rental options (long-term, shortlet) display
+  - Owner information
+  - Admin action bar (Approve/Reject, Suspend/Reactivate, Edit, Delete)
+  - "View Listing" button navigates to public tenant-facing property page
+
+- **Property Actions**
+  - View property (opens admin property details page)
+  - View listing (opens tenant-facing property page)
+  - Edit property
+  - Suspend/Reactivate listing
+  - Delete property
 
 - **Inspection Management**
   - Agent assignment
@@ -2049,12 +2097,20 @@ Chatbot: OpenAI Assistants API LangChain (custom logic)
   - Report generation
   - Follow-up actions
 
-#### 10.2.3 Service Monitoring
+#### 10.2.4 Service Monitoring
 - **Service Provider Management**
+  - Paginated service listings
   - Application reviews
   - Performance monitoring
   - Rating management
   - Service category analytics
+
+- **Service Actions**
+  - View service details (opens dialog with full service information)
+  - View public service page
+  - Edit service
+  - Suspend/Reactivate service
+  - Delete service
 
 - **Booking Management**
   - Service booking overview
@@ -2062,7 +2118,15 @@ Chatbot: OpenAI Assistants API LangChain (custom logic)
   - Performance tracking
   - Commission calculations
 
-#### 10.2.4 Financial Management
+#### 10.2.5 Financial Management
+- **Payments Dashboard**
+  - Paginated payments table with sorting
+  - Sort by amount, date, status, payment method
+  - Payment details view with full transaction information
+  - Refund management with confirmation dialogs
+  - Payment approval/rejection workflows
+  - Receipt download functionality
+
 - **Revenue Dashboard**
   - Real-time revenue tracking
   - Commission breakdown
@@ -2075,7 +2139,42 @@ Chatbot: OpenAI Assistants API LangChain (custom logic)
   - Service performance reports
   - Export capabilities (CSV, PDF)
 
-#### 10.2.5 Analytics & Insights
+#### 10.2.6 Dispute Resolution
+- **Disputes Management**
+  - Paginated disputes listing (card-based layout)
+  - Dispute status tracking and filtering
+  - Case details view with comprehensive information
+  - Document management with improved UI
+  - Document cards with 2x2 grid layout for action buttons
+  - Document names display fully without truncation on desktop
+  - Improved hover states for better visibility
+
+- **Dispute Actions**
+  - View case (opens dialog with dispute details)
+  - Send message (creates group chat or direct chat in messaging page)
+    - "Both Parties" creates group chat titled "Admin - {dispute reference}"
+    - Single party creates direct chat titled "Admin - {user name}"
+  - View documents (opens dialog with document list and actions)
+  - Resolve in favor of complainant/respondent
+  - Close without resolution
+  - Clickable message badges navigate to associated chat history
+
+#### 10.2.7 Background Checks
+- **Background Check Management**
+  - Paginated background check listings
+  - Document viewing with dedicated viewer dialog
+  - Document approval/rejection workflows
+  - Progress tracking with visual indicators
+  - Overall background check approval/rejection
+
+- **Document Management**
+  - Document cards with improved visibility
+  - Larger icons with better hover states
+  - Document viewing and downloading capabilities
+  - Document type indicators with color coding
+  - Status badges (pending, approved, rejected)
+
+#### 10.2.8 Analytics & Insights
 - **User Analytics**
   - Daily/Monthly Active Users
   - User acquisition funnel

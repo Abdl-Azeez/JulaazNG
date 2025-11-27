@@ -96,6 +96,13 @@ export function PasswordPage() {
 
     setRoles(resolvedRoles)
 
+    // Get intended destination from location state or sessionStorage
+    const locationState = (window.history.state?.usr as { intendedDestination?: string }) ?? {}
+    const intendedDestination = locationState.intendedDestination || sessionStorage.getItem('intendedDestination')
+    if (intendedDestination) {
+      sessionStorage.removeItem('intendedDestination')
+    }
+
     if (resolvedRoles.length === 1) {
       const active = resolvedRoles[0].type
       setActiveRole(active)
@@ -109,10 +116,25 @@ export function PasswordPage() {
         handyman: ROUTES.HANDYMAN_DASHBOARD,
         homerunner: ROUTES.HOMERUNNER_DASHBOARD,
       }
-      navigate(roleToRoute[active] ?? ROUTES.HOME)
+      
+      // For admin, homerunner, and handyman, always go to their dashboard
+      const forceDashboardRoles: RoleType[] = ['admin', 'homerunner', 'handyman']
+      if (forceDashboardRoles.includes(active)) {
+        navigate(roleToRoute[active] ?? ROUTES.HOME, { replace: true })
+      } else if (intendedDestination && active === 'tenant') {
+        // For tenants, navigate to intended destination if available
+        navigate(intendedDestination, { replace: true })
+      } else {
+        navigate(roleToRoute[active] ?? ROUTES.HOME, { replace: true })
+      }
     } else {
       openRoleSwitcher()
-    navigate(ROUTES.HOME)
+      // For multi-role users, check if there's an intended destination
+      if (intendedDestination) {
+        navigate(intendedDestination, { replace: true })
+      } else {
+        navigate(ROUTES.HOME, { replace: true })
+      }
     }
   }
 

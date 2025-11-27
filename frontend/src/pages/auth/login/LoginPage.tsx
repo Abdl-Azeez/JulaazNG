@@ -33,7 +33,9 @@ export function LoginPage() {
 
   // Check if we should show as modal (desktop) or full page
   const shouldShowAsModal = isDesktop
-  const backgroundLocation = (location.state as { backgroundLocation?: Location })?.backgroundLocation
+  const locationState = (location.state as { backgroundLocation?: Location; intendedDestination?: string }) ?? {}
+  const backgroundLocation = locationState.backgroundLocation
+  const intendedDestination = locationState.intendedDestination || sessionStorage.getItem('intendedDestination')
 
   // Detect login method based on first character
   useEffect(() => {
@@ -82,10 +84,21 @@ export function LoginPage() {
   const handleContinue = () => {
     if (!validateInput()) return
 
+    // Preserve state including intended destination
+    const preserveState = {
+      backgroundLocation,
+      intendedDestination,
+      modal: shouldShowAsModal,
+    }
+
     if (loginMethod === 'email') {
-      navigate(`${ROUTES.LOGIN_PASSWORD}?email=${encodeURIComponent(inputValue)}`)
+      navigate(`${ROUTES.LOGIN_PASSWORD}?email=${encodeURIComponent(inputValue)}`, {
+        state: preserveState,
+      })
     } else if (loginMethod === 'phone') {
-      navigate(`${ROUTES.LOGIN_PASSWORD}?phone=${encodeURIComponent(inputValue)}`)
+      navigate(`${ROUTES.LOGIN_PASSWORD}?phone=${encodeURIComponent(inputValue)}`, {
+        state: preserveState,
+      })
     }
   }
 

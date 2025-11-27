@@ -427,6 +427,98 @@
 }
 ```
 
+#### **Disputes**
+```typescript
+{
+  id: UUID (PK)
+  reference: string (unique, indexed) // e.g., "DISP-2025-001"
+  type: enum ['payment', 'property', 'service', 'booking', 'other']
+  
+  complainantId: UUID (FK → Users)
+  respondentId: UUID (FK → Users)
+  
+  relatedPropertyId: UUID (FK → Properties, optional)
+  relatedBookingId: UUID (FK → PropertyBookings, optional)
+  relatedPaymentId: UUID (FK → Payments, optional)
+  relatedServiceBookingId: UUID (FK → ServiceBookings, optional)
+  
+  title: string
+  description: text
+  documents: JSON[] {
+    id: UUID
+    name: string
+    type: enum ['image', 'pdf', 'document']
+    url: string
+    uploadedAt: DateTime
+  }
+  
+  status: enum ['open', 'in_progress', 'resolved', 'closed']
+  resolution: enum ['in_favor_of_complainant', 'in_favor_of_respondent', 'closed_without_resolution', null]
+  resolutionNotes: text
+  
+  conversationId: UUID (FK → Conversations, optional) // Links to associated chat
+  
+  createdAt: DateTime
+  updatedAt: DateTime
+  resolvedAt: DateTime
+}
+```
+
+#### **BackgroundChecks**
+```typescript
+{
+  id: UUID (PK)
+  userId: UUID (FK → Users, unique)
+  
+  status: enum ['pending', 'submitted', 'in_review', 'verified', 'rejected']
+  progress: integer (0-100)
+  
+  personalInfo: JSON {
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    dateOfBirth: Date
+    nationality: string
+  }
+  
+  employment: JSON {
+    status: enum ['employed', 'self_employed', 'student', 'unemployed']
+    employer: string
+    position: string
+    monthlyIncome: decimal
+    employmentLength: integer // months
+  }
+  
+  financial: JSON {
+    bankName: string
+    accountNumber: string
+    hasGuarantor: boolean
+    guarantorDetails: JSON (optional)
+  }
+  
+  documents: JSON[] {
+    id: UUID
+    type: enum ['id_card', 'proof_of_income', 'employment_letter', 'bank_statement', 'guarantor_letter']
+    name: string
+    url: string
+    status: enum ['pending', 'approved', 'rejected']
+    uploadedAt: DateTime
+    reviewedAt: DateTime
+    reviewedBy: UUID (FK → Users, optional)
+    rejectionReason: text (optional)
+  }
+  
+  submittedAt: DateTime
+  verifiedAt: DateTime
+  verifiedBy: UUID (FK → Users, optional)
+  rejectionReason: text (optional)
+  
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+```
+
 ---
 
 ## 3. API Endpoints
@@ -1545,7 +1637,864 @@ TWILIO_AUTH_TOKEN=...
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** November 2025  
+## 11. Admin API Endpoints
+
+### 11.1 Analytics (`/api/v1/admin/analytics`)
+
+#### GET `/dashboard`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "revenue": {
+      "total": 50000000,
+      "thisMonth": 5000000,
+      "lastMonth": 4500000,
+      "growth": 11.11,
+      "monthlyBreakdown": [
+        { "month": "January", "revenue": 3000000, "users": 1200 },
+        { "month": "February", "revenue": 3500000, "users": 1400 }
+      ]
+    },
+    "users": {
+      "total": 15000,
+      "thisMonth": 1200,
+      "lastMonth": 1000,
+      "growth": 20,
+      "monthlyBreakdown": [
+        { "month": "January", "revenue": 3000000, "users": 1200 },
+        { "month": "February", "revenue": 3500000, "users": 1400 }
+      ]
+    },
+    "properties": {
+      "total": 500,
+      "active": 450,
+      "pending": 30,
+      "suspended": 20
+    },
+    "bookings": {
+      "total": 1200,
+      "active": 800,
+      "pending": 200,
+      "completed": 200
+    }
+  }
+}
+```
+
+### 11.2 User Management (`/api/v1/admin/users`)
+
+#### GET `/`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Query Params:** `?page=1&limit=20&sortBy=name&sortDirection=asc&role=tenant&status=active&search=john`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "uuid",
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string",
+        "phoneNumber": "string",
+        "roles": ["tenant", "landlord"],
+        "profilePicture": "url",
+        "isEmailVerified": true,
+        "isPhoneVerified": true,
+        "isBackgroundChecked": true,
+        "backgroundCheckStatus": "verified",
+        "status": "active",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "lastLoginAt": "2025-12-01T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 150,
+      "totalPages": 8
+    }
+  }
+}
+```
+
+#### GET `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "firstName": "string",
+    "lastName": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "roles": ["tenant"],
+    "profilePicture": "url",
+    "isEmailVerified": true,
+    "isBackgroundChecked": true,
+    "backgroundCheckStatus": "verified",
+    "status": "active",
+    "properties": [
+      {
+        "id": "uuid",
+        "title": "string",
+        "address": "string",
+        "status": "active"
+      }
+    ],
+    "tenantStats": {
+      "propertiesViewed": 15,
+      "viewingRequests": 8,
+      "currentRentals": 1,
+      "shortletsUsed": 3
+    },
+    "backgroundCheck": {
+      "status": "verified",
+      "documents": [
+        {
+          "id": "uuid",
+          "type": "id_card",
+          "name": "National ID",
+          "status": "approved",
+          "url": "url"
+        }
+      ],
+      "progress": 100
+    },
+    "createdAt": "2024-01-15T10:00:00Z"
+  }
+}
+```
+
+#### POST `/`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "firstName": "string",
+  "lastName": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "password": "string",
+  "roles": ["tenant", "landlord"],
+  "dateOfBirth": "1995-05-15",
+  "gender": "male"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": {
+    "userId": "uuid"
+  }
+}
+```
+
+#### PATCH `/:id/suspend`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User suspended successfully"
+}
+```
+
+#### PATCH `/:id/reactivate`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User reactivated successfully"
+}
+```
+
+#### PATCH `/:id/ban`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User banned successfully"
+}
+```
+
+#### DELETE `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+```
+
+#### POST `/:id/background-check/documents/:docId/approve`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document approved successfully"
+}
+```
+
+#### POST `/:id/background-check/documents/:docId/reject`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "reason": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document rejected"
+}
+```
+
+#### POST `/:id/background-check/documents/upload`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:** (multipart/form-data)
+```json
+{
+  "documentType": "id_card|proof_of_income|employment_letter",
+  "file": File
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document uploaded successfully",
+  "data": {
+    "documentId": "uuid"
+  }
+}
+```
+
+#### POST `/:id/message`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "message": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Conversation created",
+  "data": {
+    "conversationId": "uuid"
+  }
+}
+```
+
+### 11.3 Property Management (`/api/v1/admin/properties`)
+
+#### GET `/`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Query Params:** `?page=1&limit=20&status=pending&city=Lagos`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "properties": [
+      {
+        "id": "uuid",
+        "title": "string",
+        "address": "string",
+        "city": "string",
+        "propertyType": "apartment",
+        "bedrooms": 2,
+        "bathrooms": 2,
+        "annualRent": 1200000,
+        "images": ["url1", "url2"],
+        "status": "pending",
+        "landlord": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "createdAt": "2025-11-15T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 500,
+      "totalPages": 25
+    }
+  }
+}
+```
+
+#### GET `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "title": "string",
+    "description": "text",
+    "address": "string",
+    "city": "string",
+    "propertyType": "apartment",
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "images": ["url1", "url2", "url3", "url4"],
+    "status": "pending",
+    "landlord": {
+      "id": "uuid",
+      "name": "string",
+      "email": "string"
+    },
+    "createdAt": "2025-11-15T10:00:00Z"
+  }
+}
+```
+
+#### PATCH `/:id/approve`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Property approved successfully"
+}
+```
+
+#### PATCH `/:id/reject`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "reason": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Property rejected"
+}
+```
+
+#### PATCH `/:id/suspend`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Property suspended successfully"
+}
+```
+
+#### PATCH `/:id/reactivate`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Property reactivated successfully"
+}
+```
+
+#### DELETE `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Property deleted successfully"
+}
+```
+
+### 11.4 Service Management (`/api/v1/admin/services`)
+
+#### GET `/`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Query Params:** `?page=1&limit=20&status=pending&category=cleaning`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "services": [
+      {
+        "id": "uuid",
+        "name": "string",
+        "category": "cleaning",
+        "provider": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "status": "pending",
+        "averageRating": 4.5,
+        "totalBookings": 50,
+        "createdAt": "2025-11-15T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 200,
+      "totalPages": 10
+    }
+  }
+}
+```
+
+#### GET `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "name": "string",
+    "description": "text",
+    "category": "cleaning",
+    "pricing": {
+      "basePrice": 8000,
+      "priceType": "per_room"
+    },
+    "provider": {
+      "id": "uuid",
+      "name": "string",
+      "email": "string"
+    },
+    "status": "pending",
+    "createdAt": "2025-11-15T10:00:00Z"
+  }
+}
+```
+
+#### PATCH `/:id/approve`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Service approved successfully"
+}
+```
+
+#### PATCH `/:id/reject`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "reason": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Service rejected"
+}
+```
+
+#### PATCH `/:id/suspend`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Service suspended successfully"
+}
+```
+
+#### PATCH `/:id/reactivate`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Service reactivated successfully"
+}
+```
+
+#### DELETE `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Service deleted successfully"
+}
+```
+
+### 11.5 Payment Management (`/api/v1/admin/payments`)
+
+#### GET `/`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Query Params:** `?page=1&limit=20&sortBy=amount&sortDirection=desc&status=pending`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "payments": [
+      {
+        "id": "uuid",
+        "userId": "uuid",
+        "userName": "string",
+        "paymentType": "rent",
+        "totalAmount": 1218000,
+        "status": "pending",
+        "paymentMethod": "card",
+        "createdAt": "2025-11-15T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 500,
+      "totalPages": 25
+    }
+  }
+}
+```
+
+#### GET `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "userId": "uuid",
+    "userName": "string",
+    "paymentType": "rent",
+    "items": [
+      { "description": "Annual Rent", "amount": 1200000 }
+    ],
+    "subtotal": 1200000,
+    "processingFee": 18000,
+    "totalAmount": 1218000,
+    "paymentMethod": "card",
+    "paymentReference": "string",
+    "status": "pending",
+    "createdAt": "2025-11-15T10:00:00Z"
+  }
+}
+```
+
+#### POST `/:id/refund`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "amount": 1218000,
+      "reason": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Refund initiated successfully",
+  "data": {
+    "refundId": "uuid",
+    "status": "processing"
+  }
+}
+```
+
+#### PATCH `/:id/approve`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Payment approved successfully"
+}
+```
+
+#### PATCH `/:id/reject`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "reason": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Payment rejected"
+}
+```
+
+### 11.6 Dispute Management (`/api/v1/admin/disputes`)
+
+#### GET `/`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Query Params:** `?page=1&limit=20&status=open`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "disputes": [
+      {
+        "id": "uuid",
+        "reference": "DISP-2025-001",
+        "type": "payment",
+        "complainant": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "respondent": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "status": "open",
+        "messageCount": 8,
+        "conversationId": "uuid",
+        "createdAt": "2025-11-15T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 100,
+      "totalPages": 5
+    }
+  }
+}
+```
+
+#### GET `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "reference": "DISP-2025-001",
+    "type": "payment",
+    "complainant": {
+      "id": "uuid",
+      "name": "string",
+      "email": "string"
+    },
+    "respondent": {
+      "id": "uuid",
+      "name": "string",
+      "email": "string"
+    },
+    "description": "text",
+    "documents": [
+      {
+        "id": "uuid",
+        "name": "string",
+        "type": "image|pdf",
+        "url": "url"
+      }
+    ],
+    "status": "open",
+    "conversationId": "uuid",
+    "createdAt": "2025-11-15T10:00:00Z"
+  }
+}
+```
+
+#### POST `/:id/message`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "message": "string",
+  "recipients": "both|complainant|respondent"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Message sent and conversation created",
+  "data": {
+    "conversationId": "uuid",
+    "messageId": "uuid"
+  }
+}
+```
+
+#### PATCH `/:id/resolve`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "resolution": "in_favor_of_complainant|in_favor_of_respondent|closed_without_resolution",
+  "notes": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Dispute resolved successfully"
+}
+```
+
+### 11.7 Background Check Management (`/api/v1/admin/background-checks`)
+
+#### GET `/`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Query Params:** `?page=1&limit=20&status=pending`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "backgroundChecks": [
+      {
+        "id": "uuid",
+        "userId": "uuid",
+        "userName": "string",
+        "status": "pending",
+        "progress": 75,
+        "documents": [
+          {
+            "id": "uuid",
+            "type": "id_card",
+            "name": "National ID",
+            "status": "approved"
+          }
+        ],
+        "submittedAt": "2025-11-15T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 200,
+      "totalPages": 10
+    }
+  }
+}
+```
+
+#### GET `/:id`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "userId": "uuid",
+    "userName": "string",
+    "status": "pending",
+    "progress": 75,
+    "documents": [
+      {
+        "id": "uuid",
+        "type": "id_card",
+        "name": "National ID",
+        "status": "approved",
+        "url": "url"
+      }
+    ],
+    "submittedAt": "2025-11-15T10:00:00Z"
+  }
+}
+```
+
+#### GET `/:id/documents/:docId`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "type": "id_card",
+    "name": "National ID",
+    "status": "approved",
+    "url": "url",
+    "uploadedAt": "2025-11-15T10:00:00Z"
+  }
+}
+```
+
+#### POST `/:id/documents/:docId/approve`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document approved successfully"
+}
+```
+
+#### POST `/:id/documents/:docId/reject`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "reason": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document rejected"
+}
+```
+
+#### POST `/:id/approve`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Background check approved successfully"
+}
+```
+
+#### POST `/:id/reject`
+**Headers:** `Authorization: Bearer {accessToken}`, `X-Active-Role: admin`
+**Request:**
+```json
+{
+  "reason": "string"
+}
+```
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Background check rejected"
+}
+```
+
+---
+
+**Document Version:** 2.0  
+**Last Updated:** December 2025  
 **Prepared By:** JulaazNG Development Team
 
