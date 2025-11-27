@@ -10,7 +10,8 @@ import {
   MapPin,
   CheckCircle2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle
 } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import HouseIcon from '@/assets/icons/house.svg?react'
@@ -22,14 +23,17 @@ import { Footer } from '@/widgets/footer'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { Header } from '@/widgets/header'
+import { ReportDialog } from '@/widgets/report-dialog'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore } from '@/shared/store/role.store'
 import { useFavouritesStore } from '@/shared/store/favourites.store'
+import { usePropertyReportEligibility } from '@/shared/hooks/useReportEligibility'
 import { samplePropertyDetails } from './data/sample-property-details'
 import { cn } from '@/shared/lib/utils/cn'
 import type { PropertyDetail, MoveInItem } from '@/entities/property/model/types'
 import { ROUTES } from '@/shared/constants/routes'
 import toast from 'react-hot-toast'
+import type { ReportFormData } from '@/shared/types/report.types'
 
 const formatCurrency = (value: number) =>
   `₦${new Intl.NumberFormat('en-NG', {
@@ -51,11 +55,15 @@ const HEART_BURST_PARTICLES = [
 export function PropertyDetailsPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const { activeRole } = useRoleStore()
   const [isAuthModalOpen, setAuthModalOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false)
+  
+  // Check report eligibility for property
+  const reportEligibility = usePropertyReportEligibility(id || '')
 
   const toggleFavourite = useFavouritesStore((state) => state.toggleFavourite)
   const favouritePropertyIds = useFavouritesStore((state) => state.favouritePropertyIds)
@@ -299,6 +307,46 @@ export function PropertyDetailsPage() {
     }
 
     navigate(ROUTES.PROPERTY_BOOKING(property.id))
+  }
+
+  const handleReportProperty = () => {
+    if (!isAuthenticated) {
+      setAuthModalOpen(true)
+      return
+    }
+
+    if (!reportEligibility.canReport) {
+      toast.error(reportEligibility.reason || 'You cannot report this property')
+      return
+    }
+
+    setIsReportDialogOpen(true)
+  }
+
+  const handleReportSubmit = async (data: ReportFormData) => {
+    // Create dispute from report
+    // In a real app, this would call an API endpoint
+    const disputeData = {
+      type: 'property' as const,
+      complainant: {
+        name: user?.name || 'Unknown',
+        role: activeRole || 'tenant',
+      },
+      respondent: {
+        name: property.owner.name,
+        role: 'landlord',
+      },
+      subject: data.title,
+      description: data.description,
+      relatedPropertyId: property.id,
+    }
+
+    // Simulate API call
+    toast.success('Report submitted successfully. Our admin team will review it shortly.')
+    setIsReportDialogOpen(false)
+    
+    // In production, this would create a dispute in the admin disputes page
+    console.log('Report submitted:', disputeData)
   }
 
   return (
@@ -771,19 +819,31 @@ export function PropertyDetailsPage() {
                   </div>
                 </div>
                 {!isLandlordRole && (
-                  canRequestViewing ? (
-                  <Button
-                    className="rounded-xl w-full sm:w-auto sm:self-start"
-                    onClick={handleRequestViewing}
-                  >
-                    Request Viewing
-                  </Button>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">
-                      Viewing requests are reserved for tenants. Reach out to the concierge team to coordinate a
-                      tour.
-                    </p>
-                  )
+                  <div className="flex flex-col gap-2">
+                    {canRequestViewing ? (
+                      <Button
+                        className="rounded-xl w-full sm:w-auto sm:self-start"
+                        onClick={handleRequestViewing}
+                      >
+                        Request Viewing
+                      </Button>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Viewing requests are reserved for tenants. Reach out to the concierge team to coordinate a
+                        tour.
+                      </p>
+                    )}
+                    {activeRole === 'tenant' && reportEligibility.canReport && (
+                      <Button
+                        variant="outline"
+                        className="rounded-xl w-full sm:w-auto sm:self-start border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                        onClick={handleReportProperty}
+                      >
+                        <AlertTriangle className="h-4 w-4 mr-2" />
+                        Report Property
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
             </Card>
@@ -867,6 +927,24 @@ export function PropertyDetailsPage() {
           }}
           intendedDestination={property ? ROUTES.PROPERTY_BOOKING(property.id) : undefined}
         />
+        {property && (
+          <ReportDialog
+            open={isReportDialogOpen}
+            onOpenChange={setIsReportDialogOpen}
+            reportType="property"
+            reportedEntity={{
+              id: property.id,
+              name: property.title,
+              type: 'property',
+            }}
+            relatedTo={property ? {
+              type: 'property',
+              id: property.id,
+              title: property.title,
+            } : undefined}
+            onReportSubmit={handleReportSubmit}
+          />
+        )}
     </div>
   )
 }

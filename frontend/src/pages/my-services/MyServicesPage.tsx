@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { ReportButton } from '@/widgets/report-button'
 import { useNavigate } from 'react-router-dom'
 import {
   Sparkles,
@@ -547,7 +548,26 @@ export function MyServicesPage() {
 
               {/* Provider Info */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-foreground">Service Provider</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-foreground">Service Provider</h3>
+                  <ReportButton
+                    reportedEntity={{
+                      id: selectedBooking.provider.id || selectedBooking.providerId,
+                      name: selectedBooking.provider.name,
+                      type: 'user',
+                      role: 'service_provider',
+                    }}
+                    reportType="service_provider"
+                    relatedTo={{
+                      type: 'service_booking',
+                      id: selectedBooking.id,
+                      title: selectedBooking.serviceName,
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                  />
+                </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50">
                   <Avatar className="h-14 w-14">
                     <AvatarImage src={selectedBooking.provider.avatar} />

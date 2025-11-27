@@ -3,6 +3,7 @@ import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { Footer } from '@/widgets/footer'
 import { AuthDialog } from '@/widgets/auth-dialog'
+import { ReportButton } from '@/widgets/report-button'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { LandlordNav } from '@/widgets/landlord-nav'
 import { landlordApplications as sampleApplications } from '../data/sample-applications'
@@ -349,6 +350,23 @@ export function LandlordApplicationsPage() {
                             <MessageSquare className="h-4 w-4" />
                             Continue chat
                           </Button>
+                          <ReportButton
+                            reportedEntity={{
+                              id: application.id,
+                              name: application.applicantName,
+                              type: 'user',
+                              role: 'tenant',
+                            }}
+                            reportType="tenant"
+                            relatedTo={{
+                              type: 'property',
+                              id: application.propertyId,
+                              title: application.propertyName,
+                            }}
+                            variant="ghost"
+                            size="sm"
+                            className="rounded-xl gap-2 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                          />
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <Calendar className="h-3.5 w-3.5" />
                             Submitted {format(new Date(application.submittedAt), 'MMM d')}
