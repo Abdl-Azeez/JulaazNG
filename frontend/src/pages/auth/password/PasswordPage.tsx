@@ -10,6 +10,7 @@ import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { useRoleStore, type UserRole, type RoleType } from '@/shared/store/role.store'
 import { findSampleUser } from '@/shared/data/sample-users'
+import { ArrowLeft } from 'lucide-react'
 
 export function PasswordPage() {
   const [isDesktop, setIsDesktop] = useState(false)
@@ -138,6 +139,10 @@ export function PasswordPage() {
     }
   }
 
+  const handleGoBack = () => {
+    navigate(ROUTES.LOGIN, { replace: true })
+  }
+
   // Desktop Modal Layout
   if (isDesktop) {
     return (
@@ -148,6 +153,17 @@ export function PasswordPage() {
           </div>
           
           <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+            </div>
             <h1 className="text-2xl font-bold text-foreground text-center">
               Enter Password
             </h1>
@@ -208,6 +224,17 @@ export function PasswordPage() {
       
       <div className="flex-1 bg-surface rounded-t-[24px] -mt-6 relative z-10 px-6 py-8">
         <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGoBack}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+          </div>
           <h1 className="text-2xl font-bold text-foreground text-center">
             Enter Password
           </h1>

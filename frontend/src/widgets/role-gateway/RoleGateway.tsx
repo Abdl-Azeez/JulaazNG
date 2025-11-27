@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Dialog, DialogContent, DialogHeader } from '@/shared/ui/dialog'
 import { Card } from '@/shared/ui/card'
@@ -7,7 +7,7 @@ import { cn } from '@/shared/lib/utils/cn'
 import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore, type RoleType } from '@/shared/store/role.store'
-import { Home, Building2, Wrench, ShieldCheck, Sparkles, Hammer } from 'lucide-react'
+import { Home, Building2, Wrench, ShieldCheck, Sparkles, Hammer, Eye } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 type RoleMeta = {
@@ -40,7 +40,7 @@ const roleCatalog: Record<RoleType, RoleMeta> = {
     label: 'Admin',
     description: 'Administer the platform',
     icon: ShieldCheck,
-    to: ROUTES.HOME,
+    to: ROUTES.ADMIN_DASHBOARD,
   },
   handyman: {
     label: 'Handyman',
@@ -63,8 +63,8 @@ const roleCatalog: Record<RoleType, RoleMeta> = {
   homerunner: {
     label: 'Homerunner',
     description: 'Inspect and guide property viewings',
-    icon: Wrench,
-    to: ROUTES.MY_SERVICES,
+    icon: Eye,
+    to: ROUTES.HOMERUNNER_DASHBOARD,
   },
 }
 
@@ -74,6 +74,7 @@ export function RoleGateway() {
   const { isAuthenticated } = useAuthStore()
   const { roles, activeRole, suggestedRole, isRoleSwitcherOpen, setActiveRole, closeRoleSwitcher } =
     useRoleStore()
+  const pendingNavigation = useRef<RoleType | null>(null)
 
   const shouldOpen = useMemo(() => {
     if (!isAuthenticated) return false
@@ -86,12 +87,24 @@ export function RoleGateway() {
     // Auto-focus suggested role if we ever need that behavior in the future
   }, [suggestedRole])
 
+  // Handle navigation after role change
+  useEffect(() => {
+    if (pendingNavigation.current && activeRole === pendingNavigation.current && !isRoleSwitcherOpen) {
+      const role = pendingNavigation.current
+      const to = roleCatalog[role]?.to ?? ROUTES.HOME
+      navigate(to, { replace: true })
+      toast.success(`Switched to ${roleCatalog[role]?.label ?? 'role'}`)
+      pendingNavigation.current = null
+    }
+  }, [activeRole, isRoleSwitcherOpen, navigate])
+
   const onSelectRole = (role: RoleType) => {
+    // Store the role we want to navigate to
+    pendingNavigation.current = role
+    // Close the dialog first
+    closeRoleSwitcher()
+    // Set the active role - this will trigger the useEffect above
     setActiveRole(role)
-    const to = roleCatalog[role]?.to ?? ROUTES.HOME
-    // maintain background location state for modal-based routes
-    navigate(to, { replace: location.pathname === to })
-    toast.success(`Switched to ${roleCatalog[role]?.label ?? 'role'}`)
   }
 
   if (!shouldOpen) return null

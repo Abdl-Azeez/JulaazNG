@@ -13,6 +13,7 @@ import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore, type RoleType, type UserRole } from '@/shared/store/role.store'
 import { findSampleUser } from '@/shared/data/sample-users'
+import { ArrowLeft } from 'lucide-react'
 
 interface ModalState {
   backgroundLocation?: Location
@@ -37,6 +38,16 @@ export function PasswordModal() {
     } else {
       navigate(ROUTES.HOME, { replace: true })
     }
+  }
+
+  const handleGoBack = () => {
+    navigate(ROUTES.LOGIN, {
+      state: {
+        backgroundLocation,
+        intendedDestination,
+      },
+      replace: true,
+    })
   }
 
   const phone = searchParams.get('phone') || ''
@@ -160,6 +171,17 @@ export function PasswordModal() {
         <div className="flex flex-col items-center">
           <LogoSvg className="h-40 w-40 md:h-44 md:w-44 text-primary -mt-16" />
           <div className="w-full space-y-6 -mt-8">
+            <div className="flex items-center gap-3 w-full">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+            </div>
             <h1 className="text-2xl font-bold text-foreground text-center">
               Enter Password
             </h1>

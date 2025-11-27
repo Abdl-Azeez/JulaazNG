@@ -18,9 +18,9 @@ const roleToDashboard: Record<RoleType, string> = {
   service_provider: ROUTES.HANDYMAN_DASHBOARD,
   artisan: ROUTES.HANDYMAN_DASHBOARD,
   property_manager: ROUTES.HOME,
-  admin: ROUTES.HOME,
+  admin: ROUTES.ADMIN_DASHBOARD,
   handyman: ROUTES.HANDYMAN_DASHBOARD,
-  homerunner: ROUTES.HOME,
+  homerunner: ROUTES.HOMERUNNER_DASHBOARD,
 }
 
 export function RoleGuard({
