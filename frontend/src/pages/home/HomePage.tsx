@@ -25,7 +25,17 @@ export function HomePage() {
 
   const handleSearch = (query: string) => {
     // Navigate to search page with query
+    if (query.trim()) {
     navigate(`${ROUTES.PROPERTY_SEARCH}?q=${encodeURIComponent(query)}`)
+    } else {
+      // If empty, just go to properties page
+      navigate(ROUTES.PROPERTIES)
+    }
+  }
+
+  const handleFilterClick = () => {
+    // Navigate to properties page where filters are available
+    navigate(ROUTES.PROPERTIES)
   }
 
   const handleShare = (propertyId: string) => {
@@ -247,7 +257,7 @@ export function HomePage() {
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-2xl" />
                     <div className="relative bg-surface/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-border/50">
-                      <SearchBar onSearch={handleSearch} onFilterClick={() => console.log('Filter clicked')} />
+                      <SearchBar onSearch={handleSearch} onFilterClick={handleFilterClick} />
                       <div className="mt-6 grid grid-cols-3 gap-4">
                         <div className="text-center p-4 rounded-xl bg-background/50">
                           <div className="text-2xl font-bold text-primary">1K+</div>

@@ -74,6 +74,7 @@ export function ProfilePage() {
   const effectiveRole = activeRole ?? user?.role ?? null
   const isHandyman =
     effectiveRole === 'handyman' || effectiveRole === 'service_provider' || effectiveRole === 'artisan'
+  const isAdmin = effectiveRole === 'admin'
 
   const [backgroundForm, setBackgroundForm] = useState({
     monthlyIncome: '',
@@ -506,8 +507,8 @@ export function ProfilePage() {
           )}
         </div>
 
-        {/* Background Check Section */}
-        {!isEditing && (
+        {/* Background Check Section - Hidden for Admin */}
+        {!isEditing && !isAdmin && (
           <div id="background-check" className="space-y-6 pt-6 lg:pt-8">
             <h2 className="text-xl lg:text-2xl font-bold text-foreground">Background Check</h2>
 

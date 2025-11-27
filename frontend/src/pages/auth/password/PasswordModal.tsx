@@ -116,9 +116,9 @@ export function PasswordModal() {
         service_provider: ROUTES.MY_SERVICES,
         artisan: ROUTES.MY_SERVICES,
         property_manager: ROUTES.HOME,
-        admin: ROUTES.HOME,
-        handyman: ROUTES.MY_SERVICES,
-        homerunner: ROUTES.MY_SERVICES,
+        admin: ROUTES.ADMIN_DASHBOARD,
+        handyman: ROUTES.HANDYMAN_DASHBOARD,
+        homerunner: ROUTES.HOMERUNNER_DASHBOARD,
     }
       const targetRoute = roleToRoute[active] ?? ROUTES.HOME
       

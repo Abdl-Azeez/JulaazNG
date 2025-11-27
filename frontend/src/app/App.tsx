@@ -17,6 +17,24 @@ import {
   UpcomingRotaPage,
   ViewAllAssignmentsPage,
 } from '@/pages/handyman'
+import {
+  HomerunnerDashboardPage,
+  HomerunnerInspectionsPage,
+  HomerunnerViewingsPage,
+  HomerunnerEarningsPage,
+} from '@/pages/homerunner'
+import {
+  AdminDashboardPage,
+  AdminApprovalsPage,
+  AdminAnalyticsPage,
+  AdminUsersPage,
+  AdminPropertiesPage,
+  AdminPropertyDetailsPage,
+  AdminPaymentsPage,
+  AdminDisputesPage,
+  AdminServicesPage,
+  AdminBackgroundChecksPage,
+} from '@/pages/admin'
 import { LoginPage } from '@/pages/auth/login'
 import { PasswordPage } from '@/pages/auth/password'
 import { SignupPage } from '@/pages/auth/signup'
@@ -181,6 +199,136 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
           element={
             <RoleGuard allowedRoles={['handyman']} redirectTo={ROUTES.HANDYMAN_DASHBOARD}>
               <ViewAllAssignmentsPage />
+            </RoleGuard>
+          }
+        />
+        {/* Homerunner Routes */}
+        <Route
+          path={ROUTES.HOMERUNNER_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['homerunner']} redirectTo={ROUTES.HOME}>
+              <HomerunnerDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOMERUNNER_INSPECTIONS}
+          element={
+            <RoleGuard allowedRoles={['homerunner']} redirectTo={ROUTES.HOMERUNNER_DASHBOARD}>
+              <HomerunnerInspectionsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOMERUNNER_VIEWINGS}
+          element={
+            <RoleGuard allowedRoles={['homerunner']} redirectTo={ROUTES.HOMERUNNER_DASHBOARD}>
+              <HomerunnerViewingsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOMERUNNER_EARNINGS}
+          element={
+            <RoleGuard allowedRoles={['homerunner']} redirectTo={ROUTES.HOMERUNNER_DASHBOARD}>
+              <HomerunnerEarningsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOMERUNNER_SCHEDULE}
+          element={
+            <RoleGuard allowedRoles={['homerunner']} redirectTo={ROUTES.HOMERUNNER_DASHBOARD}>
+              <HomerunnerDashboardPage />
+            </RoleGuard>
+          }
+        />
+        {/* Admin Routes */}
+        <Route
+          path={ROUTES.ADMIN}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.HOME}>
+              <AdminDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.HOME}>
+              <AdminDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_APPROVALS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminApprovalsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_ANALYTICS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminAnalyticsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_USERS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminUsersPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_PROPERTIES}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminPropertiesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_PROPERTY_DETAILS(':id')}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminPropertyDetailsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_SERVICES}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminServicesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_PAYMENTS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminPaymentsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_DISPUTES}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminDisputesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_BACKGROUND_CHECKS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminBackgroundChecksPage />
             </RoleGuard>
           }
         />

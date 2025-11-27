@@ -312,19 +312,19 @@ export function ServicesPage() {
                 </div>
               </div>
             ) : (
-              <div
-                className={`rounded-3xl bg-gradient-to-br ${selectedCategory.color} p-1 mb-6`}
-              >
-                <div className="rounded-[28px] bg-background/80 p-6">
-                  <div className="flex items-center gap-3">
-                    <selectedCategory.icon className="h-10 w-10 text-primary" />
-                    <div>
-                      <h3 className="text-xl font-semibold">{selectedCategory.name}</h3>
-                      <p className="text-sm text-muted-foreground">{selectedCategory.description}</p>
-                    </div>
+            <div
+              className={`rounded-3xl bg-gradient-to-br ${selectedCategory.color} p-1 mb-6`}
+            >
+              <div className="rounded-[28px] bg-background/80 p-6">
+                <div className="flex items-center gap-3">
+                  <selectedCategory.icon className="h-10 w-10 text-primary" />
+                  <div>
+                    <h3 className="text-xl font-semibold">{selectedCategory.name}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedCategory.description}</p>
                   </div>
                 </div>
               </div>
+            </div>
             )}
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -333,11 +333,11 @@ export function ServicesPage() {
                   const { service, category } = item
                   
                   return (
-                    <motion.div
+                <motion.div
                       key={`${category.id}-${service.id}`}
-                      whileHover={{ translateY: -4 }}
-                      className="rounded-2xl border border-border/60 bg-background/80 p-5 shadow-sm"
-                    >
+                  whileHover={{ translateY: -4 }}
+                  className="rounded-2xl border border-border/60 bg-background/80 p-5 shadow-sm"
+                >
                       {searchQuery.trim() && (
                         <div className="mb-2">
                           <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
@@ -346,33 +346,33 @@ export function ServicesPage() {
                           </span>
                         </div>
                       )}
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-lg font-semibold text-foreground">
-                          {service.title}
-                        </h4>
-                        <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                          From ₦{service.priceFrom.toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                        {service.summary}
-                      </p>
-                      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                        <span className="font-medium">{service.rating}★ satisfaction</span>
-                        <span>{service.jobsCompleted.toLocaleString()} jobs completed</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        className="mt-4 w-full rounded-xl border border-border/60"
-                        onClick={() => {
-                          handleServiceCardClick(service.id, service.title)
-                          navigate(ROUTES.SERVICE_REQUEST(service.id))
-                        }}
-                      >
-                        Request this crew
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </motion.div>
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold text-foreground">
+                      {service.title}
+                    </h4>
+                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                      From ₦{service.priceFrom.toLocaleString()}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    {service.summary}
+                  </p>
+                  <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="font-medium">{service.rating}★ satisfaction</span>
+                    <span>{service.jobsCompleted.toLocaleString()} jobs completed</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    className="mt-4 w-full rounded-xl border border-border/60"
+                    onClick={() => {
+                      handleServiceCardClick(service.id, service.title)
+                      navigate(ROUTES.SERVICE_REQUEST(service.id))
+                    }}
+                  >
+                    Request this crew
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </motion.div>
                   )
                 })
               ) : (

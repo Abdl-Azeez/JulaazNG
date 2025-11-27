@@ -3,6 +3,7 @@ import type { ElementType } from 'react'
 import {
   Menu,
   User,
+  Users,
   Home,
   Building2,
   Wrench,
@@ -17,6 +18,12 @@ import {
   ChevronDown,
   LayoutGrid,
   HardHat,
+  Eye,
+  ClipboardCheck,
+  Wallet,
+  ShieldCheck,
+  BarChart3,
+  CheckCircle,
 } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import LogoSvg from '@/assets/images/logo.svg?react'
@@ -53,17 +60,25 @@ type ActivityItem = NavigationItem & {
 export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const { roles, activeRole, openRoleSwitcher } = useRoleStore()
   const [isVisible, setIsVisible] = useState(true)
   const [isLandlordMenuOpen, setLandlordMenuOpen] = useState(false)
   const lastScrollYRef = useRef(0)
 
   const isLandlordRoute = location.pathname.includes('/landlord')
+  const isHomerunnerRoute = location.pathname.includes('/homerunner')
+  const isAdminRoute = location.pathname.includes('/admin')
+  
+  // Fallback to user.role from auth store if activeRole is not set
   const effectiveRole: RoleType | null = isAuthenticated
-    ? activeRole ?? null
+    ? activeRole ?? user?.role ?? null
     : isLandlordRoute
     ? 'landlord'
+    : isHomerunnerRoute
+    ? 'homerunner'
+    : isAdminRoute
+    ? 'admin'
     : null
 
   const formatRoleLabel = (role?: string | null) =>
@@ -117,6 +132,25 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
       ]
     }
 
+    if (role === 'homerunner') {
+      return [
+        { icon: ClipboardCheck, label: 'Dashboard', path: ROUTES.HOMERUNNER_DASHBOARD },
+        { icon: Eye, label: 'Inspections', path: ROUTES.HOMERUNNER_INSPECTIONS },
+        { icon: Eye, label: 'Viewings', path: ROUTES.HOMERUNNER_VIEWINGS },
+        { icon: Wallet, label: 'Earnings', path: ROUTES.HOMERUNNER_EARNINGS },
+      ]
+    }
+
+    if (role === 'admin') {
+      return [
+        { icon: ShieldCheck, label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD },
+        { icon: CheckCircle, label: 'Approvals', path: ROUTES.ADMIN_APPROVALS },
+        { icon: BarChart3, label: 'Analytics', path: ROUTES.ADMIN_ANALYTICS },
+        { icon: Users, label: 'Users', path: ROUTES.ADMIN_USERS },
+        { icon: Building2, label: 'Properties', path: ROUTES.ADMIN_PROPERTIES },
+      ]
+    }
+
     if (role === 'tenant') {
       return [
         { icon: Home, label: 'Home', path: ROUTES.HOME },
@@ -151,6 +185,21 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
       return [
         ...base,
         { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
+      ]
+    }
+
+    if (role === 'homerunner') {
+      // Homerunner only needs messages and notifications
+      return base
+    }
+
+    if (role === 'admin') {
+      return [
+        ...base,
+        { icon: Wrench, label: 'Services', path: ROUTES.ADMIN_SERVICES },
+        { icon: CreditCard, label: 'Payments', path: ROUTES.ADMIN_PAYMENTS },
+        { icon: MessageCircle, label: 'Disputes', path: ROUTES.ADMIN_DISPUTES },
+        { icon: ShieldCheck, label: 'Background Checks', path: ROUTES.ADMIN_BACKGROUND_CHECKS },
       ]
     }
 

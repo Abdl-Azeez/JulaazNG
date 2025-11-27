@@ -1,4 +1,4 @@
-import { X, Home, Building2, MessageCircle, Bell, Calendar, User, LogOut, Settings, Heart, FileText, Briefcase, Wrench, Zap, Droplet, Sparkles, Paintbrush, Clock, Receipt, CreditCard, HardHat } from 'lucide-react'
+import { X, Home, Building2, MessageCircle, Bell, Calendar, User, LogOut, Settings, Heart, FileText, Briefcase, Wrench, Zap, Droplet, Sparkles, Paintbrush, Clock, Receipt, CreditCard, HardHat, Eye, ClipboardCheck, Wallet, ShieldCheck, BarChart3, CheckCircle } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore, type RoleType } from '@/shared/store/role.store'
@@ -23,8 +23,11 @@ interface MenuItem {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const { activeRole } = useRoleStore()
+
+  // Fallback to user.role from auth store if activeRole is not set
+  const currentRole = activeRole || user?.role || null
 
   const isActive = (path: string) => {
     if (path === ROUTES.HOME) {
@@ -33,17 +36,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     return location.pathname.startsWith(path)
   }
 
-  const isHandyman = activeRole === 'handyman'
+  const isHandyman = currentRole === 'handyman'
+  const isHomerunner = currentRole === 'homerunner'
+  const isAdmin = currentRole === 'admin'
 
   const hideTenantFeatures =
-    activeRole === 'landlord' ||
+    currentRole === 'landlord' ||
     isHandyman ||
-    location.pathname.includes('/landlord')
+    isHomerunner ||
+    isAdmin ||
+    location.pathname.includes('/landlord') ||
+    location.pathname.includes('/homerunner') ||
+    location.pathname.includes('/admin')
 
+  // Admin and homerunner don't need Home, Properties, or Services pages
   const publicMenuItems: MenuItem[] = [
-    { icon: Home, label: 'Home', path: ROUTES.HOME },
+    ...((isHomerunner || isAdmin) ? [] : [{ icon: Home, label: 'Home', path: ROUTES.HOME }]),
     ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }]),
-    ...(isHandyman ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
+    ...((isHandyman || isHomerunner || isAdmin) ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
   ]
 
   const authenticatedMenuItems: MenuItem[] = [
@@ -57,8 +67,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const filteredAuthenticatedMenuItems = hideTenantFeatures
     ? authenticatedMenuItems.filter((item) => {
+        // Admin and homerunner don't need Calendar, Favorites, My Bookings, My Services
+        if (isHomerunner || isAdmin) {
+          // Only keep Messages and Notifications for admin/homerunner
+          if (item.path !== ROUTES.MESSAGING && item.path !== ROUTES.NOTIFICATIONS) return false
+        }
         if (item.path === ROUTES.MY_BOOKINGS) return false
-        if ((activeRole === 'landlord' || isHandyman) && item.path === ROUTES.MY_SERVICES) return false
+        if ((currentRole === 'landlord' || isHandyman || isHomerunner || isAdmin) && item.path === ROUTES.MY_SERVICES) return false
         return true
       })
     : authenticatedMenuItems
@@ -118,6 +133,82 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: ROUTES.HANDYMAN_JOBS,
       requiresAuth: true,
       roles: ['handyman'],
+    },
+  ]
+
+  const homerunnerMenuItems: MenuItem[] = [
+    {
+      icon: Home,
+      label: 'Homerunner HQ',
+      path: ROUTES.HOMERUNNER_DASHBOARD,
+      requiresAuth: true,
+      roles: ['homerunner'],
+    },
+    {
+      icon: ClipboardCheck,
+      label: 'Inspections',
+      path: ROUTES.HOMERUNNER_INSPECTIONS,
+      requiresAuth: true,
+      roles: ['homerunner'],
+    },
+    {
+      icon: Eye,
+      label: 'Viewings',
+      path: ROUTES.HOMERUNNER_VIEWINGS,
+      requiresAuth: true,
+      roles: ['homerunner'],
+    },
+    {
+      icon: Wallet,
+      label: 'Earnings',
+      path: ROUTES.HOMERUNNER_EARNINGS,
+      requiresAuth: true,
+      roles: ['homerunner'],
+    },
+  ]
+
+  const adminMenuItems: MenuItem[] = [
+    {
+      icon: ShieldCheck,
+      label: 'Admin Dashboard',
+      path: ROUTES.ADMIN_DASHBOARD,
+      requiresAuth: true,
+      roles: ['admin'],
+    },
+    {
+      icon: CheckCircle,
+      label: 'Approvals',
+      path: ROUTES.ADMIN_APPROVALS,
+      requiresAuth: true,
+      roles: ['admin'],
+    },
+    {
+      icon: BarChart3,
+      label: 'Analytics',
+      path: ROUTES.ADMIN_ANALYTICS,
+      requiresAuth: true,
+      roles: ['admin'],
+    },
+    {
+      icon: User,
+      label: 'Users',
+      path: ROUTES.ADMIN_USERS,
+      requiresAuth: true,
+      roles: ['admin'],
+    },
+    {
+      icon: Building2,
+      label: 'Properties',
+      path: ROUTES.ADMIN_PROPERTIES,
+      requiresAuth: true,
+      roles: ['admin'],
+    },
+    {
+      icon: ShieldCheck,
+      label: 'Background Checks',
+      path: ROUTES.ADMIN_BACKGROUND_CHECKS,
+      requiresAuth: true,
+      roles: ['admin'],
     },
   ]
 
@@ -189,7 +280,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const shouldShowItem = (item: MenuItem) => {
     if (item.requiresAuth && !isAuthenticated) return false
-    if (item.roles && activeRole && !item.roles.includes(activeRole)) return false
+    if (item.roles && currentRole && !item.roles.includes(currentRole)) return false
     return true
   }
 
@@ -253,7 +344,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Quick Services Chips */}
-          {!isHandyman && (
+          {!isHandyman && !isHomerunner && !isAdmin && (
           <div className="sidebar__section">
             <h3 className="sidebar__section-title">Quick Services</h3>
             <div className="grid grid-cols-2 gap-2 px-2">
@@ -309,7 +400,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </div>
 
               {/* Role-specific Items */}
-              {activeRole === 'tenant' && tenantMenuItems.some(shouldShowItem) && (
+              {currentRole === 'tenant' && tenantMenuItems.some(shouldShowItem) && (
                 <div className="sidebar__section">
                   <h3 className="sidebar__section-title">Tenant</h3>
                   {tenantMenuItems.filter(shouldShowItem).map((item) => {
@@ -349,10 +440,50 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
               )}
 
-              {activeRole === 'landlord' && landlordMenuItems.some(shouldShowItem) && (
+              {currentRole === 'landlord' && landlordMenuItems.some(shouldShowItem) && (
                 <div className="sidebar__section">
                   <h3 className="sidebar__section-title">Landlord</h3>
                   {landlordMenuItems.filter(shouldShowItem).map((item) => {
+                    const active = isActive(item.path)
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigation(item.path)}
+                        className={cn('sidebar__item', active && 'sidebar__item--active')}
+                      >
+                        <item.icon className="sidebar__item-icon" />
+                        <span className="sidebar__item-label">{item.label}</span>
+                        <div className="sidebar__item-shine" />
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {isHomerunner && homerunnerMenuItems.some(shouldShowItem) && (
+                <div className="sidebar__section">
+                  <h3 className="sidebar__section-title">Homerunner</h3>
+                  {homerunnerMenuItems.filter(shouldShowItem).map((item) => {
+                    const active = isActive(item.path)
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigation(item.path)}
+                        className={cn('sidebar__item', active && 'sidebar__item--active')}
+                      >
+                        <item.icon className="sidebar__item-icon" />
+                        <span className="sidebar__item-label">{item.label}</span>
+                        <div className="sidebar__item-shine" />
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {isAdmin && adminMenuItems.some(shouldShowItem) && (
+                <div className="sidebar__section">
+                  <h3 className="sidebar__section-title">Admin</h3>
+                  {adminMenuItems.filter(shouldShowItem).map((item) => {
                     const active = isActive(item.path)
                     return (
                       <button

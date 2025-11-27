@@ -14,7 +14,7 @@ export const samplePropertyBookings: PropertyBooking[] = [
     type: 'rental',
     status: 'active',
     property: {
-      id: 'prop-1',
+      id: '1',
       name: '2 Bedroom Apartment',
       address: '45 Admiralty Way',
       city: 'Lekki',
@@ -120,7 +120,7 @@ export const samplePropertyBookings: PropertyBooking[] = [
     type: 'rental',
     status: 'under_review',
     property: {
-      id: 'prop-2',
+      id: '2',
       name: '3 Bedroom Duplex',
       address: '12 Ogudu Road',
       city: 'Ikeja',
@@ -206,7 +206,7 @@ export const samplePropertyBookings: PropertyBooking[] = [
     type: 'short_let',
     status: 'confirmed',
     property: {
-      id: 'prop-3',
+      id: '3',
       name: 'Luxury Studio Apartment',
       address: '89 Adeola Odeku Street',
       city: 'Victoria Island',
@@ -280,7 +280,7 @@ export const samplePropertyBookings: PropertyBooking[] = [
     type: 'rental',
     status: 'viewing_scheduled',
     property: {
-      id: 'prop-4',
+      id: '4',
       name: '4 Bedroom Terrace',
       address: '23 Chevron Drive',
       city: 'Lekki',
@@ -330,7 +330,7 @@ export const samplePropertyBookings: PropertyBooking[] = [
     type: 'rental',
     status: 'rejected',
     property: {
-      id: 'prop-5',
+      id: '5',
       name: '1 Bedroom Apartment',
       address: '67 Allen Avenue',
       city: 'Ikeja',

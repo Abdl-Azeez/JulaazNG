@@ -105,9 +105,9 @@ export function PasswordPage() {
         service_provider: ROUTES.MY_SERVICES,
         artisan: ROUTES.MY_SERVICES,
         property_manager: ROUTES.HOME,
-        admin: ROUTES.HOME,
+        admin: ROUTES.ADMIN_DASHBOARD,
         handyman: ROUTES.HANDYMAN_DASHBOARD,
-        homerunner: ROUTES.MY_SERVICES,
+        homerunner: ROUTES.HOMERUNNER_DASHBOARD,
       }
       navigate(roleToRoute[active] ?? ROUTES.HOME)
     } else {

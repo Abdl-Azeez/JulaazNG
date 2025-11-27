@@ -1,0 +1,2 @@
+export { AdminBackgroundChecksPage } from './AdminBackgroundChecksPage'
+

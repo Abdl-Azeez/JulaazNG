@@ -31,6 +31,24 @@ const demoUsers = [
     roles: [UserRole.TENANT, UserRole.LANDLORD],
     preferredRole: UserRole.TENANT,
   },
+  {
+    email: 'homerunner@julaaz.com',
+    phone: '08010000006',
+    password: 'homerunner123',
+    firstName: 'Adebayo',
+    lastName: 'Johnson',
+    roles: [UserRole.HOMERUNNER],
+    preferredRole: UserRole.HOMERUNNER,
+  },
+  {
+    email: 'admin@julaaz.com',
+    phone: '08010000007',
+    password: 'admin123',
+    firstName: 'Super',
+    lastName: 'Admin',
+    roles: [UserRole.ADMIN],
+    preferredRole: UserRole.ADMIN,
+  },
 ]
 
 async function seedDemoUsers() {
