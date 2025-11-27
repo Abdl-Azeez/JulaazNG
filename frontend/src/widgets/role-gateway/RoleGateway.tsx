@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Dialog, DialogContent, DialogHeader } from '@/shared/ui/dialog'
 import { Card } from '@/shared/ui/card'
 import { Button } from '@/shared/ui/button'
@@ -70,7 +70,7 @@ const roleCatalog: Record<RoleType, RoleMeta> = {
 
 export function RoleGateway() {
   const navigate = useNavigate()
-  const location = useLocation()
+  // const location = useLocation()
   const { isAuthenticated } = useAuthStore()
   const { roles, activeRole, suggestedRole, isRoleSwitcherOpen, setActiveRole, closeRoleSwitcher } =
     useRoleStore()
