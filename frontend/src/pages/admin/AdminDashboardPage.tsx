@@ -162,23 +162,23 @@ export function AdminDashboardPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-violet-500/10 via-background to-background">
-          <div className="container mx-auto max-w-7xl px-4 lg:px-6 xl:px-8 py-8 lg:py-10">
-            <div className="flex flex-wrap items-start justify-between gap-6">
-              <div className="space-y-4 max-w-3xl">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              <div className="space-y-4 w-full lg:max-w-3xl">
                 <Badge className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
                   <ShieldCheck className="h-3 w-3 mr-1" />
                   Admin Command Center
                 </Badge>
                 <div className="space-y-2">
-                  <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
                     Operational pulse at a glance
                   </h1>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     Stay ahead of approvals, liquidity, and service health. Every card below is
                     wired to a quick action so you can keep the marketplace calm and fast.
                   </p>
                 </div>
-                <div className="grid gap-4 w-full sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                   {highlightStats.map((stat) => (
                     <div
                       key={stat.id}
@@ -192,16 +192,16 @@ export function AdminDashboardPage() {
                         <p className="text-sm font-medium text-white/80">{stat.label}</p>
                         <stat.icon className="h-4 w-4 text-white/80" />
                       </div>
-                      <p className="text-2xl font-semibold">{stat.value}</p>
+                      <p className="text-xl sm:text-2xl font-semibold">{stat.value}</p>
                       <p className="text-xs text-white/80 mt-1">{stat.subtext}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 min-w-[220px]">
+              <div className="flex flex-col gap-3 w-full lg:w-auto lg:min-w-[220px]">
                 <Button
-                  className="rounded-xl bg-primary text-primary-foreground shadow-lg"
+                  className="rounded-xl bg-primary text-primary-foreground shadow-lg w-full lg:w-auto"
                   onClick={() => navigate(ROUTES.ADMIN_ANALYTICS)}
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
@@ -209,7 +209,7 @@ export function AdminDashboardPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="rounded-xl border-primary/40 text-primary hover:bg-primary/10"
+                  className="rounded-xl border-primary/40 text-primary hover:bg-primary/10 w-full lg:w-auto"
                   onClick={() => navigate(ROUTES.ADMIN_BACKGROUND_CHECKS)}
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
@@ -221,22 +221,22 @@ export function AdminDashboardPage() {
         </section>
 
         {/* Operational Snapshot */}
-        <section className="container mx-auto max-w-7xl px-4 lg:px-6 xl:px-8 py-8">
+        <section className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="grid gap-4 lg:grid-cols-[1.4fr,0.6fr]">
             <Card className="rounded-3xl border-none bg-surface shadow-lg">
-              <div className="p-6 border-b border-border/60">
-                <div className="flex items-center justify-between">
+              <div className="p-4 sm:p-6 border-b border-border/60">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <p className="text-sm text-muted-foreground">Engagement</p>
-                    <p className="text-xl font-semibold text-foreground">User velocity</p>
+                    <p className="text-lg sm:text-xl font-semibold text-foreground">User velocity</p>
                   </div>
-                  <Badge className="bg-primary/10 text-primary">
+                  <Badge className="bg-primary/10 text-primary w-fit">
                     <ArrowUpRight className="h-3 w-3 mr-1" />
                     +{sampleSystemStats.monthlyGrowth}%
                   </Badge>
                 </div>
               </div>
-              <div className="p-6 grid gap-4 md:grid-cols-2">
+              <div className="p-4 sm:p-6 grid gap-4 grid-cols-1 sm:grid-cols-2">
                 {[
                   {
                     label: 'Active tenants',
@@ -261,10 +261,10 @@ export function AdminDashboardPage() {
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className="rounded-2xl border border-border/60 bg-background/70 p-4"
+                    className="rounded-2xl border border-border/60 bg-background/70 p-3 sm:p-4"
                   >
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
-                    <p className="text-2xl font-semibold text-foreground">{item.value}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{item.label}</p>
+                    <p className="text-xl sm:text-2xl font-semibold text-foreground">{item.value}</p>
                     <p className="text-xs text-primary mt-1">{item.change}</p>
                   </div>
                 ))}
@@ -272,11 +272,11 @@ export function AdminDashboardPage() {
             </Card>
 
             <Card className="rounded-3xl border border-border/60 bg-background/80 shadow-sm">
-              <div className="p-6 border-b border-border/60">
+              <div className="p-4 sm:p-6 border-b border-border/60">
                 <p className="text-sm text-muted-foreground">Watchlist</p>
-                <p className="text-xl font-semibold text-foreground">Signals & alerts</p>
+                <p className="text-lg sm:text-xl font-semibold text-foreground">Signals & alerts</p>
               </div>
-              <div className="p-6 space-y-4">
+              <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 {[
                   {
                     title: 'Liquidity buffer',
@@ -297,9 +297,9 @@ export function AdminDashboardPage() {
                     state: 'text-primary',
                   },
                 ].map((item) => (
-                  <div key={item.title} className="rounded-2xl border border-dashed border-border/60 p-4">
-                    <p className="text-sm text-muted-foreground">{item.title}</p>
-                    <p className={cn('text-2xl font-semibold', item.state)}>{item.value}</p>
+                  <div key={item.title} className="rounded-2xl border border-dashed border-border/60 p-3 sm:p-4">
+                    <p className="text-xs sm:text-sm text-muted-foreground">{item.title}</p>
+                    <p className={cn('text-xl sm:text-2xl font-semibold', item.state)}>{item.value}</p>
                     <p className="text-xs text-muted-foreground mt-1">{item.helper}</p>
                   </div>
                 ))}
@@ -309,10 +309,10 @@ export function AdminDashboardPage() {
         </section>
 
         {/* User Breakdown */}
-        <section className="container mx-auto max-w-7xl px-4 lg:px-6 xl:px-8 pb-6">
-          <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5">
+        <section className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-6">
+          <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-4 sm:p-5">
             <h3 className="text-sm font-semibold text-foreground mb-4">User Distribution</h3>
-            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
               {[
                 { label: 'Tenants', value: sampleUserStats.tenants, icon: Users, color: 'text-blue-600 bg-blue-500/10' },
                 { label: 'Landlords', value: sampleUserStats.landlords, icon: Home, color: 'text-purple-600 bg-purple-500/10' },
@@ -336,17 +336,17 @@ export function AdminDashboardPage() {
         </section>
 
         {/* Main Grid */}
-        <section className="container mx-auto max-w-7xl px-4 lg:px-6 xl:px-8 pb-8 lg:pb-12">
-          <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+        <section className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8 lg:pb-12">
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.2fr,0.8fr]">
             {/* Pending Approvals */}
             <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm">
-              <div className="p-5 border-b border-border/50 flex items-center justify-between">
+              <div className="p-4 sm:p-5 border-b border-border/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
                     <Clock className="h-5 w-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-foreground">Pending Approvals</h2>
+                    <h2 className="text-base sm:text-lg font-semibold text-foreground">Pending Approvals</h2>
                     <p className="text-xs text-muted-foreground">
                       {pendingApprovals.length} items need your attention
                     </p>
@@ -354,7 +354,7 @@ export function AdminDashboardPage() {
                 </div>
                 <Button
                   variant="ghost"
-                  className="rounded-xl text-sm"
+                  className="rounded-xl text-sm w-full sm:w-auto"
                   onClick={() => navigate(ROUTES.ADMIN_APPROVALS)}
                 >
                   View all
@@ -363,12 +363,12 @@ export function AdminDashboardPage() {
 
               <div className="divide-y divide-border/60">
                 {approvals.slice(0, 4).map((approval) => (
-                  <div key={approval.id} className="p-5 flex items-start gap-4">
+                  <div key={approval.id} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
                     <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
                       {getApprovalTypeIcon(approval.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
                         <Badge className="rounded-full bg-muted text-muted-foreground text-[10px]">
                           {approval.type.replace('_', ' ')}
                         </Badge>
@@ -384,12 +384,12 @@ export function AdminDashboardPage() {
                         by {approval.submittedBy} • {approval.submittedAt}
                       </p>
                     </div>
-                    <div className="flex gap-2 shrink-0">
+                    <div className="flex gap-2 shrink-0 sm:flex-col sm:items-end">
                       {approval.status === 'pending' ? (
                         <>
                           <Button
                             size="sm"
-                            className="rounded-lg h-8 px-3 bg-emerald-600 hover:bg-emerald-700"
+                            className="rounded-lg h-8 px-3 bg-emerald-600 hover:bg-emerald-700 text-xs sm:text-sm w-full sm:w-auto"
                             onClick={() => handleQuickApprove(approval.id)}
                           >
                             Approve
@@ -397,7 +397,7 @@ export function AdminDashboardPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="rounded-lg h-8 px-3"
+                            className="rounded-lg h-8 px-3 text-xs sm:text-sm w-full sm:w-auto"
                             onClick={() => setReviewApproval(approval)}
                           >
                             Review
@@ -415,21 +415,21 @@ export function AdminDashboardPage() {
             </Card>
 
             {/* Right Column */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Recent Activity */}
               <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm">
-                <div className="p-5 border-b border-border/50">
-                  <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
+                <div className="p-4 sm:p-5 border-b border-border/50">
+                  <h2 className="text-base sm:text-lg font-semibold text-foreground">Recent Activity</h2>
                   <p className="text-xs text-muted-foreground">Platform-wide events</p>
                 </div>
                 <div className="divide-y divide-border/60">
                   {sampleRecentActivities.slice(0, 5).map((activity) => (
-                    <div key={activity.id} className="p-4 flex items-start gap-3">
+                    <div key={activity.id} className="p-3 sm:p-4 flex items-start gap-3">
                       <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
                         {getActivityIcon(activity.type)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{activity.title}</p>
+                        <p className="text-xs sm:text-sm font-medium text-foreground">{activity.title}</p>
                         <p className="text-xs text-muted-foreground truncate">
                           {activity.description}
                         </p>
@@ -438,7 +438,7 @@ export function AdminDashboardPage() {
                         </p>
                       </div>
                       {activity.amount && (
-                        <p className="text-sm font-semibold text-emerald-600 shrink-0">
+                        <p className="text-xs sm:text-sm font-semibold text-emerald-600 shrink-0">
                           ₦{activity.amount.toLocaleString()}
                         </p>
                       )}
@@ -448,9 +448,9 @@ export function AdminDashboardPage() {
               </Card>
 
               {/* Quick Links */}
-              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5">
-                <h3 className="text-sm font-semibold text-foreground mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-2 gap-2">
+              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-4 sm:p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-3 sm:mb-4">Quick Actions</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
                     { label: 'Users', icon: Users, route: ROUTES.ADMIN_USERS },
                     { label: 'Properties', icon: Building2, route: ROUTES.ADMIN_PROPERTIES },
@@ -463,11 +463,11 @@ export function AdminDashboardPage() {
                     <Button
                       key={item.label}
                       variant="outline"
-                      className="rounded-xl h-12 justify-start"
+                      className="rounded-xl h-10 sm:h-12 justify-start text-xs sm:text-sm"
                       onClick={() => navigate(item.route)}
                     >
-                      <item.icon className="h-4 w-4 mr-2 text-primary" />
-                      {item.label}
+                      <item.icon className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-primary shrink-0" />
+                      <span className="truncate">{item.label}</span>
                     </Button>
                   ))}
                 </div>
