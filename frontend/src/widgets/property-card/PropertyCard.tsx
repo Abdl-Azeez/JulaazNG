@@ -226,16 +226,18 @@ export function PropertyCard({ property, onRequestViewing, onShare, onSelect, la
                 {property.parking}
               </span>
             </div>
-            {annualLabel && (
-              <p className="text-lg font-bold text-foreground text-center">
-                {annualLabel}
-              </p>
-            )}
-            {nightlyLabel && (
-              <p className="text-[11px] font-semibold text-primary text-center">
-                {hasLongTerm ? `Shortlet from ${nightlyLabel}` : nightlyLabel}
-              </p>
-            )}
+            <div className="h-[44px] flex flex-col justify-center">
+              {annualLabel && (
+                <p className="text-lg font-bold text-foreground text-center leading-tight">
+                  {annualLabel}
+                </p>
+              )}
+              {nightlyLabel && (
+                <p className="text-[11px] font-semibold text-primary text-center leading-tight">
+                  {hasLongTerm ? `Shortlet from ${nightlyLabel}` : nightlyLabel}
+                </p>
+              )}
+            </div>
           </>
         )}
         
