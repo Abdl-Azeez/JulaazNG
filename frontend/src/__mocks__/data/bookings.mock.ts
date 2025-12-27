@@ -233,8 +233,8 @@ export const mockPropertyApplications: PropertyApplication[] = [
     status: 'pending',
     moveInDate: '2024-03-01',
     leaseDuration: 12,
-    leaseDurationUnit: 'MONTH',
-    employmentStatus: 'EMPLOYED',
+    leaseDurationUnit: 'month',
+    employmentStatus: 'employed',
     monthlyIncome: 500000,
     hasGuarantor: true,
     guarantorDetails: {
@@ -246,13 +246,13 @@ export const mockPropertyApplications: PropertyApplication[] = [
     documents: [
       {
         id: 'doc_001',
-        type: 'ID_CARD',
+        type: 'id_card',
         url: 'https://example.com/id-card.pdf',
         uploadedAt: '2024-02-12T10:00:00Z',
       },
       {
         id: 'doc_002',
-        type: 'PROOF_OF_INCOME',
+        type: 'proof_of_income',
         url: 'https://example.com/income.pdf',
         uploadedAt: '2024-02-12T10:05:00Z',
       },
@@ -273,21 +273,21 @@ export const mockBookingTimeline: BookingTimeline[] = [
     actor: {
       id: mockUsers.tenant1.id,
       name: `${mockUsers.tenant1.firstName} ${mockUsers.tenant1.lastName}`,
-      role: 'TENANT',
+      role: 'tenant',
     },
     notes: 'Application submitted',
   },
   {
     id: 'tl_002',
     bookingId: 'book_002',
-    status: 'under_review',
+    status: 'application_submitted',
     timestamp: '2024-02-12T14:00:00Z',
     actor: {
       id: mockUsers.landlord1.id,
       name: `${mockUsers.landlord1.firstName} ${mockUsers.landlord1.lastName}`,
-      role: 'LANDLORD',
+      role: 'landlord',
     },
-    notes: 'Documents received, under review',
+    notes: 'Documents received, application submitted',
   },
 ]
 
