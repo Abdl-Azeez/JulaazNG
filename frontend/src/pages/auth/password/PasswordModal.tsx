@@ -12,7 +12,7 @@ import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore, type RoleType, type UserRole } from '@/shared/store/role.store'
-import { findSampleUser } from '@/shared/data/sample-users'
+import { findSampleUser } from '@/__mocks__/data/users.mock'
 import { ArrowLeft } from 'lucide-react'
 
 interface ModalState {

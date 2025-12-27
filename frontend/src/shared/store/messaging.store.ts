@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { Conversation, Message } from '@/shared/types/activity.types'
-import { sampleConversations, sampleMessages } from '@/pages/messaging/data/sample-conversations'
+import { sampleConversations, sampleMessages } from '@/__mocks__/data/messages.mock'
 import { format } from 'date-fns'
 import type { RentalCategory } from '@/entities/property/model/types'
 

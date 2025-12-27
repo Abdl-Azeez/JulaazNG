@@ -19,7 +19,7 @@ import {
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
 import { Textarea } from '@/shared/ui/textarea'
-import { serviceCategories } from '@/pages/services/data/sample-services'
+import { serviceCategories } from '@/__mocks__/data/services.mock'
 
 interface ModalState {
   backgroundLocation?: Location

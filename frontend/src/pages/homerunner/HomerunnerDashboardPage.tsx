@@ -30,16 +30,12 @@ import {
   Clock,
   ArrowRight,
   Building2,
-  MessageCircle,
-  BellRing,
-  Route,
   NotebookPen,
   ShieldCheck,
   Send,
   Sparkles,
   CalendarCheck,
 } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
@@ -49,63 +45,11 @@ import {
   sampleEarnings,
   performanceStats,
   sampleScheduleItems,
+  quickActionShortcuts,
   type HomerunnerScheduleItem,
-} from './data/sample-homerunner-data'
+  type QuickAction,
+} from '@/__mocks__/data/homerunner.mock'
 import toast from 'react-hot-toast'
-
-type QuickAction = {
-  id: string
-  title: string
-  description: string
-  ctaLabel: string
-  placeholder: string
-  referenceLabel: string
-  icon: LucideIcon
-  accent: string
-}
-
-const quickActionShortcuts: QuickAction[] = [
-  {
-    id: 'log-inspection',
-    title: 'Log inspection note',
-    description: 'Capture a quick highlight for landlords',
-    ctaLabel: 'Save note',
-    placeholder: 'e.g. Fixed loose cabinet hinge in the kitchen...',
-    referenceLabel: 'Property / landlord contact',
-    icon: ClipboardCheck,
-    accent: 'bg-emerald-500/10 text-emerald-600',
-  },
-  {
-    id: 'share-update',
-    title: 'Send tenant update',
-    description: 'Share next steps or arrival times',
-    ctaLabel: 'Send message',
-    placeholder: 'Let tenant know what to expect...',
-    referenceLabel: 'Tenant name or phone',
-    icon: MessageCircle,
-    accent: 'bg-purple-500/10 text-purple-600',
-  },
-  {
-    id: 'schedule-reminder',
-    title: 'Set follow-up reminder',
-    description: 'Stay on track with quick reminders',
-    ctaLabel: 'Schedule reminder',
-    placeholder: 'Reminder details and time...',
-    referenceLabel: 'Reminder time / channel',
-    icon: BellRing,
-    accent: 'bg-amber-500/10 text-amber-600',
-  },
-  {
-    id: 'share-route',
-    title: 'Share route with team',
-    description: 'Drop a pin so support can assist',
-    ctaLabel: 'Share route',
-    placeholder: 'Paste map link or directions...',
-    referenceLabel: 'Route or location link',
-    icon: Route,
-    accent: 'bg-blue-500/10 text-blue-600',
-  },
-]
 
 const scheduleTypeStyles: Record<
   HomerunnerScheduleItem['type'],

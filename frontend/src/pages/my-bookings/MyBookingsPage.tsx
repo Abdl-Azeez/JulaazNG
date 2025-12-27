@@ -29,7 +29,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { ROUTES } from '@/shared/constants/routes'
 import { cn } from '@/shared/lib/utils/cn'
-import { samplePropertyBookings } from './data/sample-bookings'
+import { samplePropertyBookings } from '@/__mocks__/data/bookings.mock'
 import type { PropertyBooking, BookingStatus } from '@/shared/types/booking.types'
 
 const formatCurrency = (value: number) =>
@@ -627,10 +627,10 @@ export function MyBookingsPage() {
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold text-foreground">Booking Timeline</h3>
                 <div className="space-y-3">
-                  {selectedBooking.timeline.map((item, index) => {
+                  {selectedBooking.timeline?.map((item, index) => {
                     const config = getStatusConfig(item.status)
                     const Icon = config.icon
-                    const isLast = index === selectedBooking.timeline.length - 1
+                    const isLast = index === (selectedBooking.timeline?.length ?? 0) - 1
 
                     return (
                       <div key={index} className="flex gap-3">
@@ -643,7 +643,7 @@ export function MyBookingsPage() {
                           >
                             <Icon className="h-4 w-4" />
                           </div>
-                          {index < selectedBooking.timeline.length - 1 && (
+                          {index < (selectedBooking.timeline?.length ?? 0) - 1 && (
                             <div className="w-0.5 h-full min-h-[24px] bg-border mt-1" />
                           )}
                         </div>

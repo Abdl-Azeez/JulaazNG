@@ -28,47 +28,7 @@ import {
 import { ResponsiveDrawer } from './components/ResponsiveDrawer'
 import { Label } from '@/shared/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
-
-const jobCategories = [
-  { id: 'all', label: 'All jobs' },
-  { id: 'emergency', label: 'Emergency' },
-  { id: 'maintenance', label: 'Maintenance cycles' },
-  { id: 'installations', label: 'Installations' },
-  { id: 'projects', label: 'Project support' },
-]
-
-const jobBoard = [
-  {
-    id: 'board-001',
-    category: 'emergency',
-    title: 'Emergency generator diagnostics',
-    payout: '₦75,000',
-    responseWindow: 'Dispatch within 45 min',
-    location: 'Ikoyi, Lagos',
-    shift: 'Today • 8:30 PM',
-    badges: ['Priority', 'Requires two-man crew'],
-  },
-  {
-    id: 'board-002',
-    category: 'maintenance',
-    title: 'Monthly water treatment cycle',
-    payout: '₦40,000',
-    responseWindow: 'Schedule by 11 AM',
-    location: 'Magodo GRA, Lagos',
-    shift: 'Tomorrow • 9:00 AM',
-    badges: ['Recurring'],
-  },
-  {
-    id: 'board-003',
-    category: 'installations',
-    title: 'Smart lock & CCTV installation',
-    payout: '₦110,000',
-    responseWindow: 'Confirm availability before 1 PM',
-    location: 'Surulere, Lagos',
-    shift: 'In 2 days • 12:00 PM',
-    badges: ['Premium client', 'Materials supplied'],
-  },
-]
+import { jobCategories, jobBoard } from '@/__mocks__/data/handyman.mock'
 
 export function HandymanJobsPage() {
   const navigate = useNavigate()

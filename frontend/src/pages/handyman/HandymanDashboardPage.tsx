@@ -10,11 +10,8 @@ import {
   ClipboardCheck,
   MapPin,
   Phone,
-  ShieldCheck,
-  Star,
   Wrench,
   CheckCircle2,
-  Clock,
   Sparkles,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
@@ -25,73 +22,11 @@ import {
   JobSheetDrawer,
 } from './components'
 
-const upcomingJobs = [
-  {
-    id: 'job-001',
-    title: 'Emergency Electrical Diagnostics',
-    client: 'Victoria Crest Apartments',
-    scheduledFor: 'Today • 4:00 PM',
-    location: 'Lekki Phase 1, Lagos',
-    contact: '+234 801 234 5678',
-    status: 'enroute',
-    badge: 'Priority',
-  },
-  {
-    id: 'job-002',
-    title: 'HVAC quarterly maintenance',
-    client: 'Oasis Co-working',
-    scheduledFor: 'Tomorrow • 10:00 AM',
-    location: 'Yaba, Lagos',
-    contact: '+234 809 234 9090',
-    status: 'confirmed',
-    badge: 'Recurring',
-  },
-]
-
-const performanceHighlights = [
-  {
-    id: 'rating',
-    label: 'Average rating',
-    value: '4.9★',
-    description: 'from 128 completed jobs',
-    icon: Star,
-  },
-  {
-    id: 'response',
-    label: 'Response time',
-    value: '28 min',
-    description: 'average dispatch acceptance',
-    icon: Clock,
-  },
-  {
-    id: 'quality',
-    label: 'Quality score',
-    value: '98%',
-    description: 'based on concierge QA checks',
-    icon: ShieldCheck,
-  },
-]
-
-const onboardingChecklist = [
-  {
-    id: 'identity',
-    title: 'Identity verification',
-    description: 'Upload NIN or driver’s licence and confirm selfie check.',
-    completed: true,
-  },
-  {
-    id: 'competency',
-    title: 'Competency proof',
-    description: 'Submit trade certifications or apprenticeship references.',
-    completed: true,
-  },
-  {
-    id: 'workshop',
-    title: 'Workshop address',
-    description: 'Share your workshop/service radius so we can assign jobs near you.',
-    completed: false,
-  },
-]
+import {
+  upcomingJobs,
+  performanceHighlights,
+  onboardingChecklist,
+} from '@/__mocks__/data/handyman.mock'
 
 export function HandymanDashboardPage() {
   const navigate = useNavigate()

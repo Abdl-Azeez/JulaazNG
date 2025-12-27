@@ -52,66 +52,7 @@ import {
   DropdownMenuSeparator,
 } from '@/shared/ui/dropdown-menu'
 import toast from 'react-hot-toast'
-
-interface Service {
-  id: string
-  name: string
-  category: 'electrical' | 'plumbing' | 'painting' | 'cleaning' | 'repairs'
-  provider: string
-  providerId: string
-  status: 'active' | 'pending' | 'suspended' | 'rejected'
-  verified: boolean
-  rating: number
-  totalBookings: number
-  completedBookings: number
-  price: { min: number; max: number }
-  createdAt: string
-  lastActive: string
-  description?: string
-  location?: string
-}
-
-// Expanded sample data for pagination demo
-const generateSampleServices = (): Service[] => {
-  const categories: Service['category'][] = ['electrical', 'plumbing', 'painting', 'cleaning', 'repairs']
-  const statuses: Service['status'][] = ['active', 'pending', 'suspended', 'rejected']
-  const providers = [
-    'Kunle Balogun',
-    'Emeka Okoro',
-    'Grace Eze',
-    'Sarah Ike',
-    'Michael Obi',
-    'David Adeyemi',
-    'Chioma Nwosu',
-    'Femi Ogunleye',
-  ]
-  const locations = ['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano']
-
-  return Array.from({ length: 38 }, (_, i) => ({
-    id: `service-${i + 1}`,
-    name: `${categories[Math.floor(Math.random() * categories.length)]} Service ${i + 1}`,
-    category: categories[Math.floor(Math.random() * categories.length)],
-    provider: providers[Math.floor(Math.random() * providers.length)],
-    providerId: `SP${String(i + 1).padStart(3, '0')}`,
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    verified: Math.random() > 0.3,
-    rating: Math.random() > 0.2 ? Math.round((Math.random() * 2 + 3) * 10) / 10 : 0,
-    totalBookings: Math.floor(Math.random() * 300),
-    completedBookings: Math.floor(Math.random() * 280),
-    price: {
-      min: Math.floor(Math.random() * 100000) + 5000,
-      max: Math.floor(Math.random() * 500000) + 50000,
-    },
-    createdAt: new Date(2024, Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1)
-      .toISOString()
-      .split('T')[0],
-    lastActive: `${Math.floor(Math.random() * 7)} days ago`,
-    description: 'Professional service with excellent customer satisfaction.',
-    location: locations[Math.floor(Math.random() * locations.length)],
-  }))
-}
-
-const sampleServices = generateSampleServices()
+import { adminServices, type AdminService as Service } from '@/__mocks__/data/admin.mock'
 
 const statusColors: Record<Service['status'], string> = {
   active: 'bg-emerald-500/10 text-emerald-600',
@@ -151,7 +92,7 @@ export function AdminServicesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Service['status'] | 'all'>('all')
   const [categoryFilter, setCategoryFilter] = useState<Service['category'] | 'all'>('all')
-  const [services, setServices] = useState<Service[]>(sampleServices)
+  const [services, setServices] = useState<Service[]>(adminServices)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)

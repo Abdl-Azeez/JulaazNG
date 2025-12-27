@@ -109,8 +109,8 @@ export interface PropertyBooking {
     paidAt?: Date
   }
 
-  // Timeline
-  timeline: {
+  // Timeline (optional for mock data flexibility)
+  timeline?: {
     status: BookingStatus
     timestamp: Date
     note?: string

@@ -43,7 +43,7 @@ import {
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
-import { sampleViewings, type PropertyViewing } from './data/sample-homerunner-data'
+import { sampleViewings, type PropertyViewing } from '@/__mocks__/data/homerunner.mock'
 import { useMessagingStore } from '@/shared/store/messaging.store'
 import { useAuthStore } from '@/shared/store/auth.store'
 import toast from 'react-hot-toast'

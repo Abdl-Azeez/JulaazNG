@@ -16,7 +16,7 @@ import { ROUTES } from '@/shared/constants/routes'
 import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { Textarea } from '@/shared/ui/textarea'
-import { serviceCategories } from '@/pages/services/data/sample-services'
+import { serviceCategories } from '@/__mocks__/data/services.mock'
 
 export function SignupPage() {
   const [isDesktop, setIsDesktop] = useState(false)

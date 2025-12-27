@@ -33,7 +33,7 @@ import {
   sampleRecentActivities,
   type PendingApproval,
   type RecentActivity,
-} from './data/sample-admin-data'
+} from '@/__mocks__/data/admin.mock'
 import {
   Dialog,
   DialogContent,

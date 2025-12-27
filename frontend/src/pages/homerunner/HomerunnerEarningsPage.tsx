@@ -23,7 +23,7 @@ import {
   sampleEarnings,
   sampleTransactions,
   type EarningsTransaction,
-} from './data/sample-homerunner-data'
+} from '@/__mocks__/data/homerunner.mock'
 
 type FilterType = 'all' | 'inspection' | 'viewing' | 'commission'
 

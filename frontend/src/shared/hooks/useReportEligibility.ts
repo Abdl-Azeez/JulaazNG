@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore } from '@/shared/store/role.store'
-import { samplePropertyBookings } from '@/pages/my-bookings/data/sample-bookings'
+import { samplePropertyBookings } from '@/__mocks__/data/bookings.mock'
 import { checkReportEligibility } from '@/shared/lib/report-utils'
 import type { ReportEligibility } from '@/shared/types/report.types'
 

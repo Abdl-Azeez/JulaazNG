@@ -53,30 +53,7 @@ import toast from 'react-hot-toast'
 import { useMessagingStore } from '@/shared/store/messaging.store'
 import { useAuthStore } from '@/shared/store/auth.store'
 import type { Conversation, Message } from '@/shared/types/activity.types'
-
-interface Dispute {
-  id: string
-  reference: string
-  type: 'property' | 'service' | 'payment' | 'behavior'
-  priority: 'low' | 'medium' | 'high' | 'critical'
-  status: 'open' | 'investigating' | 'pending_response' | 'resolved' | 'closed'
-  complainant: {
-    name: string
-    role: 'tenant' | 'landlord' | 'service_provider'
-  }
-  respondent: {
-    name: string
-    role: 'tenant' | 'landlord' | 'service_provider' | 'homerunner'
-  }
-  subject: string
-  description: string
-  createdAt: string
-  lastUpdated: string
-  amount?: number
-  messages: number
-  documents?: string[]
-  conversationId?: string // Store the group chat ID for this dispute
-}
+import { adminDisputes, type AdminDispute as Dispute } from '@/__mocks__/data/admin.mock'
 
 const statusColors: Record<Dispute['status'], string> = {
   open: 'bg-blue-500/10 text-blue-600',
@@ -108,65 +85,6 @@ const typeIcons: Record<Dispute['type'], React.ReactNode> = {
   behavior: <User className="h-4 w-4 text-amber-600" />,
 }
 
-// Expanded sample data for pagination demo
-const generateSampleDisputes = (): Dispute[] => {
-  const types: Dispute['type'][] = ['property', 'service', 'payment', 'behavior']
-  const statuses: Dispute['status'][] = ['open', 'investigating', 'pending_response', 'resolved', 'closed']
-  const priorities: Dispute['priority'][] = ['low', 'medium', 'high', 'critical']
-  const complainants = [
-    { name: 'Tosin Adeyemi', role: 'tenant' as const },
-    { name: 'Chioma Nwosu', role: 'tenant' as const },
-    { name: 'Grace Eze', role: 'landlord' as const },
-    { name: 'Adebayo Johnson', role: 'tenant' as const },
-    { name: 'Emeka Okoro', role: 'tenant' as const },
-    { name: 'Sarah Ike', role: 'landlord' as const },
-  ]
-  const respondents = [
-    { name: 'Femi Ogunleye', role: 'landlord' as const },
-    { name: 'Kunle Balogun', role: 'service_provider' as const },
-    { name: 'Michael Obi', role: 'tenant' as const },
-    { name: 'Linda Ade', role: 'landlord' as const },
-    { name: 'David Okoro', role: 'service_provider' as const },
-  ]
-  const subjects = [
-    'Property condition not as described',
-    'Incomplete service work',
-    'Payment not received',
-    'Unprofessional communication',
-    'Security deposit refund',
-    'Service quality issues',
-    'Contract violation',
-    'Property damage claim',
-  ]
-
-  return Array.from({ length: 47 }, (_, i) => {
-    const complainant = complainants[Math.floor(Math.random() * complainants.length)]
-    const respondent = respondents[Math.floor(Math.random() * respondents.length)]
-    const type = types[Math.floor(Math.random() * types.length)]
-    const status = statuses[Math.floor(Math.random() * statuses.length)]
-    const priority = priorities[Math.floor(Math.random() * priorities.length)]
-
-    return {
-      id: `dispute-${i + 1}`,
-      reference: `DSP-2024-${String(i + 1).padStart(3, '0')}`,
-      type,
-      priority,
-      status,
-      complainant,
-      respondent,
-      subject: subjects[Math.floor(Math.random() * subjects.length)],
-      description: `Dispute regarding ${type} issue between ${complainant.name} and ${respondent.name}.`,
-      createdAt: new Date(2024, Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-      lastUpdated: `${Math.floor(Math.random() * 7)} days ago`,
-      amount: type === 'payment' ? Math.floor(Math.random() * 2000000) + 50000 : undefined,
-      messages: Math.floor(Math.random() * 20) + 1,
-      documents: Math.random() > 0.3 ? [`document_${i + 1}.pdf`, `evidence_${i + 1}.zip`] : undefined,
-    }
-  })
-}
-
-const sampleDisputes = generateSampleDisputes()
-
 const ITEMS_PER_PAGE = 10
 
 export function AdminDisputesPage() {
@@ -180,7 +98,7 @@ export function AdminDisputesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Dispute['status'] | 'all'>('all')
   const [priorityFilter, setPriorityFilter] = useState<Dispute['priority'] | 'all'>('all')
-  const [disputes, setDisputes] = useState<Dispute[]>(sampleDisputes)
+  const [disputes, setDisputes] = useState<Dispute[]>(adminDisputes)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null)
   const [isCaseDialogOpen, setIsCaseDialogOpen] = useState(false)

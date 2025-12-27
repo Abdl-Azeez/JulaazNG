@@ -10,71 +10,7 @@ import { Search, Filter, MapPin, Phone, Calendar } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
-
-const allAssignments = [
-  {
-    id: 'assign-001',
-    title: 'Emergency Electrical Diagnostics',
-    client: 'Victoria Crest Apartments',
-    scheduledFor: 'Today • 4:00 PM',
-    location: 'Lekki Phase 1, Lagos',
-    contact: '+234 801 234 5678',
-    status: 'enroute',
-    badge: 'Priority',
-    category: 'emergency',
-  },
-  {
-    id: 'assign-002',
-    title: 'HVAC quarterly maintenance',
-    client: 'Oasis Co-working',
-    scheduledFor: 'Tomorrow • 10:00 AM',
-    location: 'Yaba, Lagos',
-    contact: '+234 809 234 9090',
-    status: 'confirmed',
-    badge: 'Recurring',
-    category: 'maintenance',
-  },
-  {
-    id: 'assign-003',
-    title: 'Generator Service',
-    client: 'Tech Hub Building',
-    scheduledFor: 'Jan 16 • 10:00 AM',
-    location: 'Ikeja, Lagos',
-    contact: '+234 802 345 6789',
-    status: 'pending',
-    badge: 'Standard',
-    category: 'maintenance',
-  },
-  {
-    id: 'assign-004',
-    title: 'Smart Lock & CCTV Installation',
-    client: 'Surulere Complex',
-    scheduledFor: 'Jan 17 • 1:00 PM',
-    location: 'Surulere, Lagos',
-    contact: '+234 804 567 8901',
-    status: 'confirmed',
-    badge: 'Premium',
-    category: 'installations',
-  },
-  {
-    id: 'assign-005',
-    title: 'Water Treatment Cycle',
-    client: 'Magodo GRA',
-    scheduledFor: 'Jan 17 • 8:00 AM',
-    location: 'Magodo, Lagos',
-    contact: '+234 803 456 7890',
-    status: 'confirmed',
-    badge: 'Recurring',
-    category: 'maintenance',
-  },
-]
-
-const statusFilters = [
-  { id: 'all', label: 'All' },
-  { id: 'enroute', label: 'En Route' },
-  { id: 'confirmed', label: 'Confirmed' },
-  { id: 'pending', label: 'Pending' },
-]
+import { allAssignments, statusFilters } from '@/__mocks__/data/handyman.mock'
 
 export function ViewAllAssignmentsPage() {
   const navigate = useNavigate()

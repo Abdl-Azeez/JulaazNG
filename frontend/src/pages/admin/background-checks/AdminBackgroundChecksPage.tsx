@@ -45,40 +45,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/shared/ui/dropdown-menu'
-
-interface BackgroundCheckDocument {
-  id: string
-  name: string
-  type: 'identity' | 'employment' | 'financial' | 'competency' | 'workshop' | 'other'
-  status: 'pending' | 'approved' | 'rejected'
-  uploadedAt: string
-  fileUrl?: string
-  notes?: string
-}
-
-interface BackgroundCheck {
-  id: string
-  userId: string
-  userName: string
-  userEmail: string
-  userRole: 'tenant' | 'landlord' | 'handyman' | 'service_provider' | 'homerunner'
-  status: 'pending' | 'in_review' | 'approved' | 'rejected'
-  progress: number // 0-100 based on approved documents
-  submittedAt: string
-  lastUpdated: string
-  documents: BackgroundCheckDocument[]
-  formData: {
-    identityNumber?: string
-    monthlyIncome?: string
-    occupation?: string
-    employer?: string
-    employmentLength?: string
-    financialCommitments?: string
-    competencyEvidence?: string
-    authenticityNotes?: string
-    workshopAddress?: string
-  }
-}
+import {
+  adminBackgroundChecks,
+  type AdminBackgroundCheck as BackgroundCheck,
+  type AdminBackgroundCheckDocument as BackgroundCheckDocument,
+} from '@/__mocks__/data/admin.mock'
 
 const documentTypeColors: Record<BackgroundCheckDocument['type'], string> = {
   identity: 'bg-blue-500/10 text-blue-600',
@@ -118,59 +89,6 @@ const docStatusColors: Record<BackgroundCheckDocument['status'], string> = {
   rejected: 'bg-red-500/10 text-red-600',
 }
 
-// Expanded sample data for pagination demo
-const generateSampleBackgroundChecks = (): BackgroundCheck[] => {
-  const roles: BackgroundCheck['userRole'][] = ['tenant', 'landlord', 'handyman', 'service_provider', 'homerunner']
-  const statuses: BackgroundCheck['status'][] = ['pending', 'in_review', 'approved', 'rejected']
-  const users = [
-    { name: 'Tosin Adeyemi', email: 'tosin@example.com' },
-    { name: 'Kunle Balogun', email: 'kunle@example.com' },
-    { name: 'Chioma Nwosu', email: 'chioma@example.com' },
-    { name: 'Adebayo Johnson', email: 'adebayo@example.com' },
-    { name: 'Grace Eze', email: 'grace@example.com' },
-    { name: 'Femi Ogunleye', email: 'femi@example.com' },
-    { name: 'Michael Obi', email: 'michael@example.com' },
-    { name: 'Sarah Ike', email: 'sarah@example.com' },
-  ]
-
-  return Array.from({ length: 38 }, (_, i) => {
-    const user = users[Math.floor(Math.random() * users.length)]
-    const role = roles[Math.floor(Math.random() * roles.length)]
-    const status = statuses[Math.floor(Math.random() * statuses.length)]
-    const docCount = Math.floor(Math.random() * 5) + 3
-    const approvedDocs = Math.floor(docCount * (status === 'approved' ? 1 : Math.random() * 0.8))
-    const progress = Math.round((approvedDocs / docCount) * 100)
-
-    return {
-      id: `bc-${String(i + 1).padStart(3, '0')}`,
-      userId: `user-${String(i + 1).padStart(3, '0')}`,
-      userName: user.name,
-      userEmail: user.email,
-      userRole: role,
-      status,
-      progress,
-      submittedAt: new Date(2024, Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-      lastUpdated: `${Math.floor(Math.random() * 7)} days ago`,
-      documents: Array.from({ length: docCount }, (_, j) => ({
-        id: `doc-${i}-${j}`,
-        name: `Document ${j + 1}`,
-        type: ['identity', 'employment', 'financial', 'competency', 'workshop', 'other'][Math.floor(Math.random() * 6)] as BackgroundCheckDocument['type'],
-        status: j < approvedDocs ? 'approved' : (j === approvedDocs && status !== 'approved' ? 'pending' : 'pending') as BackgroundCheckDocument['status'],
-        uploadedAt: new Date(2024, Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-      })),
-      formData: {
-        identityNumber: `${String.fromCharCode(65 + (i % 26))}${String(i + 1).padStart(9, '0')}`,
-        monthlyIncome: String(Math.floor(Math.random() * 500000) + 100000),
-        occupation: 'Professional',
-        employer: 'Company Ltd',
-        employmentLength: `${Math.floor(Math.random() * 10) + 1} years`,
-      },
-    }
-  })
-}
-
-const sampleBackgroundChecks = generateSampleBackgroundChecks()
-
 const ITEMS_PER_PAGE = 8
 
 export function AdminBackgroundChecksPage() {
@@ -179,7 +97,7 @@ export function AdminBackgroundChecksPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<BackgroundCheck['status'] | 'all'>('all')
   const [roleFilter, setRoleFilter] = useState<BackgroundCheck['userRole'] | 'all'>('all')
-  const [backgroundChecks, setBackgroundChecks] = useState<BackgroundCheck[]>(sampleBackgroundChecks)
+  const [backgroundChecks, setBackgroundChecks] = useState<BackgroundCheck[]>(adminBackgroundChecks)
   const [currentPage, setCurrentPage] = useState(1)
   const [viewingDocument, setViewingDocument] = useState<{
     check: BackgroundCheck

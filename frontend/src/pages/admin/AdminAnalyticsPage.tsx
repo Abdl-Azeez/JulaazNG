@@ -23,7 +23,7 @@ import {
 } from '@/shared/ui/tooltip'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
-import { sampleAnalytics, sampleUserStats } from './data/sample-admin-data'
+import { sampleAnalytics, sampleUserStats } from '@/__mocks__/data/admin.mock'
 
 type TimeRange = '7d' | '30d' | '90d' | '1y'
 

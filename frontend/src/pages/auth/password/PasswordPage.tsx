@@ -9,7 +9,7 @@ import { useAuthStore } from '@/shared/store/auth.store'
 import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { useRoleStore, type UserRole, type RoleType } from '@/shared/store/role.store'
-import { findSampleUser } from '@/shared/data/sample-users'
+import { findSampleUser } from '@/__mocks__/data/users.mock'
 import { ArrowLeft } from 'lucide-react'
 
 export function PasswordPage() {

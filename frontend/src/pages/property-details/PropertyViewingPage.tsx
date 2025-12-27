@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/shared/ui/select'
-import { samplePropertyDetails } from './data/sample-property-details'
+import { samplePropertyDetails } from '@/__mocks__/data/property-details.mock'
 import {
   addDays,
   addMonths,

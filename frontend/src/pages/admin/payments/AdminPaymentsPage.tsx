@@ -47,55 +47,7 @@ import {
   DropdownMenuSeparator,
 } from '@/shared/ui/dropdown-menu'
 import toast from 'react-hot-toast'
-
-interface Payment {
-  id: string
-  reference: string
-  type: 'rent' | 'service' | 'commission' | 'withdrawal' | 'refund'
-  amount: number
-  fee: number
-  status: 'completed' | 'pending' | 'failed' | 'refunded'
-  payer: string
-  payerType: 'tenant' | 'landlord' | 'service_provider'
-  recipient: string
-  recipientType: 'landlord' | 'platform' | 'service_provider' | 'homerunner'
-  method: 'card' | 'bank_transfer' | 'wallet'
-  date: string
-  description: string
-  transactionId?: string
-  cardLast4?: string
-  bankAccount?: string
-}
-
-// Expanded sample data for pagination demo
-const generateSamplePayments = (): Payment[] => {
-  const types: Payment['type'][] = ['rent', 'service', 'commission', 'withdrawal', 'refund']
-  const statuses: Payment['status'][] = ['completed', 'pending', 'failed', 'refunded']
-  const methods: Payment['method'][] = ['card', 'bank_transfer', 'wallet']
-  const payers = ['Tosin Adeyemi', 'Chioma Nwosu', 'Grace Eze', 'Femi Ogunleye', 'Kunle Balogun', 'Michael Obi', 'Adebayo Johnson']
-  const recipients = ['Femi Ogunleye', 'Kunle Balogun', 'Platform', 'Adebayo Johnson', 'Bank Account']
-  
-  return Array.from({ length: 52 }, (_, i) => ({
-    id: `pay-${i + 1}`,
-    reference: `PAY-2024-${String(i + 1).padStart(6, '0')}`,
-    type: types[Math.floor(Math.random() * types.length)],
-    amount: Math.floor(Math.random() * 5000000) + 10000,
-    fee: Math.floor(Math.random() * 50000) + 1000,
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    payer: payers[Math.floor(Math.random() * payers.length)],
-    payerType: 'tenant' as const,
-    recipient: recipients[Math.floor(Math.random() * recipients.length)],
-    recipientType: 'landlord' as const,
-    method: methods[Math.floor(Math.random() * methods.length)],
-    date: new Date(2024, Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1, Math.floor(Math.random() * 24), Math.floor(Math.random() * 60)).toLocaleString('en-NG'),
-    description: `Payment for ${types[Math.floor(Math.random() * types.length)]} service`,
-    transactionId: `TXN${String(i + 1).padStart(10, '0')}`,
-    cardLast4: String(Math.floor(Math.random() * 9000) + 1000),
-    bankAccount: `****${String(Math.floor(Math.random() * 9000) + 1000)}`,
-  }))
-}
-
-const samplePayments = generateSamplePayments()
+import { adminPayments, type AdminPayment as Payment } from '@/__mocks__/data/admin.mock'
 
 const statusColors: Record<Payment['status'], string> = {
   completed: 'bg-emerald-500/10 text-emerald-600',
@@ -130,7 +82,7 @@ export function AdminPaymentsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Payment['status'] | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<Payment['type'] | 'all'>('all')
-  const [payments, setPayments] = useState<Payment[]>(samplePayments)
+  const [payments, setPayments] = useState<Payment[]>(adminPayments)
   const [currentPage, setCurrentPage] = useState(1)
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')

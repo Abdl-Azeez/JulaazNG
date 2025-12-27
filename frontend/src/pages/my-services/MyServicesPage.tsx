@@ -28,7 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { ROUTES } from '@/shared/constants/routes'
 import { cn } from '@/shared/lib/utils/cn'
-import { sampleServiceBookings } from './data/sample-service-bookings'
+import { sampleServiceBookings } from '@/__mocks__/data/bookings.mock'
 import type { ServiceBooking, ServiceBookingStatus } from '@/shared/types/booking.types'
 
 const formatCurrency = (value: number) =>

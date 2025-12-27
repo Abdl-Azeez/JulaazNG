@@ -12,7 +12,7 @@ import LogoSvg from '@/assets/images/logo.svg?react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
-import { serviceCategories } from './data/sample-services'
+import { serviceCategories } from '@/__mocks__/data/services.mock'
 import {
   trackServicePageView,
   trackServiceCategoryClick,

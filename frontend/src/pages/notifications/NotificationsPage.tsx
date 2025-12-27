@@ -26,7 +26,7 @@ import {
   FileCheck,
   CreditCard,
 } from 'lucide-react'
-import { sampleNotifications } from './data/sample-notifications'
+import { sampleNotifications } from '@/__mocks__/data/notifications.mock'
 import { Notification } from '@/shared/types/activity.types'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { ROUTES } from '@/shared/constants/routes'

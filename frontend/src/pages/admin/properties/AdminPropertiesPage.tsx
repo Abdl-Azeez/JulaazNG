@@ -37,89 +37,7 @@ import {
   DropdownMenuSeparator,
 } from '@/shared/ui/dropdown-menu'
 import toast from 'react-hot-toast'
-import home1 from '@/assets/images/home1.jpg'
-import home2 from '@/assets/images/home2.jpg'
-import home3 from '@/assets/images/home3.jpg'
-import home4 from '@/assets/images/home4.jpg'
-import home5 from '@/assets/images/home5.jpg'
-import home6 from '@/assets/images/home6.jpg'
-import home7 from '@/assets/images/home7.jpg'
-import home8 from '@/assets/images/home8.jpg'
-
-interface Property {
-  id: string
-  title: string
-  address: string
-  type: 'apartment' | 'house' | 'duplex' | 'studio' | 'office'
-  price: number
-  landlord: string
-  landlordId: string
-  status: 'active' | 'pending' | 'suspended' | 'rejected'
-  verified: boolean
-  createdAt: string
-  views: number
-  bookings: number
-  images: string[]
-  description?: string
-  bedrooms?: number
-  bathrooms?: number
-  area?: number
-  parking?: number
-  amenities?: string[]
-  neighbourhood?: string
-  city?: string
-}
-
-// Sample images array
-const sampleImageArray = [home1, home2, home3, home4, home5, home6, home7, home8]
-
-// Expanded sample data for pagination demo
-const generateSampleProperties = (): Property[] => {
-  const types: Property['type'][] = ['apartment', 'house', 'duplex', 'studio', 'office']
-  const statuses: Property['status'][] = ['active', 'pending', 'suspended', 'rejected']
-  const landlords = ['Femi Ogunleye', 'Chioma Nwosu', 'Grace Eze', 'Kunle Balogun', 'Tosin Adeyemi', 'Aisha Mohammed', 'David Okoro']
-  const addresses = ['Lekki Phase 1', 'Victoria Island', 'Ikeja GRA', 'Surulere', 'Banana Island', 'Ikoyi', 'Yaba']
-  const neighbourhoods = ['Lekki', 'Victoria Island', 'Ikeja', 'Surulere', 'Banana Island', 'Ikoyi', 'Yaba']
-  const amenitiesList = [
-    ['24/7 Power Supply', 'Fibre Internet', 'Parking', 'CCTV'],
-    ['Swimming Pool', 'Gym', 'Security', 'Water Supply'],
-    ['Smart Home', 'Balcony', 'Garden', 'Elevator'],
-    ['Air Conditioning', 'Heating', 'Laundry', 'Storage'],
-  ]
-  
-  return Array.from({ length: 45 }, (_, i) => {
-    const imageCount = Math.floor(Math.random() * 5) + 3
-    const selectedImages = Array.from({ length: imageCount }, () => 
-      sampleImageArray[Math.floor(Math.random() * sampleImageArray.length)]
-    )
-    
-    return {
-      id: `${i + 1}`,
-      title: `${Math.floor(Math.random() * 5) + 1} Bedroom ${types[Math.floor(Math.random() * types.length)]}`,
-      address: `${addresses[Math.floor(Math.random() * addresses.length)]}, Lagos`,
-      type: types[Math.floor(Math.random() * types.length)],
-      price: Math.floor(Math.random() * 15000000) + 500000,
-      landlord: landlords[Math.floor(Math.random() * landlords.length)],
-      landlordId: `L${String(i + 1).padStart(3, '0')}`,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      verified: Math.random() > 0.3,
-      createdAt: new Date(2024, Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-      views: Math.floor(Math.random() * 2000),
-      bookings: Math.floor(Math.random() * 20),
-      images: selectedImages,
-      description: 'Beautiful property with modern amenities and great location. Perfect for families and professionals seeking comfort and convenience.',
-      bedrooms: Math.floor(Math.random() * 5) + 1,
-      bathrooms: Math.floor(Math.random() * 4) + 1,
-      area: Math.floor(Math.random() * 500) + 100,
-      parking: Math.floor(Math.random() * 3) + 1,
-      amenities: amenitiesList[Math.floor(Math.random() * amenitiesList.length)],
-      neighbourhood: neighbourhoods[Math.floor(Math.random() * neighbourhoods.length)],
-      city: 'Lagos',
-    }
-  })
-}
-
-const sampleProperties = generateSampleProperties()
+import { adminProperties, type AdminProperty as Property } from '@/__mocks__/data/admin.mock'
 
 const statusColors: Record<Property['status'], string> = {
   active: 'bg-emerald-500/10 text-emerald-600',
@@ -143,7 +61,7 @@ export function AdminPropertiesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Property['status'] | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<Property['type'] | 'all'>('all')
-  const [properties, setProperties] = useState<Property[]>(sampleProperties)
+  const [properties, setProperties] = useState<Property[]>(adminProperties)
   const [currentPage, setCurrentPage] = useState(1)
   const [propertyImageIndices, setPropertyImageIndices] = useState<Record<string, number>>({})
 

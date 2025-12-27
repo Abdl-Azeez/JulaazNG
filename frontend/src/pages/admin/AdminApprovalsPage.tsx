@@ -21,7 +21,7 @@ import { Input } from '@/shared/ui/input'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
-import { samplePendingApprovals, type PendingApproval } from './data/sample-admin-data'
+import { samplePendingApprovals, type PendingApproval } from '@/__mocks__/data/admin.mock'
 import {
   Dialog,
   DialogContent,

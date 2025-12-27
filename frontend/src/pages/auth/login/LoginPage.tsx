@@ -7,7 +7,7 @@ import { LoginBanner } from '@/widgets/login-banner'
 import { ROUTES } from '@/shared/constants/routes'
 // import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
-import { sampleUsers } from '@/shared/data/sample-users'
+import { sampleUsers } from '@/__mocks__/data/users.mock'
 import {
   Dialog,
   DialogContent,

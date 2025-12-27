@@ -35,7 +35,7 @@ import {
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
-import { sampleInspections, type PropertyInspection } from './data/sample-homerunner-data'
+import { sampleInspections, inspectionSteps, type PropertyInspection } from '@/__mocks__/data/homerunner.mock'
 import toast from 'react-hot-toast'
 
 type FilterStatus = 'all' | 'pending' | 'confirmed' | 'completed'
@@ -55,24 +55,6 @@ export function HomerunnerInspectionsPage() {
   const [inspectionNotes, setInspectionNotes] = useState('')
   const [inspectionMedia, setInspectionMedia] = useState<File[]>([])
   const ITEMS_PER_PAGE = 3
-
-  const inspectionSteps = [
-    {
-      id: 'check-in',
-      title: 'Check in with landlord',
-      description: 'Confirm access instructions and highlight any last-minute updates.',
-    },
-    {
-      id: 'capture',
-      title: 'Capture evidence',
-      description: 'Document spaces with clear photos and annotate damage if needed.',
-    },
-    {
-      id: 'report',
-      title: 'Submit report',
-      description: 'Summarize findings and flag anything that may delay listing approval.',
-    },
-  ]
 
   const filteredInspections = inspections.filter((inspection) => {
     if (filterStatus === 'all') return true
