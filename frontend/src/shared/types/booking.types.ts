@@ -1,36 +1,40 @@
 /**
  * Booking-related TypeScript types and interfaces
+ * Matches backend API spec from BACKEND_API_SPEC.md Section 2.2
  */
 
-// Booking Types
-export type BookingType = 'rental' | 'short_let'
+// API Spec: rentalPreference: enum ['annual_lease', 'shortlet']
+export type BookingType = 'annual_lease' | 'shortlet'
 
+// API Spec: status: enum ['pending', 'viewing_scheduled', 'viewing_completed', 'application_submitted', 'approved', 'rejected', 'agreement_sent', 'agreement_signed', 'payment_pending', 'payment_completed', 'active', 'completed', 'cancelled']
 export type BookingStatus =
   | 'pending'
   | 'viewing_scheduled'
   | 'viewing_completed'
   | 'application_submitted'
-  | 'documents_pending'
-  | 'under_review'
   | 'approved'
+  | 'rejected'
   | 'agreement_sent'
+  | 'agreement_signed'
   | 'payment_pending'
   | 'payment_completed'
-  | 'confirmed'
   | 'active'
   | 'completed'
   | 'cancelled'
-  | 'rejected'
 
+// Legacy/Extended UI statuses
+export type ExtendedBookingStatus = BookingStatus | 'documents_pending' | 'under_review' | 'confirmed'
+
+// API Spec: ServiceBookings status: enum ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled']
 export type ServiceBookingStatus =
   | 'pending'
   | 'confirmed'
   | 'in_progress'
   | 'completed'
   | 'cancelled'
-  | 'rescheduled'
 
-export type ServiceType = 'cleaning' | 'moving' | 'maintenance' | 'fumigation' | 'painting' | 'plumbing' | 'electrical' | 'carpentry'
+// API Spec: category: enum ['cleaning', 'moving', 'plumbing', 'electrical', 'carpentry', 'painting', 'tiling', 'mechanic']
+export type ServiceType = 'cleaning' | 'moving' | 'plumbing' | 'electrical' | 'carpentry' | 'painting' | 'tiling' | 'mechanic'
 
 // Property Booking Interface
 export interface PropertyBooking {

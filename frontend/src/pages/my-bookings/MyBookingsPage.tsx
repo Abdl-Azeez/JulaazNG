@@ -67,18 +67,6 @@ const getStatusConfig = (status: BookingStatus) => {
       className: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
       description: 'Application submitted',
     },
-    documents_pending: {
-      label: 'Documents Needed',
-      icon: AlertCircle,
-      className: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-      description: 'Additional documents required',
-    },
-    under_review: {
-      label: 'Under Review',
-      icon: Clock,
-      className: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-      description: 'Landlord reviewing application',
-    },
     approved: {
       label: 'Approved',
       icon: CheckCircle2,
@@ -91,6 +79,12 @@ const getStatusConfig = (status: BookingStatus) => {
       className: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
       description: 'Rental agreement sent',
     },
+    agreement_signed: {
+      label: 'Agreement Signed',
+      icon: CheckCircle2,
+      className: 'bg-primary/10 text-primary border-primary/20',
+      description: 'Agreement signed by both parties',
+    },
     payment_pending: {
       label: 'Payment Due',
       icon: CreditCard,
@@ -102,12 +96,6 @@ const getStatusConfig = (status: BookingStatus) => {
       icon: CheckCircle2,
       className: 'bg-primary/10 text-primary border-primary/20',
       description: 'Payment completed',
-    },
-    confirmed: {
-      label: 'Confirmed',
-      icon: CheckCircle2,
-      className: 'bg-primary/10 text-primary border-primary/20',
-      description: 'Booking confirmed',
     },
     active: {
       label: 'Active',
@@ -160,15 +148,16 @@ export function MyBookingsPage() {
     let filtered = samplePropertyBookings
 
     if (filter === 'active') {
-      filtered = filtered.filter((b) => b.status === 'active' || b.status === 'confirmed')
+      filtered = filtered.filter((b) => b.status === 'active' || b.status === 'payment_completed')
     } else if (filter === 'pending') {
       filtered = filtered.filter(
         (b) =>
           b.status === 'pending' ||
           b.status === 'viewing_scheduled' ||
           b.status === 'application_submitted' ||
-          b.status === 'under_review' ||
-          b.status === 'documents_pending' ||
+          b.status === 'approved' ||
+          b.status === 'agreement_sent' ||
+          b.status === 'agreement_signed' ||
           b.status === 'payment_pending'
       )
     } else if (filter === 'completed') {
@@ -182,15 +171,16 @@ export function MyBookingsPage() {
 
   const stats = useMemo(() => {
     const active = samplePropertyBookings.filter(
-      (b) => b.status === 'active' || b.status === 'confirmed'
+      (b) => b.status === 'active' || b.status === 'payment_completed'
     ).length
     const pending = samplePropertyBookings.filter(
       (b) =>
         b.status === 'pending' ||
         b.status === 'viewing_scheduled' ||
         b.status === 'application_submitted' ||
-        b.status === 'under_review' ||
-        b.status === 'documents_pending' ||
+        b.status === 'approved' ||
+        b.status === 'agreement_sent' ||
+        b.status === 'agreement_signed' ||
         b.status === 'payment_pending'
     ).length
     const completed = samplePropertyBookings.filter(
@@ -344,7 +334,7 @@ export function MyBookingsPage() {
                           {statusConfig.label}
                         </Badge>
                       </div>
-                      {booking.type === 'short_let' && (
+                      {booking.type === 'shortlet' && (
                         <div className="absolute top-3 left-3">
                           <Badge className="bg-accent/90 text-accent-foreground border-0 rounded-full px-3 py-1 text-xs">
                             Shortlet
@@ -413,7 +403,7 @@ export function MyBookingsPage() {
                         alt={booking.property.name}
                         className="w-full h-full object-cover"
                       />
-                      {booking.type === 'short_let' && (
+                      {booking.type === 'shortlet' && (
                         <div className="absolute top-3 left-3">
                           <Badge className="bg-accent/90 text-accent-foreground border-0 rounded-full px-3 py-1 text-xs">
                             Shortlet

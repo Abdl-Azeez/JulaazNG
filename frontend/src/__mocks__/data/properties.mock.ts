@@ -16,6 +16,7 @@ import home7 from '@/assets/images/home7.jpg'
 import home8 from '@/assets/images/home8.jpg'
 
 // GET /properties response (paginated list)
+// API Spec compliant: uses propertyType, viewCount, favouriteCount
 export const mockPropertiesListResponse: ApiResponse<{
   properties: Property[]
   pagination: PaginationMeta
@@ -27,7 +28,7 @@ export const mockPropertiesListResponse: ApiResponse<{
         id: 'prop-001',
         title: 'Luxury 2 Bedroom Apartment in Lekki',
         description: 'Modern apartment with stunning waterfront views',
-        type: 'apartment',
+        propertyType: 'apartment',
         bedrooms: 2,
         bathrooms: 2,
         price: 1200000,
@@ -44,8 +45,8 @@ export const mockPropertiesListResponse: ApiResponse<{
         isVerified: true,
         isFeatured: false,
         status: 'active' as PropertyStatus,
-        views: 1245,
-        favourites: 89,
+        viewCount: 1245,
+        favouriteCount: 89,
         landlordId: 'user-landlord-001',
         landlordName: 'Adebayo Johnson',
         landlordAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Adebayo',
@@ -57,7 +58,7 @@ export const mockPropertiesListResponse: ApiResponse<{
         id: 'prop-002',
         title: '3 Bedroom Duplex in Ikeja GRA',
         description: 'Spacious family home in a serene environment',
-        type: 'duplex',
+        propertyType: 'duplex',
         bedrooms: 3,
         bathrooms: 3,
         price: 1800000,
@@ -74,8 +75,8 @@ export const mockPropertiesListResponse: ApiResponse<{
         isVerified: true,
         isFeatured: true,
         status: 'active' as PropertyStatus,
-        views: 890,
-        favourites: 56,
+        viewCount: 890,
+        favouriteCount: 56,
         landlordId: 'user-landlord-002',
         landlordName: 'Chioma Okafor',
         landlordAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chioma',
@@ -87,7 +88,7 @@ export const mockPropertiesListResponse: ApiResponse<{
         id: 'prop-003',
         title: 'Luxury Studio Apartment - Victoria Island Shortlet',
         description: 'Fully furnished studio perfect for short stays',
-        type: 'studio',
+        propertyType: 'studio',
         bedrooms: 1,
         bathrooms: 1,
         price: 35000,
@@ -104,8 +105,8 @@ export const mockPropertiesListResponse: ApiResponse<{
         isVerified: true,
         isFeatured: true,
         status: 'active' as PropertyStatus,
-        views: 2341,
-        favourites: 178,
+        viewCount: 2341,
+        favouriteCount: 178,
         landlordId: 'user-landlord-003',
         landlordName: 'Emeka Nwosu',
         landlordAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emeka',
@@ -117,7 +118,7 @@ export const mockPropertiesListResponse: ApiResponse<{
         id: 'prop-004',
         title: '4 Bedroom Terrace in Lekki Phase 2',
         description: 'Elegant terrace house with modern finishes',
-        type: 'house',
+        propertyType: 'house',
         bedrooms: 4,
         bathrooms: 4,
         price: 2500000,
@@ -134,8 +135,8 @@ export const mockPropertiesListResponse: ApiResponse<{
         isVerified: true,
         isFeatured: false,
         status: 'active' as PropertyStatus,
-        views: 567,
-        favourites: 34,
+        viewCount: 567,
+        favouriteCount: 34,
         landlordId: 'user-landlord-004',
         landlordName: 'Funmi Adeleke',
         landlordAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Funmi',
@@ -147,7 +148,7 @@ export const mockPropertiesListResponse: ApiResponse<{
         id: 'prop-005',
         title: 'Penthouse Apartment with Rooftop - Banana Island',
         description: 'Ultra-luxury penthouse with panoramic city views',
-        type: 'penthouse',
+        propertyType: 'penthouse',
         bedrooms: 5,
         bathrooms: 6,
         price: 8500000,
@@ -175,8 +176,8 @@ export const mockPropertiesListResponse: ApiResponse<{
         isVerified: true,
         isFeatured: true,
         status: 'active' as PropertyStatus,
-        views: 3456,
-        favourites: 289,
+        viewCount: 3456,
+        favouriteCount: 289,
         landlordId: 'user-landlord-005',
         landlordName: 'Dr. Oluwaseun Akinwale',
         landlordAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Seun',
@@ -205,7 +206,7 @@ export const mockPropertyDetailResponse: ApiResponse<PropertyDetail> = {
     title: 'Luxury 2 Bedroom Apartment in Lekki',
     description:
       'Experience waterfront living at its finest in this stunning 2-bedroom apartment. Located in the heart of Lekki Phase 1, this modern residence offers breathtaking views, premium amenities, and a lifestyle of comfort and convenience.',
-    type: 'apartment',
+    propertyType: 'apartment',
     bedrooms: 2,
     bathrooms: 2,
     price: 1200000,
@@ -247,8 +248,8 @@ export const mockPropertyDetailResponse: ApiResponse<PropertyDetail> = {
     isVerified: true,
     isFeatured: false,
     status: 'active' as PropertyStatus,
-    views: 1245,
-    favourites: 89,
+    viewCount: 1245,
+    favouriteCount: 89,
     landlord: {
       id: 'user-landlord-001',
       name: 'Adebayo Johnson',
@@ -502,13 +503,13 @@ export const getMockProperties = (filters?: {
     filtered = filtered.filter((p) => p.city === filters.city)
   }
   if (filters?.type) {
-    filtered = filtered.filter((p) => p.type === filters.type)
+    filtered = filtered.filter((p) => p.propertyType === filters.type)
   }
   if (filters?.minPrice !== undefined) {
-    filtered = filtered.filter((p) => p.price >= filters.minPrice!)
+    filtered = filtered.filter((p) => (p.price ?? 0) >= filters.minPrice!)
   }
   if (filters?.maxPrice !== undefined) {
-    filtered = filtered.filter((p) => p.price <= filters.maxPrice!)
+    filtered = filtered.filter((p) => (p.price ?? Infinity) <= filters.maxPrice!)
   }
   if (filters?.bedrooms !== undefined) {
     filtered = filtered.filter((p) => p.bedrooms === filters.bedrooms)

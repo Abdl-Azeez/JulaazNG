@@ -72,12 +72,6 @@ const getStatusConfig = (status: ServiceBookingStatus) => {
       className: 'bg-muted text-muted-foreground border-border',
       description: 'Service booking cancelled',
     },
-    rescheduled: {
-      label: 'Rescheduled',
-      icon: Calendar,
-      className: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-      description: 'Service has been rescheduled',
-    },
   }
   return configs[status]
 }
@@ -115,8 +109,7 @@ export function MyServicesPage() {
         (b) =>
           b.status === 'pending' ||
           b.status === 'confirmed' ||
-          b.status === 'in_progress' ||
-          b.status === 'rescheduled'
+          b.status === 'in_progress'
       )
     } else if (filter === 'completed') {
       filtered = filtered.filter((b) => b.status === 'completed')
@@ -132,8 +125,7 @@ export function MyServicesPage() {
       (b) =>
         b.status === 'pending' ||
         b.status === 'confirmed' ||
-        b.status === 'in_progress' ||
-        b.status === 'rescheduled'
+        b.status === 'in_progress'
     ).length
     const completed = sampleServiceBookings.filter((b) => b.status === 'completed').length
     const cancelled = sampleServiceBookings.filter((b) => b.status === 'cancelled').length

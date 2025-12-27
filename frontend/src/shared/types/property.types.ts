@@ -1,62 +1,94 @@
 /**
  * Property Type Definitions
- * Matches backend Prisma schema and existing property entity
+ * Matches backend API spec from BACKEND_API_SPEC.md Section 2.2
  */
 
+// API Spec: propertyType: enum ['apartment', 'house', 'duplex', 'studio', 'penthouse']
 export type PropertyType =
-  | 'APARTMENT'
-  | 'HOUSE'
-  | 'DUPLEX'
-  | 'VILLA'
-  | 'STUDIO'
-  | 'TOWNHOUSE'
-  | 'PENTHOUSE'
-  // Also allow lowercase variants for flexibility
   | 'apartment'
   | 'house'
   | 'duplex'
-  | 'villa'
   | 'studio'
-  | 'townhouse'
   | 'penthouse'
 
-export type PropertyStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'RENTED' | 'draft' | 'active' | 'inactive' | 'rented'
+// API Spec: status: enum ['inactive', 'pending_inspection', 'active', 'reserved', 'rented']
+export type PropertyStatus =
+  | 'inactive'
+  | 'pending_inspection'
+  | 'active'
+  | 'reserved'
+  | 'rented'
 
-export type PriceType = 'ANNUAL' | 'MONTHLY' | 'NIGHTLY' | 'WEEKLY' | 'annually' | 'monthly' | 'nightly' | 'weekly'
+// Legacy uppercase types for backward compatibility
+export type LegacyPropertyType = 'APARTMENT' | 'HOUSE' | 'DUPLEX' | 'VILLA' | 'STUDIO' | 'TOWNHOUSE' | 'PENTHOUSE'
+export type LegacyPropertyStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'RENTED'
 
-export type RentalCategory = 'LONG_TERM' | 'SHORT_LET' | 'BOTH' | 'long_term' | 'shortlet'
+export type PriceType = 'annually' | 'monthly' | 'nightly' | 'weekly'
 
+// API Spec: rentalCategories: enum[] ['long_term', 'shortlet']
+export type RentalCategory = 'long_term' | 'shortlet'
+
+// API Spec compliant Property interface
 export interface Property {
   id: string
+  landlordId: string
   title: string
   description: string
-  type: PropertyType | string
-  bedrooms: number
-  bathrooms: number
-  price: number
-  currency: string
-  priceType: PriceType | string
+  address: string
   city: string
   state: string
-  neighbourhood: string
-  address: string
-  rentalCategories: (RentalCategory | string)[]
+  country?: string
+  latitude?: number
+  longitude?: number
+  propertyType: PropertyType
+  bedrooms: number
+  bathrooms: number
+  toilets?: number
+  carParkingSpaces?: number
+  squareMeters?: number
+  rentalCategories: RentalCategory[]
+  // Long-term rental
+  annualRent?: number
+  monthlyRent?: number
+  minimumTenancyMonths?: number
+  // Shortlet
+  nightlyRate?: number
+  weeklyRate?: number
+  minimumStayNights?: number
+  maximumStayNights?: number
+  // Amenities
+  amenities: string[] | Record<string, boolean>
+  // Media
   images: string[]
-  thumbnail: string
-  amenities: string[]
-  isVerified: boolean
-  isFeatured: boolean
-  status: PropertyStatus | string
-  views: number
-  favourites: number
-  landlordId: string
-  landlordName: string
-  // Optional additional landlord info
-  landlordAvatar?: string
-  landlordRating?: number
-  // Dates can be string or Date
+  video?: string
+  virtualTourUrl?: string
+  // Status
+  status: PropertyStatus
+  isShortletReady?: boolean
+  inspectionDate?: string
+  inspectionNotes?: string
+  // Metadata
+  viewCount: number
+  favouriteCount: number
+  averageRating?: number
+  totalReviews?: number
   createdAt: string | Date
   updatedAt: string | Date
+  publishedAt?: string | Date
+  // Extended UI fields (for compatibility)
+  type?: PropertyType | string // Legacy alias for propertyType
+  price?: number // Legacy price field
+  currency?: string
+  priceType?: PriceType | string
+  neighbourhood?: string
+  thumbnail?: string
+  isVerified?: boolean
+  isFeatured?: boolean
+  views?: number // Legacy alias for viewCount
+  favourites?: number // Legacy alias for favouriteCount
+  landlordName?: string
+  landlordAvatar?: string
+  landlordRating?: number
 }
 
 export interface PropertyDetail extends Omit<Property, 'images'> {

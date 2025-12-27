@@ -1,20 +1,39 @@
 /**
  * Service Type Definitions
- * Matches backend Prisma schema
+ * Matches backend API spec from BACKEND_API_SPEC.md Section 2.7
  */
 
-export type ServiceType = 'REPAIR' | 'INSTALLATION' | 'MAINTENANCE' | 'INSPECTION'
+// API Spec: category: enum ['cleaning', 'moving', 'plumbing', 'electrical', 'carpentry', 'painting', 'tiling', 'mechanic']
+export type ServiceCategorySlug =
+  | 'cleaning'
+  | 'moving'
+  | 'plumbing'
+  | 'electrical'
+  | 'carpentry'
+  | 'painting'
+  | 'tiling'
+  | 'mechanic'
 
-export type ServicePriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+// API Spec: priceType: enum ['fixed', 'hourly', 'per_sqm']
+export type ServicePriceType = 'fixed' | 'hourly' | 'per_sqm'
 
+// API Spec: ServiceBookings status: enum ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled']
 export type ServiceStatus =
-  | 'PENDING'
-  | 'CONFIRMED'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'CANCELLED'
+  | 'pending'
+  | 'confirmed'
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled'
 
-export type QuoteStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED'
+// Legacy uppercase types
+export type LegacyServiceStatus = 'PENDING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+export type ServiceType = 'repair' | 'installation' | 'maintenance' | 'inspection'
+export type LegacyServiceType = 'REPAIR' | 'INSTALLATION' | 'MAINTENANCE' | 'INSPECTION'
+export type ServicePriority = 'low' | 'medium' | 'high' | 'urgent'
+export type LegacyServicePriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+
+export type QuoteStatus = 'pending' | 'accepted' | 'rejected' | 'expired'
+export type LegacyQuoteStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED'
 
 export interface ServiceCategory {
   id: string
