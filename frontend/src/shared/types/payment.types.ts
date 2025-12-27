@@ -1,26 +1,44 @@
 /**
  * Payment Type Definitions
- * Matches backend Prisma schema
+ * Matches backend API spec from BACKEND_API_SPEC.md Section 2.3 Payments
  */
 
+// API Spec: paymentType: enum ['rent', 'security_deposit', 'processing_fee', 'legal_fee', 'insurance', 'service_booking', 'commission']
 export type PaymentType =
-  | 'RENT'
-  | 'DEPOSIT'
-  | 'SERVICE'
-  | 'APPLICATION_FEE'
-  | 'PLATFORM_FEE'
+  | 'rent'
+  | 'security_deposit'
+  | 'processing_fee'
+  | 'legal_fee'
+  | 'insurance'
+  | 'service_booking'
+  | 'commission'
 
-export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED'
+// API Spec: status: enum ['pending', 'processing', 'completed', 'failed', 'refunded']
+export type PaymentStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'
 
-export type PaymentMethodType = 'CARD' | 'BANK_TRANSFER' | 'USSD' | 'WALLET'
+// API Spec: paymentMethod: enum ['card', 'bank_transfer', 'wallet']
+export type PaymentMethodType = 'card' | 'bank_transfer' | 'wallet'
 
-export type PaymentProvider = 'PAYSTACK' | 'FLUTTERWAVE' | 'INTERNAL'
+// API Spec: paymentGateway: enum ['paystack', 'flutterwave']
+export type PaymentGateway = 'paystack' | 'flutterwave'
+
+// Legacy uppercase types for backward compatibility
+export type LegacyPaymentType = 'RENT' | 'DEPOSIT' | 'SERVICE' | 'APPLICATION_FEE' | 'PLATFORM_FEE'
+export type LegacyPaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED'
+export type LegacyPaymentMethodType = 'CARD' | 'BANK_TRANSFER' | 'USSD' | 'WALLET'
+export type LegacyPaymentProvider = 'PAYSTACK' | 'FLUTTERWAVE' | 'INTERNAL'
+
+// Payment item as per API spec
+export interface PaymentItem {
+  description: string
+  amount: number
+}
 
 export interface PaymentMethod {
   id: string
   userId: string
   type: PaymentMethodType
-  provider: PaymentProvider
+  provider: PaymentGateway
   last4?: string
   cardBrand?: string
   expiryMonth?: number
@@ -37,19 +55,25 @@ export interface PaymentMethod {
 export interface Payment {
   id: string
   userId: string
-  propertyId?: string
   bookingId?: string
-  serviceBookingId?: string
-  type: PaymentType
-  amount: number
-  currency: string
+  agreementId?: string
+  paymentType: PaymentType
+  items: PaymentItem[]
+  subtotal: number
+  processingFee: number // 1.5% of subtotal
+  totalAmount: number
+  paymentMethod: PaymentMethodType
+  paymentReference: string
+  paymentGateway: PaymentGateway
   status: PaymentStatus
-  paymentMethod: string
-  provider: PaymentProvider
-  reference: string
-  description: string
-  metadata?: Record<string, any>
+  dueDate?: string
   paidAt: string | null
+  metadata?: {
+    cardLast4?: string
+    bankName?: string
+    accountNumber?: string
+    [key: string]: unknown
+  }
   createdAt: string
   updatedAt: string
 }
@@ -57,13 +81,13 @@ export interface Payment {
 export interface Transaction {
   id: string
   paymentId: string
-  type: 'CHARGE' | 'REFUND' | 'TRANSFER'
+  type: 'charge' | 'refund' | 'transfer'
   amount: number
   currency: string
-  status: 'SUCCESS' | 'FAILED' | 'PENDING'
+  status: 'success' | 'failed' | 'pending'
   reference: string
-  provider: PaymentProvider
-  providerResponse?: Record<string, any>
+  provider: PaymentGateway
+  providerResponse?: Record<string, unknown>
   createdAt: string
   updatedAt: string
 }
@@ -97,7 +121,7 @@ export interface PayoutRequest {
   userId: string
   amount: number
   currency: string
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  status: 'pending' | 'processing' | 'completed' | 'failed'
   bankAccount: {
     accountNumber: string
     bankName: string

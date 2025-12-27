@@ -33,16 +33,16 @@ export function FavouritesPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const visibleFavourites = favourites.filter((fav) =>
-    activeRole === 'landlord' ? fav.type !== 'property' : true
+    activeRole === 'landlord' ? fav.itemType !== 'property' : true
   )
 
   const effectiveFilter =
     activeRole === 'landlord' && filter === 'property' ? 'all' : filter
 
   const filteredFavourites = visibleFavourites.filter((fav) => {
-    const matchesFilter = effectiveFilter === 'all' || fav.type === effectiveFilter
-    const matchesSearch = fav.item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      fav.item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesFilter = effectiveFilter === 'all' || fav.itemType === effectiveFilter
+    const matchesSearch = fav.item?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      fav.item?.description?.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesFilter && matchesSearch
   })
 
@@ -69,21 +69,21 @@ export function FavouritesPage() {
   }
 
   const handleItemClick = (favourite: Favourite) => {
-    if (favourite.type === 'property') {
+    if (favourite.itemType === 'property') {
       navigate(ROUTES.PROPERTY_DETAILS(favourite.itemId))
-    } else if (favourite.type === 'service') {
+    } else if (favourite.itemType === 'service') {
       navigate(`${ROUTES.SERVICES}/${favourite.itemId}`)
-    } else if (favourite.type === 'provider') {
+    } else if (favourite.itemType === 'provider') {
       navigate(`${ROUTES.SERVICES}/providers/${favourite.itemId}`)
     }
   }
 
   // Calculate counts from original favourites array, not filtered
   const favouritesByType = visibleFavourites.reduce((acc, fav) => {
-    if (!acc[fav.type]) {
-      acc[fav.type] = []
+    if (!acc[fav.itemType]) {
+      acc[fav.itemType] = []
     }
-    acc[fav.type].push(fav)
+    acc[fav.itemType].push(fav)
     return acc
   }, {} as Record<string, Favourite[]>)
 
@@ -246,7 +246,7 @@ export function FavouritesPage() {
                           {favourite.item.price && (
                             <p className="text-sm font-bold text-primary">
                               ₦{favourite.item.price.toLocaleString()}
-                              {favourite.type === 'property' && '/month'}
+                              {favourite.itemType === 'property' && '/month'}
                             </p>
                           )}
                         </CardContent>
@@ -318,7 +318,7 @@ export function FavouritesPage() {
                                 {favourite.item.price && (
                                   <p className="text-sm font-bold text-primary">
                                     ₦{favourite.item.price.toLocaleString()}
-                                    {favourite.type === 'property' && '/month'}
+                                    {favourite.itemType === 'property' && '/month'}
                                   </p>
                                 )}
                               </div>

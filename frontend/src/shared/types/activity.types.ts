@@ -139,13 +139,20 @@ export interface Event {
 }
 
 // Favourite Types
-export type FavouriteType = 'property' | 'service' | 'provider' | 'artisan'
+// API Spec: itemType: enum ['property', 'service', 'provider']
+export type FavouriteItemType = 'property' | 'service' | 'provider'
 
+// Extended type for artisan support
+export type FavouriteType = FavouriteItemType | 'artisan'
+
+// API Spec compliant Favourite (extended with UI fields)
 export interface Favourite {
   id: string
   userId: string
-  type: FavouriteType
+  itemType: FavouriteItemType
   itemId: string
+  createdAt: Date | string
+  // Extended UI fields for display (populated from related entity)
   item: {
     id: string
     title: string
@@ -154,8 +161,9 @@ export interface Favourite {
     price?: number
     location?: string
     rating?: number
-    [key: string]: any
+    [key: string]: unknown
   }
-  createdAt: Date
+  // Legacy field alias
+  type?: FavouriteType
 }
 

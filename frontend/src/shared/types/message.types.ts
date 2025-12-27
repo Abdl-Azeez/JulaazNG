@@ -1,13 +1,21 @@
 /**
  * Message/Chat Type Definitions
- * Matches backend Prisma schema
+ * Matches backend API spec from BACKEND_API_SPEC.md Section 2.4
  */
 
-export type MessageType = 'TEXT' | 'IMAGE' | 'DOCUMENT' | 'SYSTEM'
+// API Spec: messageType: enum ['text', 'image', 'document', 'system']
+export type MessageType = 'text' | 'image' | 'document' | 'system'
 
-export type MessageStatus = 'SENT' | 'DELIVERED' | 'READ'
+// API Spec: conversationType: enum ['viewing_request', 'general', 'support']
+export type ConversationType = 'viewing_request' | 'general' | 'support'
 
-export type ConversationType = 'PROPERTY_INQUIRY' | 'SERVICE_REQUEST' | 'GENERAL'
+// Status is derived from isRead field in API spec
+export type MessageStatus = 'sent' | 'delivered' | 'read'
+
+// Legacy uppercase types for backward compatibility
+export type LegacyMessageType = 'TEXT' | 'IMAGE' | 'DOCUMENT' | 'SYSTEM'
+export type LegacyMessageStatus = 'SENT' | 'DELIVERED' | 'READ'
+export type LegacyConversationType = 'PROPERTY_INQUIRY' | 'SERVICE_REQUEST' | 'GENERAL'
 
 export interface MessageParticipant {
   userId: string
@@ -19,27 +27,37 @@ export interface MessageParticipant {
   lastSeen: string
 }
 
+// API Spec compliant Message
 export interface Message {
   id: string
   conversationId: string
   senderId: string
-  receiverId: string
   content: string
-  type: MessageType
-  status: MessageStatus
+  messageType: MessageType
+  attachments?: string[]
+  isRead: boolean
   readAt: string | null
-  metadata?: Record<string, any>
   createdAt: string
   updatedAt: string
+  // Additional UI fields
+  receiverId?: string
+  status?: MessageStatus
+  metadata?: Record<string, unknown>
 }
 
+// API Spec compliant Conversation
 export interface Conversation {
   id: string
-  participants: MessageParticipant[]
-  lastMessage: Message | null
-  unreadCount: number
-  type: ConversationType
-  metadata?: Record<string, any>
+  participants: string[] | MessageParticipant[]
+  conversationType: ConversationType
+  relatedPropertyId?: string
+  relatedBookingId?: string
+  lastMessageAt: string
+  lastMessagePreview: string
   createdAt: string
   updatedAt: string
+  // Additional UI fields
+  lastMessage?: Message | null
+  unreadCount?: number
+  metadata?: Record<string, unknown>
 }

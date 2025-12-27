@@ -182,7 +182,7 @@ export interface AdminPendingApproval {
     name: string
     email: string
   }
-  data: Record<string, any>
+  data: Record<string, unknown>
   status: string
   priority: string
   approvedAt?: string

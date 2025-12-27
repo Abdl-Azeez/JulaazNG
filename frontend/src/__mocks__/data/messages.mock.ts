@@ -1,6 +1,6 @@
 /**
  * Messages/Chat Mock Data
- * Matches backend API specification from BACKEND_API_SPEC.md
+ * Matches backend API specification from BACKEND_API_SPEC.md Section 2.4
  */
 
 import type { ApiResponse } from '@/shared/types/common.types'
@@ -18,7 +18,7 @@ export const mockParticipants: MessageParticipant[] = [
     firstName: mockUsers.tenant1.firstName,
     lastName: mockUsers.tenant1.lastName,
     avatar: mockUsers.tenant1.profilePicture,
-    role: 'TENANT',
+    role: 'tenant',
     isOnline: true,
     lastSeen: new Date().toISOString(),
   },
@@ -27,7 +27,7 @@ export const mockParticipants: MessageParticipant[] = [
     firstName: mockUsers.landlord1.firstName,
     lastName: mockUsers.landlord1.lastName,
     avatar: mockUsers.landlord1.profilePicture,
-    role: 'LANDLORD',
+    role: 'landlord',
     isOnline: false,
     lastSeen: '2024-02-13T18:30:00Z',
   },
@@ -36,22 +36,22 @@ export const mockParticipants: MessageParticipant[] = [
     firstName: 'Emmanuel',
     lastName: 'Adeyemi',
     avatar: 'https://i.pravatar.cc/150?img=12',
-    role: 'SERVICE_PROVIDER',
+    role: 'handyman',
     isOnline: true,
     lastSeen: new Date().toISOString(),
   },
 ]
 
-// Sample messages
+// Sample messages (API spec compliant)
 export const mockMessages: Message[] = [
   {
     id: 'msg_001',
     conversationId: 'conv_001',
     senderId: mockUsers.landlord1.id,
-    receiverId: mockUsers.tenant1.id,
     content: 'Hello! Thank you for your interest in the Marina apartment. The viewing is confirmed for February 15 at 10:00 AM.',
-    type: 'TEXT',
-    status: 'READ',
+    messageType: 'text',
+    attachments: [],
+    isRead: true,
     readAt: '2024-02-10T15:00:00Z',
     metadata: {
       propertyId: 'prop_001',
@@ -64,10 +64,10 @@ export const mockMessages: Message[] = [
     id: 'msg_002',
     conversationId: 'conv_001',
     senderId: mockUsers.tenant1.id,
-    receiverId: mockUsers.landlord1.id,
     content: 'Perfect! Thank you so much. Is parking available?',
-    type: 'TEXT',
-    status: 'READ',
+    messageType: 'text',
+    attachments: [],
+    isRead: true,
     readAt: '2024-02-10T15:30:00Z',
     createdAt: '2024-02-10T15:15:00Z',
     updatedAt: '2024-02-10T15:30:00Z',
@@ -76,10 +76,10 @@ export const mockMessages: Message[] = [
     id: 'msg_003',
     conversationId: 'conv_001',
     senderId: mockUsers.landlord1.id,
-    receiverId: mockUsers.tenant1.id,
     content: 'Yes, there are 2 dedicated parking spaces included.',
-    type: 'TEXT',
-    status: 'READ',
+    messageType: 'text',
+    attachments: [],
+    isRead: true,
     readAt: '2024-02-10T16:00:00Z',
     createdAt: '2024-02-10T15:45:00Z',
     updatedAt: '2024-02-10T16:00:00Z',
@@ -88,10 +88,10 @@ export const mockMessages: Message[] = [
     id: 'msg_004',
     conversationId: 'conv_001',
     senderId: mockUsers.tenant1.id,
-    receiverId: mockUsers.landlord1.id,
     content: 'Great! See you on the 15th.',
-    type: 'TEXT',
-    status: 'DELIVERED',
+    messageType: 'text',
+    attachments: [],
+    isRead: false,
     readAt: null,
     createdAt: '2024-02-10T16:10:00Z',
     updatedAt: '2024-02-10T16:10:00Z',
@@ -100,10 +100,10 @@ export const mockMessages: Message[] = [
     id: 'msg_005',
     conversationId: 'conv_002',
     senderId: 'user_sp_001',
-    receiverId: mockUsers.tenant1.id,
     content: 'Hi! I received your service request for the plumbing repair. I can come tomorrow at 9 AM. Does that work for you?',
-    type: 'TEXT',
-    status: 'READ',
+    messageType: 'text',
+    attachments: [],
+    isRead: true,
     readAt: '2024-02-13T15:00:00Z',
     metadata: {
       serviceBookingId: 'sb_001',
@@ -115,10 +115,10 @@ export const mockMessages: Message[] = [
     id: 'msg_006',
     conversationId: 'conv_002',
     senderId: mockUsers.tenant1.id,
-    receiverId: 'user_sp_001',
     content: 'Yes, that works perfectly! Thank you.',
-    type: 'TEXT',
-    status: 'READ',
+    messageType: 'text',
+    attachments: [],
+    isRead: true,
     readAt: '2024-02-13T15:10:00Z',
     createdAt: '2024-02-13T15:05:00Z',
     updatedAt: '2024-02-13T15:10:00Z',
@@ -127,28 +127,30 @@ export const mockMessages: Message[] = [
     id: 'msg_007',
     conversationId: 'conv_002',
     senderId: 'user_sp_001',
-    receiverId: mockUsers.tenant1.id,
     content: 'Great! See you tomorrow.',
-    type: 'TEXT',
-    status: 'DELIVERED',
+    messageType: 'text',
+    attachments: [],
+    isRead: false,
     readAt: null,
     createdAt: '2024-02-13T15:12:00Z',
     updatedAt: '2024-02-13T15:12:00Z',
   },
 ]
 
-// Sample conversations
+// Sample conversations (API spec compliant)
 export const mockConversations: Conversation[] = [
   {
     id: 'conv_001',
     participants: [mockParticipants[0], mockParticipants[1]],
+    conversationType: 'viewing_request',
+    relatedPropertyId: 'prop_001',
+    relatedBookingId: 'book_001',
+    lastMessageAt: '2024-02-10T16:10:00Z',
+    lastMessagePreview: 'Great! See you on the 15th.',
     lastMessage: mockMessages[3],
     unreadCount: 0,
-    type: 'PROPERTY_INQUIRY',
     metadata: {
-      propertyId: 'prop_001',
       propertyTitle: 'Luxury 3BR Apartment in Marina',
-      bookingId: 'book_001',
     },
     createdAt: '2024-02-10T14:45:00Z',
     updatedAt: '2024-02-10T16:10:00Z',
@@ -156,9 +158,11 @@ export const mockConversations: Conversation[] = [
   {
     id: 'conv_002',
     participants: [mockParticipants[0], mockParticipants[2]],
+    conversationType: 'general',
+    lastMessageAt: '2024-02-13T15:12:00Z',
+    lastMessagePreview: 'Great! See you tomorrow.',
     lastMessage: mockMessages[6],
     unreadCount: 1,
-    type: 'SERVICE_REQUEST',
     metadata: {
       serviceBookingId: 'sb_001',
       providerId: 'sp_001',
@@ -166,6 +170,16 @@ export const mockConversations: Conversation[] = [
     },
     createdAt: '2024-02-13T14:30:00Z',
     updatedAt: '2024-02-13T15:12:00Z',
+  },
+  {
+    id: 'conv_003',
+    participants: [mockParticipants[0].userId, 'admin_001'],
+    conversationType: 'support',
+    lastMessageAt: '2024-02-14T10:00:00Z',
+    lastMessagePreview: 'Thank you for contacting support. How can we help?',
+    unreadCount: 1,
+    createdAt: '2024-02-14T09:55:00Z',
+    updatedAt: '2024-02-14T10:00:00Z',
   },
 ]
 
@@ -185,7 +199,7 @@ export const mockConversationsResponse: ApiResponse<{
   success: true,
   data: {
     conversations: mockConversations,
-    totalUnread: mockConversations.reduce((sum, conv) => sum + conv.unreadCount, 0),
+    totalUnread: mockConversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0),
     pagination: {
       page: 1,
       limit: 20,
@@ -234,10 +248,11 @@ export const mockSendMessageResponse: ApiResponse<Message> = {
     id: 'msg_new_001',
     conversationId: 'conv_001',
     senderId: mockUsers.tenant1.id,
-    receiverId: mockUsers.landlord1.id,
     content: 'New message content',
-    type: 'TEXT',
-    status: 'SENT',
+    messageType: 'text',
+    attachments: [],
+    isRead: false,
+    status: 'sent',
     readAt: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -258,9 +273,11 @@ export const mockCreateConversationResponse: ApiResponse<Conversation> = {
   data: {
     id: 'conv_new_001',
     participants: [mockParticipants[0], mockParticipants[1]],
+    conversationType: 'viewing_request',
+    lastMessageAt: new Date().toISOString(),
+    lastMessagePreview: '',
     lastMessage: null,
     unreadCount: 0,
-    type: 'PROPERTY_INQUIRY',
     metadata: {
       propertyId: 'prop_002',
       propertyTitle: 'Modern 2BR in Lekki Phase 1',
@@ -282,7 +299,7 @@ export const mockDeleteMessageResponse: ApiResponse<{ deleted: boolean }> = {
 export const mockMessagesUnreadCountResponse: ApiResponse<{ totalUnread: number }> = {
   success: true,
   data: {
-    totalUnread: mockConversations.reduce((sum, conv) => sum + conv.unreadCount, 0),
+    totalUnread: mockConversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0),
   },
   message: 'Unread count retrieved successfully',
   timestamp: new Date().toISOString(),

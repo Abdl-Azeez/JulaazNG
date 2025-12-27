@@ -1,5 +1,6 @@
 /**
  * Mock data for Favourites
+ * Matches backend API specification from BACKEND_API_SPEC.md Section 2.6
  * Migrated from: pages/favourites/data/sample-favourites.ts
  */
 
@@ -16,7 +17,7 @@ export const mockFavourites: Favourite[] = [
   {
     id: 'fav1',
     userId: 'user1',
-    type: 'property',
+    itemType: 'property',
     itemId: 'prop1',
     item: {
       id: 'prop1',
@@ -34,7 +35,7 @@ export const mockFavourites: Favourite[] = [
   {
     id: 'fav2',
     userId: 'user1',
-    type: 'property',
+    itemType: 'property',
     itemId: 'prop2',
     item: {
       id: 'prop2',
@@ -52,7 +53,7 @@ export const mockFavourites: Favourite[] = [
   {
     id: 'fav3',
     userId: 'user1',
-    type: 'service',
+    itemType: 'service',
     itemId: 'service1',
     item: {
       id: 'service1',
@@ -69,7 +70,7 @@ export const mockFavourites: Favourite[] = [
   {
     id: 'fav4',
     userId: 'user1',
-    type: 'provider',
+    itemType: 'provider',
     itemId: 'provider1',
     item: {
       id: 'provider1',
@@ -86,7 +87,7 @@ export const mockFavourites: Favourite[] = [
   {
     id: 'fav5',
     userId: 'user1',
-    type: 'property',
+    itemType: 'property',
     itemId: 'prop3',
     item: {
       id: 'prop3',

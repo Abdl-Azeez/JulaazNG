@@ -1,9 +1,29 @@
 /**
  * Notification Type Definitions
- * Matches backend Prisma schema
+ * Matches backend API spec from BACKEND_API_SPEC.md Section 2.5 Notifications
  */
 
+// API Spec: type: enum ['viewing_request', 'viewing_approved', 'viewing_rejected', 'application_update', 'payment_due', 'payment_received', 'message_received', 'document_approved', 'document_rejected', 'agreement_sent', 'system']
 export type NotificationType =
+  | 'viewing_request'
+  | 'viewing_approved'
+  | 'viewing_rejected'
+  | 'application_update'
+  | 'payment_due'
+  | 'payment_received'
+  | 'message_received'
+  | 'document_approved'
+  | 'document_rejected'
+  | 'agreement_sent'
+  | 'system'
+
+// API Spec: relatedEntityType: enum ['property', 'booking', 'payment', 'agreement', 'message']
+export type RelatedEntityType = 'property' | 'booking' | 'payment' | 'agreement' | 'message'
+
+export type NotificationChannel = 'in_app' | 'email' | 'sms' | 'push'
+
+// Legacy uppercase types for backward compatibility
+export type LegacyNotificationType =
   | 'BOOKING_CONFIRMED'
   | 'APPLICATION_STATUS'
   | 'PAYMENT_RECEIVED'
@@ -13,7 +33,7 @@ export type NotificationType =
   | 'PROPERTY_ALERT'
   | 'SYSTEM_ANNOUNCEMENT'
 
-export type NotificationChannel = 'IN_APP' | 'EMAIL' | 'SMS' | 'PUSH'
+export type LegacyNotificationChannel = 'IN_APP' | 'EMAIL' | 'SMS' | 'PUSH'
 
 export interface Notification {
   id: string
@@ -21,13 +41,17 @@ export interface Notification {
   type: NotificationType
   title: string
   message: string
-  data?: Record<string, any>
-  channel: NotificationChannel
+  icon?: string
+  relatedEntityType?: RelatedEntityType
+  relatedEntityId?: string
   isRead: boolean
   readAt: string | null
   actionUrl?: string
   createdAt: string
-  updatedAt: string
+  // Additional fields for UI compatibility
+  data?: Record<string, unknown>
+  channel?: NotificationChannel
+  updatedAt?: string
 }
 
 export interface NotificationPreferences {
