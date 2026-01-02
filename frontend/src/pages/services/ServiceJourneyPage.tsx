@@ -174,8 +174,6 @@ const maintenancePlanBundles: MaintenancePlan[] = [
   },
 ]
 
-const geoZones = ['Lagos Island', 'Lagos Mainland', 'Abuja', 'Port Harcourt', 'Ibadan', 'Remote / Virtual']
-
 const flowConfigFactories: Record<string, (ctx: FlowContext) => JourneyConfig> = {
   'maintenance-plans': () => ({
     slug: 'maintenance-plans',
@@ -497,10 +495,6 @@ export function ServiceJourneyPage() {
   const handleSecondaryCta = () => {
     if (!config.secondaryCta?.to) return
     navigate(config.secondaryCta.to)
-  }
-
-  const handlePlanSelect = (planId: string) => {
-    setSelectedPlanId(planId)
   }
 
   const handleRequestPlan = (plan: MaintenancePlan) => {

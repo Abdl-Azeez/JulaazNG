@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { Conversation, Message } from '@/shared/types/activity.types'
 import { sampleConversations, sampleMessages } from '@/__mocks__/data/messages.mock'
 import { format } from 'date-fns'
-import type { RentalCategory } from '@/entities/property/model/types'
+import type { RentalCategory, RentTerm } from '@/entities/property/model/types'
 
 type ViewingSlotPayload = {
   date: Date
@@ -26,6 +26,7 @@ type ViewingConversationPayload = {
   moveInDate: string
   tenancyDuration: string
   minimumBudget: number
+  rentTerm?: RentTerm
   rentalPreference: RentalCategory
   shortletStayLengthNights?: number
   note?: string
@@ -108,6 +109,7 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
     moveInDate,
     tenancyDuration,
     minimumBudget,
+    rentTerm,
     rentalPreference,
     shortletStayLengthNights,
     note
@@ -168,6 +170,10 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
         `• Tenancy duration: ${tenancyDuration}`,
         `• Budget: ₦${formattedBudget} per month`
       )
+
+      if (rentTerm) {
+        messageLines.push(`• Rent term: ${rentTerm.replace(/_/g, ' ')}`)
+      }
     }
 
     messageLines.push('', 'Preferred slots:', slotSummary)

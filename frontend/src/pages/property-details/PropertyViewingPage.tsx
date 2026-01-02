@@ -38,6 +38,7 @@ import { Badge } from '@/shared/ui/badge'
 import { cn } from '@/shared/lib/utils/cn'
 import toast from 'react-hot-toast'
 import { useMessagingStore } from '@/shared/store/messaging.store'
+import type { RentTerm } from '@/entities/property/model/types'
 
 const TIME_OPTIONS = [
   '09:00 AM',
@@ -53,7 +54,7 @@ const TIME_OPTIONS = [
 ]
 
 const TENANCY_DURATION_OPTIONS = ['6 months', '12 months', '18 months', '24 months', 'Flexible']
-const RENT_TERM_LABELS: Record<string, string> = {
+const RENT_TERM_LABELS: Record<RentTerm, string> = {
   monthly: 'Monthly',
   quarterly: 'Quarterly',
   six_months: '6 months',
@@ -96,7 +97,7 @@ export function PropertyViewingPage() {
   const [minimumBudget, setMinimumBudget] = useState<string>('')
 
   const property = id ? samplePropertyDetails[id] : undefined
-  const allowedRentTerms = property?.allowedRentTerms ?? ['annually']
+  const allowedRentTerms: RentTerm[] = (property?.allowedRentTerms ?? ['annually']) as RentTerm[]
 
   const [rentalPreference, setRentalPreference] = useState<'long_term' | 'shortlet'>(() => {
     if (property?.rentalCategories.includes('long_term')) {
@@ -107,7 +108,7 @@ export function PropertyViewingPage() {
     }
     return 'long_term'
   })
-  const [rentTerm, setRentTerm] = useState<string>(allowedRentTerms[0] ?? 'annually')
+  const [rentTerm, setRentTerm] = useState<RentTerm>(allowedRentTerms[0] ?? 'annually')
   const [shortletStayNights, setShortletStayNights] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const earliestSelectableDay = startOfDay(addDays(new Date(), 1))
@@ -465,7 +466,7 @@ export function PropertyViewingPage() {
                     <Label htmlFor="rent-term" className="text-sm text-foreground">
                       Rent term
                     </Label>
-                    <Select value={rentTerm} onValueChange={setRentTerm}>
+                    <Select value={rentTerm} onValueChange={(value) => setRentTerm(value as RentTerm)}>
                       <SelectTrigger id="rent-term" className="h-11 rounded-xl">
                         <SelectValue placeholder="Select rent term" />
                       </SelectTrigger>

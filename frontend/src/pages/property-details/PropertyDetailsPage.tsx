@@ -32,6 +32,7 @@ import { usePropertyReportEligibility } from '@/shared/hooks/useReportEligibilit
 import { samplePropertyDetails } from '@/__mocks__/data/property-details.mock'
 import { cn } from '@/shared/lib/utils/cn'
 import type { PropertyDetail, MoveInItem } from '@/entities/property/model/types'
+import type { RentTerm } from '@/entities/property/model/types'
 import { ROUTES } from '@/shared/constants/routes'
 import toast from 'react-hot-toast'
 import type { ReportFormData } from '@/shared/types/report.types'
@@ -70,8 +71,8 @@ export function PropertyDetailsPage() {
   const favouritePropertyIds = useFavouritesStore((state) => state.favouritePropertyIds)
 
   const property: PropertyDetail | undefined = id ? samplePropertyDetails[id] : undefined
-  const allowedRentTerms = property?.allowedRentTerms ?? ['annually']
-  const formatRentTerm = (term: string) => {
+  const allowedRentTerms: RentTerm[] = (property?.allowedRentTerms ?? ['annually']) as RentTerm[]
+  const formatRentTerm = (term: RentTerm) => {
     if (term === 'monthly') return 'Monthly'
     if (term === 'quarterly') return 'Quarterly'
     if (term === 'six_months') return '6 months'

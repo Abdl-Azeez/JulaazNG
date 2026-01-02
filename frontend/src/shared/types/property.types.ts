@@ -25,6 +25,8 @@ export type LegacyPropertyStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'RENTED'
 
 export type PriceType = 'annually' | 'monthly' | 'nightly' | 'weekly'
 
+export type RentTerm = 'monthly' | 'quarterly' | 'six_months' | 'annually'
+
 // API Spec: rentalCategories: enum[] ['long_term', 'shortlet']
 export type RentalCategory = 'long_term' | 'shortlet'
 
@@ -47,6 +49,7 @@ export interface Property {
   carParkingSpaces?: number
   squareMeters?: number
   rentalCategories: RentalCategory[]
+  allowedRentTerms?: RentTerm[]
   // Long-term rental
   annualRent?: number
   monthlyRent?: number

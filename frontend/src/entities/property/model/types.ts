@@ -1,5 +1,7 @@
 export type RentalCategory = 'long_term' | 'shortlet'
 
+export type RentTerm = 'monthly' | 'quarterly' | 'six_months' | 'annually'
+
 export interface ShortletOffering {
   isAvailable: boolean
   headline: string
@@ -26,6 +28,7 @@ export interface LongTermOffering {
   furnished: boolean
   utilitiesIncluded: string[]
   paymentPlan: string[]
+  allowedRentTerms?: RentTerm[]
   notes?: string
 }
 
@@ -42,6 +45,7 @@ export interface Property {
   location?: string
   ownerId?: string
   rentalCategories: RentalCategory[]
+  allowedRentTerms?: RentTerm[]
   annualRent?: number
   monthlyRent?: number
   nightlyRate?: number
@@ -96,5 +100,4 @@ export interface PropertyDetail extends Property {
   longTermOffering?: LongTermOffering
   shortletOffering?: ShortletOffering
 }
-  allowedRentTerms?: Array<'monthly' | 'quarterly' | 'six_months' | 'annually'>
 

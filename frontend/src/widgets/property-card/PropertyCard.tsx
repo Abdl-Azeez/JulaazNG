@@ -27,17 +27,6 @@ export function PropertyCard({ property, onRequestViewing, onShare, onSelect, la
   const annualPrice = property.annualRent ?? (hasLongTerm ? property.price : undefined)
   const nightlyRate = property.nightlyRate ?? (hasShortlet && property.price && !hasLongTerm ? property.price : undefined)
 
-  const rentTerms = (property.allowedRentTerms ?? ['annually']).map((term) => {
-    if (term === 'monthly') return 'Monthly'
-    if (term === 'quarterly') return 'Quarterly'
-    if (term === 'six_months') return '6 months'
-    return 'Annual'
-  })
-
-  const rentTermsLabel = rentTerms.length > 2
-    ? `${rentTerms.slice(0, 2).join(' • ')} +${rentTerms.length - 2} more`
-    : rentTerms.join(' • ')
-
   const annualLabel = annualPrice ? `${formatPrice(annualPrice)}/yr` : undefined
   const nightlyLabel = nightlyRate ? `${formatPrice(nightlyRate)}/night` : undefined
 

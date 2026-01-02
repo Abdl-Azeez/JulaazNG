@@ -10,6 +10,10 @@ export interface User {
   role?: 'tenant' | 'landlord' | 'service_provider' | 'artisan' | 'property_manager' | 'admin' | 'handyman' | 'homerunner'
   isVerified?: boolean
   roles?: RoleType[]
+  averageRating?: number
+  ratingCount?: number
+  pointsBalance?: number
+  lifetimePoints?: number
 }
 
 interface AuthState {
