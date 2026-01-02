@@ -115,6 +115,17 @@ export function LoginModal() {
     return 'Enter your email or phone number'
   }
 
+  const handleGoToSignup = () => {
+    const signupState = preserveState ?? {
+      backgroundLocation: backgroundLocation ?? location,
+      modal: true,
+    }
+
+    navigate(ROUTES.SIGNUP, {
+      state: signupState,
+    })
+  }
+
   return (
     <Dialog open onOpenChange={(open) => {
       if (!open) {
@@ -178,6 +189,18 @@ export function LoginModal() {
             >
               Continue
             </Button>
+
+            {/* Signup Redirect */}
+            <p className="text-sm text-center text-muted-foreground">
+              Don't have an account?{' '}
+              <button
+                type="button"
+                className="font-semibold text-primary hover:underline"
+                onClick={handleGoToSignup}
+              >
+                Sign up
+              </button>
+            </p>
 
             {/* Terms and Privacy */}
             <p className="text-xs text-center text-muted-foreground">

@@ -278,6 +278,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     onClose()
   }
 
+  const handleMessagesClick = () => {
+    if (isAuthenticated) {
+      handleNavigation(ROUTES.MESSAGING)
+      return
+    }
+
+    navigate(ROUTES.LOGIN, {
+      state: {
+        backgroundLocation: location,
+        modal: true,
+      },
+    })
+    onClose()
+  }
+
   const shouldShowItem = (item: MenuItem) => {
     if (item.requiresAuth && !isAuthenticated) return false
     if (item.roles && currentRole && !item.roles.includes(currentRole)) return false
@@ -341,6 +356,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </button>
               )
             })}
+            <button
+              onClick={handleMessagesClick}
+              className={cn('sidebar__item', isActive(ROUTES.MESSAGING) && 'sidebar__item--active')}
+            >
+              <MessageCircle className="sidebar__item-icon" />
+              <span className="sidebar__item-label">Messages</span>
+              <div className="sidebar__item-shine" />
+            </button>
           </div>
 
           {/* Quick Services Chips */}

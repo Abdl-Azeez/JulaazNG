@@ -226,6 +226,20 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
     return location.pathname.startsWith(path)
   }
 
+  const handleMessagesClick = () => {
+    if (isAuthenticated) {
+      navigate(ROUTES.MESSAGING)
+      return
+    }
+
+    navigate(ROUTES.LOGIN, {
+      state: {
+        backgroundLocation: location,
+        modal: true,
+      },
+    })
+  }
+
   return (
     <TooltipProvider>
       <header className={cn(
@@ -385,32 +399,38 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-2 lg:gap-3">
+          {/* Messages - always visible; prompts login when unauthenticated */}
+          <div className="hidden lg:flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'bg-icon-bg text-foreground hover:bg-primary/10 hover:text-primary relative transition-colors',
+                    isActive(ROUTES.MESSAGING) && 'bg-primary/10 text-primary'
+                  )}
+                  onClick={handleMessagesClick}
+                  aria-label="Messages"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  {isAuthenticated && (
+                    <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs bg-primary text-primary-foreground">
+                      2
+                    </Badge>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Messages</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
           {isAuthenticated && (
             <>
-              {/* Desktop - Messages & Notifications (Always visible) */}
+              {/* Desktop - Notifications (auth only) */}
               <div className="hidden lg:flex items-center gap-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className={cn(
-                        'bg-icon-bg text-foreground hover:bg-primary/10 hover:text-primary relative transition-colors',
-                        isActive(ROUTES.MESSAGING) && 'bg-primary/10 text-primary'
-                      )}
-                      onClick={() => navigate(ROUTES.MESSAGING)}
-                      aria-label="Messages"
-                    >
-                      <MessageCircle className="h-5 w-5" />
-                      <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs bg-primary text-primary-foreground">
-                        2
-                      </Badge>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Messages</p>
-                  </TooltipContent>
-                </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button

@@ -44,8 +44,7 @@ export function SignupPage() {
   const [userType, setUserType] = useState<UserType>(defaultRole)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [dateOfBirth, setDateOfBirth] = useState('')
-  const [gender, setGender] = useState<string>('')
+  const [ageRange, setAgeRange] = useState('')
   const [email, setEmail] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [password, setPassword] = useState('')
@@ -57,8 +56,7 @@ export function SignupPage() {
   const [errors, setErrors] = useState<{
     firstName?: string
     lastName?: string
-    dateOfBirth?: string
-    gender?: string
+    ageRange?: string
     email?: string
     phone?: string
     password?: string
@@ -81,6 +79,15 @@ export function SignupPage() {
     []
   )
 
+  const ageRangeOptions = [
+    { value: 'below-18', label: 'Below 18' },
+    { value: '18-25', label: '18 - 25' },
+    { value: '26-35', label: '26 - 35' },
+    { value: '36-45', label: '36 - 45' },
+    { value: '46-60', label: '46 - 60' },
+    { value: '60-plus', label: '60+' },
+  ]
+
   const validateForm = () => {
     const newErrors: typeof errors = {}
 
@@ -92,19 +99,8 @@ export function SignupPage() {
       newErrors.lastName = 'Last name is required'
     }
 
-    if (!dateOfBirth.trim()) {
-      newErrors.dateOfBirth = 'Date of birth is required'
-    } else {
-      const dob = new Date(dateOfBirth)
-      const today = new Date()
-      const age = today.getFullYear() - dob.getFullYear()
-      if (age < 18) {
-        newErrors.dateOfBirth = 'You must be at least 18 years old'
-      }
-    }
-
-    if (!gender) {
-      newErrors.gender = 'Gender is required'
+    if (!ageRange.trim()) {
+      newErrors.ageRange = 'Select your age range'
     }
 
     if (!email.trim()) {
@@ -168,8 +164,7 @@ export function SignupPage() {
         role: userType,
         firstName: firstName,
         lastName: lastName,
-        dateOfBirth: dateOfBirth,
-        gender: gender,
+        ageRange: ageRange,
         nationality: 'Nigeria', // Default to Nigeria based on +234 country code
       })
 
@@ -374,43 +369,31 @@ export function SignupPage() {
             )}
           </div>
 
-          {/* Date of Birth Input */}
+          {/* Age Range Input */}
           <div className="space-y-2">
-            <Label htmlFor="date-of-birth" className="text-sm font-semibold text-foreground">
-              Date of Birth
+            <Label htmlFor="age-range" className="text-sm font-semibold text-foreground">
+              Age Range
             </Label>
-            <Input
-              id="date-of-birth"
-              type="date"
-              value={dateOfBirth}
-              onChange={(e) => {
-                setDateOfBirth(e.target.value)
-                if (errors.dateOfBirth) setErrors({ ...errors, dateOfBirth: undefined })
+            <Select
+              value={ageRange}
+              onValueChange={(value) => {
+                setAgeRange(value)
+                if (errors.ageRange) setErrors({ ...errors, ageRange: undefined })
               }}
-              className={errors.dateOfBirth ? 'border-destructive' : ''}
-              max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
-            />
-            {errors.dateOfBirth && (
-              <p className="text-xs text-destructive">{errors.dateOfBirth}</p>
-            )}
-          </div>
-
-          {/* Gender Selection */}
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold text-foreground">Gender</Label>
-            <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger className={errors.gender ? 'border-destructive' : ''}>
-                <SelectValue placeholder="Select your gender" />
+            >
+              <SelectTrigger id="age-range" className={errors.ageRange ? 'border-destructive' : ''}>
+                <SelectValue placeholder="Select your age range" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-                <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                {ageRangeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            {errors.gender && (
-              <p className="text-xs text-destructive">{errors.gender}</p>
+            {errors.ageRange && (
+              <p className="text-xs text-destructive">{errors.ageRange}</p>
             )}
           </div>
 
