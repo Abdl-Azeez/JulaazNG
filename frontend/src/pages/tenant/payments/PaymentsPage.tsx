@@ -5,6 +5,7 @@ import {
   Building2,
   Smartphone,
   Wallet,
+  ShieldCheck,
   CheckCircle2,
   Clock,
   XCircle,
@@ -12,7 +13,6 @@ import {
   Receipt,
   Download,
   Calendar,
-  DollarSign,
 } from 'lucide-react'
 import { format, differenceInDays, isPast } from 'date-fns'
 import { Header } from '@/widgets/header'
@@ -191,6 +191,26 @@ export function PaymentsPage() {
             </p>
           </div>
 
+          <Card className="mb-8 rounded-2xl border border-primary/20 bg-primary/5 p-4 lg:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-xl bg-primary/10 p-2 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-sm font-semibold text-foreground">Security-first, no-scam zone</h2>
+                    <Badge className="rounded-full bg-primary/10 text-primary text-[10px]">Recommended</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    For your protection, always pay through the platform. It keeps your receipts, status updates, and support in one place.
+                  </p>
+                </div>
+              </div>
+              <Badge className="w-fit rounded-full bg-muted text-muted-foreground text-[10px]">Never pay offline</Badge>
+            </div>
+          </Card>
+
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card className="p-4 lg:p-6 min-h-[130px] bg-gradient-to-br from-amber-500/20 to-amber-600/10 border-amber-500/30">
@@ -232,7 +252,7 @@ export function PaymentsPage() {
             <Card className="p-4 lg:p-6 min-h-[130px] bg-surface border-border/50">
               <div className="flex h-full flex-col justify-between gap-2">
                 <div className="p-2 rounded-lg bg-amber-500/10 w-fit">
-                  <DollarSign className="h-5 w-5 text-amber-600" />
+                  <CreditCard className="h-5 w-5 text-amber-600" />
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs lg:text-sm text-muted-foreground">Pending</p>

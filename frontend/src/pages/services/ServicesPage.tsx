@@ -31,6 +31,7 @@ import { howItWorksSteps } from './data/how-it-works'
 const badges = [
   { id: 'response', label: 'Under 90 min response', icon: Clock },
   { id: 'vetted', label: 'Vetted artisans only', icon: ShieldCheck },
+  { id: 'secure', label: 'No-scam zone payments', icon: ShieldCheck },
   { id: 'guarantee', label: '14-day workmanship guarantee', icon: BadgeCheck },
 ]
 
@@ -192,7 +193,7 @@ export function ServicesPage() {
               <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
                 From emergency fixes to full renovations, JulaazNG curates the top 5% of technicians,
                 artisans and service partners across Nigeria. We verify every background, track every job
-                and protect your property like ours.
+                and protect your property like ours. Pay through the platform for a safer, scam-free experience.
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Button

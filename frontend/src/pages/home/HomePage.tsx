@@ -128,7 +128,8 @@ export function HomePage() {
                   </h1>
 
                   <p className="text-center text-base text-muted-foreground leading-relaxed mb-8 px-4 animate-fade-in-up animation-delay-200">
-                    Find your perfect rental, book trusted services, and connect with skilled artisans—all in one place. Nigeria's most trusted property and home services platform.
+                    Creating a one-stop ecosystem for property management—find your perfect rental, book trusted services, and connect with skilled artisans—all in one place.
+                    Built to increase value for traditional homeowners while tenants get the best value.
                   </p>
 
                   {/* Service Categories - Quick Access */}
@@ -196,7 +197,7 @@ export function HomePage() {
                       {
                         icon: ShieldCheck,
                         title: 'Verified & Trusted',
-                        desc: 'Every property and service provider is vetted by our team. Background checks, verified listings, and secure payments.',
+                        desc: 'Security-first, no-scam zone. Every property and service provider is vetted, and we keep payments protected through the platform.',
                         gradient: 'from-primary/20 to-primary/5',
                         delay: '300',
                       },
@@ -210,7 +211,7 @@ export function HomePage() {
                       {
                         icon: CreditCard,
                         title: 'Transparent Pricing',
-                        desc: 'No hidden fees. See exact costs upfront with secure payment processing and instant receipts.',
+                        desc: 'No hidden fees. Pay through the platform, see exact costs upfront, and get instant receipts for every transaction.',
                         gradient: 'from-emerald-500/20 to-emerald-500/5',
                         delay: '500',
                       },
@@ -324,9 +325,9 @@ export function HomePage() {
                       </span>
                     </h1>
                     <p className="text-lg xl:text-xl text-muted-foreground leading-relaxed">
-                      From finding your perfect rental to booking trusted services and connecting with skilled artisans—all in one trusted platform.
+                      Creating a one-stop ecosystem for property management—find your perfect rental, book trusted services, and connect with skilled artisans in one trusted platform.
                       {' '}
-                      <span className="font-semibold text-foreground">Your complete home solution starts here.</span>
+                      <span className="font-semibold text-foreground">Increase property value, avoid scams, and get the best value—start here.</span>
                     </p>
                     
                     {/* Service Quick Links */}
@@ -360,24 +361,24 @@ export function HomePage() {
                       <div className="flex items-center gap-2">
                         <CreditCard className="h-5 w-5 text-primary" />
                         <div>
-                          <div className="text-sm font-bold text-foreground">Monthly–Annual</div>
-                          <div className="text-xs text-muted-foreground">Flexible rent terms</div>
+                          <div className="text-sm font-bold text-foreground">No-scam zone</div>
+                          <div className="text-xs text-muted-foreground">Pay through the platform</div>
                         </div>
                       </div>
                       <div className="h-12 w-px bg-border" />
                       <div className="flex items-center gap-2">
                         <Sparkles className="h-5 w-5 text-amber-500" />
                         <div>
-                          <div className="text-sm font-bold text-foreground">Points on services</div>
-                          <div className="text-xs text-muted-foreground">Earn and redeem faster</div>
+                          <div className="text-sm font-bold text-foreground">More value</div>
+                          <div className="text-xs text-muted-foreground">Better services, better homes</div>
                         </div>
                       </div>
                       <div className="h-12 w-px bg-border" />
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="h-5 w-5 text-emerald-600" />
                         <div>
-                          <div className="text-sm font-bold text-foreground">Verified landlords</div>
-                          <div className="text-xs text-muted-foreground">Background-checked</div>
+                          <div className="text-sm font-bold text-foreground">Trust by design</div>
+                          <div className="text-xs text-muted-foreground">Verified listings & partners</div>
                         </div>
                       </div>
                     </div>

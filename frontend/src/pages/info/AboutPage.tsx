@@ -27,7 +27,7 @@ export function AboutPage() {
   return (
     <InfoPageTemplate
       title="Built for modern Nigerian living"
-      subtitle="Julaaz pairs long-term rentals, flexible shortlets, and concierge-level support into one trusted ecosystem."
+      subtitle="Creating a one-stop ecosystem for property management—rentals, shortlets, and concierge support in one trusted platform."
       badge="Our Story"
     >
       <motion.div
@@ -87,7 +87,7 @@ export function AboutPage() {
               </li>
               <li className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                Seamless messaging, payments, and viewing schedules.
+                Security-first, no-scam zone payments through the platform.
               </li>
               <li className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
