@@ -8,7 +8,6 @@ import { Badge } from '@/shared/ui/badge'
 import {
   Users,
   Building2,
-  DollarSign,
   ArrowUpRight,
   ShieldCheck,
   AlertTriangle,
@@ -43,6 +42,20 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog'
 import toast from 'react-hot-toast'
+
+function NairaIcon({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        'inline-flex items-center justify-center font-semibold leading-none',
+        className
+      )}
+    >
+      ₦
+    </span>
+  )
+}
 
 export function AdminDashboardPage() {
   const navigate = useNavigate()
@@ -82,7 +95,7 @@ export function AdminDashboardPage() {
       case 'homerunner':
         return <Eye className="h-4 w-4 text-emerald-600" />
       case 'withdrawal':
-        return <DollarSign className="h-4 w-4 text-green-600" />
+        return <NairaIcon className="h-4 w-4 text-green-600" />
     }
   }
 
@@ -151,7 +164,7 @@ export function AdminDashboardPage() {
       label: 'Monthly GMV',
       value: `₦${(sampleSystemStats.totalRevenue / 1000000).toFixed(1)}M`,
       subtext: '+11.3% vs last month',
-      icon: DollarSign,
+      icon: NairaIcon,
       gradient: 'from-primary/90 via-primary to-primary/70',
     },
     {

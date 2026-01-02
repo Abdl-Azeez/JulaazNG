@@ -1199,6 +1199,7 @@ export interface AdminUserItem {
   role: 'tenant' | 'landlord' | 'homerunner' | 'admin' | 'handyman' | 'service_provider'
   status: 'active' | 'pending' | 'suspended' | 'banned'
   verified: boolean
+  rating: number
   joinedAt: string
   lastActive: string
   propertiesCount?: number
@@ -1222,6 +1223,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'tenant',
     status: 'active',
     verified: true,
+    rating: 4.8,
     joinedAt: '2024-01-15',
     lastActive: '2 hours ago',
     bookingsCount: 3,
@@ -1247,6 +1249,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'landlord',
     status: 'active',
     verified: true,
+    rating: 4.7,
     joinedAt: '2023-11-20',
     lastActive: '1 day ago',
     propertiesCount: 5,
@@ -1268,6 +1271,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'homerunner',
     status: 'active',
     verified: true,
+    rating: 4.6,
     joinedAt: '2024-02-01',
     lastActive: '30 minutes ago',
     backgroundCheck: {
@@ -1289,6 +1293,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'tenant',
     status: 'pending',
     verified: false,
+    rating: 4.5,
     joinedAt: '2024-03-10',
     lastActive: '5 hours ago',
     bookingsCount: 1,
@@ -1314,6 +1319,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'handyman',
     status: 'suspended',
     verified: true,
+    rating: 4.2,
     joinedAt: '2023-12-05',
     lastActive: '3 days ago',
     backgroundCheck: {
@@ -1334,6 +1340,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'service_provider',
     status: 'active',
     verified: true,
+    rating: 4.9,
     joinedAt: '2024-01-28',
     lastActive: '1 hour ago',
     backgroundCheck: {
@@ -1354,6 +1361,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'tenant',
     status: 'active',
     verified: true,
+    rating: 4.4,
     joinedAt: '2024-02-15',
     lastActive: '4 hours ago',
     bookingsCount: 2,
@@ -1379,6 +1387,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'landlord',
     status: 'active',
     verified: true,
+    rating: 4.8,
     joinedAt: '2023-10-10',
     lastActive: '6 hours ago',
     propertiesCount: 8,
@@ -1400,6 +1409,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'homerunner',
     status: 'pending',
     verified: false,
+    rating: 4.3,
     joinedAt: '2024-03-15',
     lastActive: '1 day ago',
     backgroundCheck: {
@@ -1421,6 +1431,7 @@ export const adminUsersList: AdminUserItem[] = [
     role: 'tenant',
     status: 'banned',
     verified: false,
+    rating: 3.9,
     joinedAt: '2023-09-01',
     lastActive: '2 weeks ago',
     bookingsCount: 0,

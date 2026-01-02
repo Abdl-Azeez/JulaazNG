@@ -139,7 +139,7 @@ export function AdminUsersPage() {
   })
 
   const filteredAndSortedUsers = useMemo(() => {
-    let result = users.filter((user) => {
+    const result = users.filter((user) => {
       const matchesSearch =
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -372,6 +372,7 @@ export function AdminUsersPage() {
       role: newUser.role,
       status: 'pending',
       verified: false,
+      rating: 5,
       joinedAt: new Date().toISOString().split('T')[0],
       lastActive: 'Just now',
       backgroundCheck: {
@@ -668,6 +669,9 @@ export function AdminUsersPage() {
                       </span>
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
+                      Rating
+                    </th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
                       BGC
                     </th>
                     <th
@@ -731,6 +735,11 @@ export function AdminUsersPage() {
                           {statusIcons[user.status]}
                           {user.status}
                         </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs font-semibold text-foreground">
+                          {user.rating.toFixed(1)}★
+                        </span>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
