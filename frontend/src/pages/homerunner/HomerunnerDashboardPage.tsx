@@ -39,6 +39,7 @@ import {
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
+import { listRentRequests } from '@/shared/lib/rent-requests'
 import {
   sampleInspections,
   sampleViewings,
@@ -67,6 +68,20 @@ export function HomerunnerDashboardPage() {
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false)
   const [activeAction, setActiveAction] = useState<QuickAction | null>(null)
   const [actionForm, setActionForm] = useState({ reference: '', notes: '' })
+
+  const assignedLocalities = useMemo(
+    () => ['Lekki', 'Ikeja', 'Yaba', 'Victoria Island', 'Ajah'],
+    []
+  )
+
+  const rentRequests = useMemo(() => {
+    const requests = listRentRequests()
+    const matchesAssignedZone = (location: string) => {
+      const normalized = location.toLowerCase()
+      return assignedLocalities.some((area) => normalized.includes(area.toLowerCase()))
+    }
+    return requests.filter((request) => matchesAssignedZone(request.location)).slice(0, 4)
+  }, [assignedLocalities])
 
   const handleProfileClick = () => {
     navigate(ROUTES.PROFILE)
@@ -162,6 +177,30 @@ export function HomerunnerDashboardPage() {
                       : 'Keep the streak going — no urgent tasks pending!'}
                   </span>
                 </div>
+
+                <Card className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 shadow-sm max-w-2xl">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Badge className="rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px]">
+                          New lead source
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">Rent requests</span>
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">Tenants are requesting apartments in your zone.</p>
+                      <p className="text-sm text-muted-foreground">
+                        Review new requests, then follow up and suggest near-match listings in-app.
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+                      onClick={() => document.getElementById('rent-requests')?.scrollIntoView()}
+                    >
+                      View requests
+                    </Button>
+                  </div>
+                </Card>
               </div>
 
               {/* Earnings Summary Card */}
@@ -234,6 +273,68 @@ export function HomerunnerDashboardPage() {
               </Card>
             ))}
           </div>
+        </section>
+
+        <section id="rent-requests" className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 pb-6 lg:pb-10">
+          <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm">
+            <div className="p-5 border-b border-border/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Rent requests in your zone</h2>
+                <p className="text-xs text-muted-foreground">
+                  New tenant requests from {assignedLocalities.slice(0, 3).join(', ')}{assignedLocalities.length > 3 ? '…' : ''}
+                </p>
+              </div>
+              <Badge className="rounded-full bg-emerald-500/10 text-emerald-600">
+                {rentRequests.length} new
+              </Badge>
+            </div>
+            <div className="divide-y divide-border/60">
+              {rentRequests.length === 0 ? (
+                <div className="p-5 text-sm text-muted-foreground">
+                  No rent requests assigned to your locality yet.
+                </div>
+              ) : (
+                rentRequests.map((request) => (
+                  <div key={request.id} className="p-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge className="rounded-full bg-primary/10 text-primary text-[10px]">New request</Badge>
+                        <span className="text-xs text-muted-foreground">{request.rooms} room(s) • {request.rentTerm.replace('_', ' ')}</span>
+                        <span className="text-xs text-muted-foreground">• {request.budgetRange ?? 'Any price'}</span>
+                        {request.furnished && (
+                          <Badge className="rounded-full bg-amber-500/10 text-amber-600 text-[10px]">Furnished</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">{request.location}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Follow up via {request.channel} and start suggesting near-match apartments.
+                      </p>
+                    </div>
+                    <div className="flex gap-2 sm:flex-col sm:items-end">
+                      <Button
+                        size="sm"
+                        className="rounded-xl"
+                        onClick={() => {
+                          toast.success('Opening messaging to follow up…')
+                          navigate(ROUTES.MESSAGING)
+                        }}
+                      >
+                        Follow up
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl"
+                        onClick={() => toast.success('Request pinned to your watchlist')}
+                      >
+                        Pin
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </Card>
         </section>
 
         {/* Main Content Grid */}

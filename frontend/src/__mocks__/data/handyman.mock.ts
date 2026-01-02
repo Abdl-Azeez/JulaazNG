@@ -137,6 +137,12 @@ export const mockPerformanceHighlights: PerformanceHighlight[] = [
   },
 ]
 
+export const mockHandymanBadgeMetrics = {
+  servicesRendered: 128,
+  companyRevenueNgn: 2_750_000,
+  averageRating: 4.9,
+}
+
 export const mockOnboardingChecklist: OnboardingChecklistItem[] = [
   {
     id: 'identity',

@@ -12,6 +12,7 @@ import type {
   SystemSettings,
 } from '@/shared/types/admin.types'
 import { mockUsers } from './auth.mock'
+import type { HandymanBadgeMetrics, HomerunnerBadgeMetrics } from '@/shared/lib/badge-config'
 
 // Sample admin analytics
 export const mockAdminAnalytics: AdminAnalytics = {
@@ -1207,6 +1208,15 @@ export interface AdminUserItem {
   viewingsRequested?: number
   currentRentals?: number
   shortletsUsed?: number
+  badgeInfo?:
+    | {
+        type: 'handyman'
+        metrics: HandymanBadgeMetrics
+      }
+    | {
+        type: 'homerunner'
+        metrics: HomerunnerBadgeMetrics
+      }
   backgroundCheck: {
     status: 'not_started' | 'in_progress' | 'completed' | 'failed'
     progress: number
@@ -1274,6 +1284,15 @@ export const adminUsersList: AdminUserItem[] = [
     rating: 4.6,
     joinedAt: '2024-02-01',
     lastActive: '30 minutes ago',
+    badgeInfo: {
+      type: 'homerunner',
+      metrics: {
+        viewingsHosted: 38,
+        inspectionsCompleted: 14,
+        conversionRate: 28,
+        averageRating: 4.6,
+      },
+    },
     backgroundCheck: {
       status: 'in_progress',
       progress: 75,
@@ -1322,6 +1341,14 @@ export const adminUsersList: AdminUserItem[] = [
     rating: 4.2,
     joinedAt: '2023-12-05',
     lastActive: '3 days ago',
+    badgeInfo: {
+      type: 'handyman',
+      metrics: {
+        servicesRendered: 64,
+        companyRevenueNgn: 850_000,
+        averageRating: 4.4,
+      },
+    },
     backgroundCheck: {
       status: 'failed',
       progress: 50,
@@ -1412,6 +1439,15 @@ export const adminUsersList: AdminUserItem[] = [
     rating: 4.3,
     joinedAt: '2024-03-15',
     lastActive: '1 day ago',
+    badgeInfo: {
+      type: 'homerunner',
+      metrics: {
+        viewingsHosted: 6,
+        inspectionsCompleted: 2,
+        conversionRate: 12,
+        averageRating: 4.2,
+      },
+    },
     backgroundCheck: {
       status: 'not_started',
       progress: 0,

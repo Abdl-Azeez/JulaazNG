@@ -23,6 +23,15 @@ export function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [layout, setLayout] = useState<LayoutType>('grid')
 
+  const handleOpenRentRequest = () => {
+    if (!isAuthenticated) {
+      setIsAuthOpen(true)
+      return
+    }
+    sessionStorage.setItem('openRentRequest', '1')
+    navigate(ROUTES.PROPERTIES)
+  }
+
   const handleSearch = (query: string) => {
     // Navigate to search page with query
     if (query.trim()) {
@@ -308,7 +317,7 @@ export function HomePage() {
 
               {/* Desktop Hero */}
               <div className="hidden lg:block">
-                <div className="grid lg:grid-cols-2 gap-12 xl:gap-16 items-center">
+                <div className="grid lg:grid-cols-2 gap-12 xl:gap-16 items-start">
                   <div className="space-y-6">
                     <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/20 via-primary/10 to-accent/20 px-4 py-2 text-sm font-medium text-primary border border-primary/30">
                       <span className="relative flex h-2 w-2">
@@ -403,8 +412,30 @@ export function HomePage() {
                         Book Services
                       </Button>
                     </div>
+
+                    {/* <Card className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5 h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                            <MapPin className="h-5 w-5" />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-sm font-semibold text-foreground">New: Request to rent</p>
+                            <p className="text-sm text-muted-foreground">
+                              Tell us your location, rooms, rent type, and furnished needs. We’ll keep sending near-match apartments via in-app notifications and chat.
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          className="rounded-xl shrink-0"
+                          onClick={handleOpenRentRequest}
+                        >
+                          Request
+                        </Button>
+                      </div>
+                    </Card> */}
                   </div>
-                  <div className="relative">
+                  <div className="relative flex flex-col gap-4">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-2xl" />
                     <div className="relative bg-surface/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-border/50">
                       <SearchBar onSearch={handleSearch} onFilterClick={handleFilterClick} />
@@ -421,6 +452,64 @@ export function HomePage() {
                           <div className="text-2xl font-bold text-primary">98%</div>
                           <div className="text-xs text-muted-foreground mt-1">Satisfaction</div>
                         </div>
+                      </div>
+
+                      <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <p className="text-sm font-semibold text-foreground">Can’t find what you want?</p>
+                            <p className="text-sm text-muted-foreground">
+                              Use <span className="font-semibold text-foreground">Request to rent</span> and we’ll keep sending near-match apartments via in-app notifications and chat.
+                            </p>
+                            <p className="text-xs text-muted-foreground">Security-first: pay through the platform (no-scam zone).</p>
+                          </div>
+                          <Button className="rounded-xl" onClick={handleOpenRentRequest}>
+                            Request
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative bg-background/70 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-border/50">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-foreground">Popular areas right now</p>
+                          <p className="text-sm text-muted-foreground">Quick-start a search or request a match.</p>
+                        </div>
+                        <Button variant="outline" className="rounded-xl" onClick={handleOpenRentRequest}>
+                          Request to rent
+                        </Button>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {['Lekki', 'Ikeja', 'Yaba', 'Victoria Island', 'Ajah', 'Surulere'].map((area) => (
+                          <button
+                            key={area}
+                            type="button"
+                            onClick={() => handleSearch(area)}
+                            className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:border-primary/50 hover:text-primary transition-colors"
+                          >
+                            {area}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="mt-5 grid gap-3">
+                        {[
+                          { title: 'Submit your request', desc: 'Location, rooms, rent type, furnished or not.' },
+                          { title: 'We match and notify you', desc: 'Near-match apartments via in-app notifications & chat.' },
+                          { title: 'Homerunners follow up', desc: 'Assigned teams help you schedule viewings faster.' },
+                        ].map((step, index) => (
+                          <div key={step.title} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-surface/60 p-3">
+                            <div className="h-7 w-7 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-foreground">{step.title}</p>
+                              <p className="text-xs text-muted-foreground">{step.desc}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>

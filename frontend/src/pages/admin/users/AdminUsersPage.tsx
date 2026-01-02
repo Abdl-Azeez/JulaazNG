@@ -45,6 +45,7 @@ import {
   Upload,
   AlertCircle,
   Download,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
@@ -65,6 +66,16 @@ import {
   type AdminUserItem as User,
   type AdminUserBackgroundCheckDocument as BackgroundCheckDocument,
 } from '@/__mocks__/data/admin.mock'
+import {
+  calculateHandymanBadge,
+  calculateHomerunnerBadge,
+  handymanBadgeTargetsDefault,
+  homerunnerBadgeTargetsDefault,
+  handymanBadgeTiers,
+  homerunnerBadgeTiers,
+  type HandymanBadgeTargets,
+  type HomerunnerBadgeTargets,
+} from '@/shared/lib/badge-config'
 
 const roleColors: Record<User['role'], string> = {
   tenant: 'bg-blue-500/10 text-blue-600',
@@ -113,6 +124,8 @@ export function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState<User['role'] | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<User['status'] | 'all'>('all')
   const [users, setUsers] = useState<User[]>(adminUsersList)
+  const [handymanTargets, setHandymanTargets] = useState<HandymanBadgeTargets>(handymanBadgeTargetsDefault)
+  const [homerunnerTargets, setHomerunnerTargets] = useState<HomerunnerBadgeTargets>(homerunnerBadgeTargetsDefault)
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -128,6 +141,7 @@ export function AdminUsersPage() {
   const [isMessageOpen, setIsMessageOpen] = useState(false)
   const [messageContent, setMessageContent] = useState('')
   const [viewingDocument, setViewingDocument] = useState<{ user: User; doc: BackgroundCheckDocument } | null>(null)
+  const [isBadgeTargetsOpen, setIsBadgeTargetsOpen] = useState(false)
 
   // Add user form
   const [newUser, setNewUser] = useState({
@@ -197,6 +211,20 @@ export function AdminUsersPage() {
     ) : (
       <ArrowDown className="h-3 w-3 ml-1" />
     )
+  }
+
+  const getBadgeResultForUser = (user: User) => {
+    if (!user.badgeInfo) return null
+
+    if (user.badgeInfo.type === 'handyman') {
+      return calculateHandymanBadge(user.badgeInfo.metrics, handymanTargets)
+    }
+
+    if (user.badgeInfo.type === 'homerunner') {
+      return calculateHomerunnerBadge(user.badgeInfo.metrics, homerunnerTargets)
+    }
+
+    return null
   }
 
   const handleViewProfile = (user: User) => {
@@ -329,6 +357,43 @@ export function AdminUsersPage() {
 
     // Navigate to the messaging page with the conversation
     navigate(ROUTES.MESSAGING_CHAT(conversationId))
+  }
+
+  const handleTargetChange = (
+    type: 'handyman' | 'homerunner',
+    field: keyof HandymanBadgeTargets | keyof HomerunnerBadgeTargets,
+    index: number,
+    value: number
+  ) => {
+    if (type === 'handyman') {
+      setHandymanTargets((prev) => {
+        const next = { ...prev }
+        const list = [...(next[field as keyof HandymanBadgeTargets] as number[])]
+        list[index] = value
+        next[field as keyof HandymanBadgeTargets] = list as never
+        return next
+      })
+      return
+    }
+
+    setHomerunnerTargets((prev) => {
+      const next = { ...prev }
+      const list = [...(next[field as keyof HomerunnerBadgeTargets] as number[])]
+      list[index] = value
+      next[field as keyof HomerunnerBadgeTargets] = list as never
+      return next
+    })
+  }
+
+  const handleResetBadgeTargets = () => {
+    setHandymanTargets(handymanBadgeTargetsDefault)
+    setHomerunnerTargets(homerunnerBadgeTargetsDefault)
+    toast.success('Badge targets reset to defaults')
+  }
+
+  const handleSaveBadgeTargets = () => {
+    toast.success('Badge targets updated for badge calculations')
+    setIsBadgeTargetsOpen(false)
   }
 
   const handleSuspendUser = (userId: string) => {
@@ -568,11 +633,16 @@ export function AdminUsersPage() {
                   </div>
                 </div>
               </div>
-
-              <Button className="rounded-xl" onClick={() => setIsAddUserOpen(true)}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add User
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" className="rounded-xl" onClick={() => setIsBadgeTargetsOpen(true)}>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Manage badge targets
+                </Button>
+                <Button className="rounded-xl" onClick={() => setIsAddUserOpen(true)}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add User
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -669,6 +739,9 @@ export function AdminUsersPage() {
                       </span>
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
+                      Badge
+                    </th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
                       Rating
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">
@@ -735,6 +808,20 @@ export function AdminUsersPage() {
                           {statusIcons[user.status]}
                           {user.status}
                         </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        {(() => {
+                          const badgeResult = getBadgeResultForUser(user)
+                          if (!badgeResult) {
+                            return <span className="text-xs text-muted-foreground">—</span>
+                          }
+
+                          return (
+                            <Badge className={cn('rounded-full px-2.5 py-0.5 text-[11px]', badgeResult.className)}>
+                              {badgeResult.label}
+                            </Badge>
+                          )
+                        })()}
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-xs font-semibold text-foreground">
@@ -924,6 +1011,71 @@ export function AdminUsersPage() {
                     </div>
                   </div>
                 </Card>
+
+                {(() => {
+                  const badgeResult = getBadgeResultForUser(selectedUser)
+                  if (!badgeResult || !selectedUser.badgeInfo) return null
+                  const tiers = selectedUser.badgeInfo.type === 'handyman' ? handymanBadgeTiers : homerunnerBadgeTiers
+
+                  return (
+                    <Card className="p-4 rounded-xl border border-border/60 space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <h4 className="text-sm font-semibold">Badge</h4>
+                        <Badge className={cn('rounded-full px-3 py-1 text-xs font-semibold', badgeResult.className)}>
+                          {badgeResult.label}
+                        </Badge>
+                      </div>
+                      {badgeResult.nextTier ? (
+                        <p className="text-xs text-muted-foreground">
+                          Next tier: {badgeResult.nextTier.label}. Keep the metrics below on track to upgrade.
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Top tier reached. Maintain metrics to keep priority routing.</p>
+                      )}
+
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {badgeResult.progress.map((item) => {
+                          const targetLabel = item.target ? `${item.current}${item.unit ?? ''} / ${item.target}${item.unit ?? ''}` : `${item.current}${item.unit ?? ''}`
+                          const completion = item.target ? Math.min(100, Math.round((item.current / item.target) * 100)) : 100
+                          return (
+                            <div key={item.key} className="rounded-lg border border-border/60 bg-muted/40 p-3 space-y-2">
+                              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span>{item.label}</span>
+                                <span className="font-medium text-foreground">{targetLabel}</span>
+                              </div>
+                              <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                                <div
+                                  className={cn('h-full rounded-full transition-all', item.met ? 'bg-primary' : 'bg-primary/50')}
+                                  style={{ width: `${completion}%` }}
+                                />
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {tiers.map((tier) => (
+                          <div key={tier.id} className="rounded-lg border border-border/60 bg-background p-3 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-semibold">{tier.label}</span>
+                              <Badge className={cn('rounded-full px-2.5 py-0.5 text-[11px]', tier.className)}>{tier.label}</Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{tier.description}</p>
+                            <ul className="text-[11px] text-muted-foreground space-y-1">
+                              {tier.requirements.map((req) => (
+                                <li key={req} className="flex items-start gap-2">
+                                  <CheckCircle className="h-3.5 w-3.5 text-primary mt-0.5" />
+                                  <span>{req}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  )
+                })()}
 
                 {/* Role-specific Stats */}
                 {selectedUser.role === 'tenant' && (
@@ -1302,6 +1454,134 @@ export function AdminUsersPage() {
             <Button className="rounded-xl" onClick={handleAddUser}>
               <UserPlus className="h-4 w-4 mr-2" />
               Create User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Badge Targets Dialog */}
+      <Dialog open={isBadgeTargetsOpen} onOpenChange={setIsBadgeTargetsOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Badge targets
+            </DialogTitle>
+            <DialogDescription>Adjust thresholds that drive handyman and homerunner badges.</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 mt-2">
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-foreground">Handyman</h4>
+              <div className="grid gap-3 md:grid-cols-3">
+                {handymanTargets.servicesRendered.map((value, index) => (
+                  <div key={`services-${index}`} className="space-y-1.5">
+                    <Label className="text-xs">Services tier {index + 1}</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={value}
+                      onChange={(event) => handleTargetChange('handyman', 'servicesRendered', index, Number(event.target.value) || 0)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                ))}
+                {handymanTargets.companyRevenueNgn.map((value, index) => (
+                  <div key={`revenue-${index}`} className="space-y-1.5">
+                    <Label className="text-xs">Revenue tier {index + 1} (₦)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={value}
+                      onChange={(event) => handleTargetChange('handyman', 'companyRevenueNgn', index, Number(event.target.value) || 0)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                ))}
+                {handymanTargets.averageRating.map((value, index) => (
+                  <div key={`rating-${index}`} className="space-y-1.5">
+                    <Label className="text-xs">Rating tier {index + 1}</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      max={5}
+                      value={value}
+                      onChange={(event) => handleTargetChange('handyman', 'averageRating', index, Number(event.target.value) || 0)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-foreground">Homerunner</h4>
+              <div className="grid gap-3 md:grid-cols-3">
+                {homerunnerTargets.viewingsHosted.map((value, index) => (
+                  <div key={`viewings-${index}`} className="space-y-1.5">
+                    <Label className="text-xs">Viewings tier {index + 1}</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={value}
+                      onChange={(event) => handleTargetChange('homerunner', 'viewingsHosted', index, Number(event.target.value) || 0)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                ))}
+                {homerunnerTargets.inspectionsCompleted.map((value, index) => (
+                  <div key={`inspections-${index}`} className="space-y-1.5">
+                    <Label className="text-xs">Inspections tier {index + 1}</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={value}
+                      onChange={(event) => handleTargetChange('homerunner', 'inspectionsCompleted', index, Number(event.target.value) || 0)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                ))}
+                {homerunnerTargets.conversionRate.map((value, index) => (
+                  <div key={`conversion-${index}`} className="space-y-1.5">
+                    <Label className="text-xs">Conversion tier {index + 1} (%)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={value}
+                      onChange={(event) => handleTargetChange('homerunner', 'conversionRate', index, Number(event.target.value) || 0)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                ))}
+                {homerunnerTargets.averageRating.map((value, index) => (
+                  <div key={`hr-rating-${index}`} className="space-y-1.5">
+                    <Label className="text-xs">Rating tier {index + 1}</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      max={5}
+                      value={value}
+                      onChange={(event) => handleTargetChange('homerunner', 'averageRating', index, Number(event.target.value) || 0)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" className="rounded-xl" onClick={handleResetBadgeTargets}>
+              Reset to defaults
+            </Button>
+            <Button variant="outline" className="rounded-xl" onClick={() => setIsBadgeTargetsOpen(false)}>
+              Cancel
+            </Button>
+            <Button className="rounded-xl" onClick={handleSaveBadgeTargets}>
+              Save targets
             </Button>
           </DialogFooter>
         </DialogContent>

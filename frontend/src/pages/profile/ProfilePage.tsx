@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react'
+import { useState, useRef, useEffect, ChangeEvent, FormEvent, useMemo } from 'react'
 import { Check, Home, MessageCircle, MapPin, LogOut, Settings, Camera, X, Save, Upload, Trash2, AlertCircle, FileText, Star, Sparkles } from 'lucide-react'
 import BackgroundCheckIcon from '@/assets/icons/background_check.svg?react'
 import { Button } from '@/shared/ui/button'
@@ -12,15 +12,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select'
+import { Badge } from '@/shared/ui/badge'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore } from '@/shared/store/role.store'
+import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
 import { LogoLoader } from '@/widgets/logo-loader'
 import toast from 'react-hot-toast'
+import { calculateHandymanBadge, handymanBadgeTiers } from '@/shared/lib/badge-config'
+import { mockHandymanBadgeMetrics } from '@/__mocks__/data/handyman.mock'
 
 export function ProfilePage() {
   const navigate = useNavigate()
@@ -94,6 +98,10 @@ export function ProfilePage() {
   const ratingCount = user?.ratingCount ?? 0
   const pointsBalance = user?.pointsBalance ?? 0
   const lifetimePoints = user?.lifetimePoints ?? pointsBalance
+  const handymanBadge = useMemo(
+    () => (isHandyman ? calculateHandymanBadge(mockHandymanBadgeMetrics) : null),
+    [isHandyman]
+  )
 
   useEffect(() => {
     if (user) {
@@ -435,6 +443,75 @@ export function ProfilePage() {
             </div>
           </div>
         </Card>
+
+        {isHandyman && handymanBadge && (
+          <Card className="p-4 lg:p-5 rounded-2xl border border-border bg-surface space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Handyman badge</p>
+                <div className="flex items-center gap-2">
+                  <Badge className={cn('rounded-full px-3 py-1 text-xs font-semibold', handymanBadge.className)}>
+                    {handymanBadge.label}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">Score {handymanBadge.score}/{handymanBadge.totalPossible}</span>
+                </div>
+                {handymanBadge.nextTier && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Next: {handymanBadge.nextTier.label} — close the gaps below to upgrade.
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                Live progress from your handyman dashboard
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {handymanBadge.progress.map((item) => {
+                const targetLabel = item.target ? `${item.current}${item.unit ?? ''} / ${item.target}${item.unit ?? ''}` : `${item.current}${item.unit ?? ''}`
+                const completion = item.target ? Math.min(100, Math.round((item.current / item.target) * 100)) : 100
+                return (
+                  <div key={item.key} className="rounded-xl border border-border/60 bg-background p-3 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{item.label}</span>
+                      <span className="font-medium text-foreground">{targetLabel}</span>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-muted/60 overflow-hidden">
+                      <div
+                        className={cn('h-full rounded-full transition-all', item.met ? 'bg-primary' : 'bg-primary/60')}
+                        style={{ width: `${completion}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Badge roadmap</p>
+              <div className="grid gap-3 md:grid-cols-2">
+                {handymanBadgeTiers.map((tier) => (
+                  <div key={tier.id} className="rounded-xl border border-border/60 bg-muted/40 p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">{tier.label}</span>
+                      <Badge className={cn('rounded-full px-2.5 py-0.5 text-[11px]', tier.className)}>{tier.label}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{tier.description}</p>
+                    <ul className="text-[11px] text-muted-foreground space-y-1">
+                      {tier.requirements.map((req) => (
+                        <li key={req} className="flex items-start gap-2">
+                          <Check className="h-3.5 w-3.5 text-primary mt-0.5" />
+                          <span>{req}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* User Information Cards */}
         <div className="grid lg:grid-cols-2 gap-4 lg:gap-6">

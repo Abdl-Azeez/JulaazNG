@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { Footer } from '@/widgets/footer'
@@ -26,7 +26,13 @@ import {
   upcomingJobs,
   performanceHighlights,
   onboardingChecklist,
+  mockHandymanBadgeMetrics,
+  jobBoard,
 } from '@/__mocks__/data/handyman.mock'
+import {
+  calculateHandymanBadge,
+  handymanBadgeTiers,
+} from '@/shared/lib/badge-config'
 
 export function HandymanDashboardPage() {
   const navigate = useNavigate()
@@ -34,6 +40,11 @@ export function HandymanDashboardPage() {
   const [isChecklistOpen, setIsChecklistOpen] = useState(false)
   const [isJobSheetOpen, setIsJobSheetOpen] = useState(false)
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>()
+
+  const badge = useMemo(
+    () => calculateHandymanBadge(mockHandymanBadgeMetrics),
+    []
+  )
 
   const handleProfileClick = () => {
     navigate(ROUTES.PROFILE)
@@ -52,9 +63,14 @@ export function HandymanDashboardPage() {
           <div className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 py-10 lg:py-14">
             <div className="flex flex-wrap items-center justify-between gap-6">
               <div className="space-y-3">
-                <Badge className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
-                  Handyman HQ
-                </Badge>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
+                    Handyman HQ
+                  </Badge>
+                  <Badge className={cn('rounded-full px-3 py-1 text-xs font-semibold', badge.className)}>
+                    {badge.label} badge
+                  </Badge>
+                </div>
                 <h1 className="text-3xl lg:text-4xl font-bold text-foreground">Welcome back, pro.</h1>
                 <p className="text-muted-foreground max-w-2xl">
                   Track active assignments, confirm upcoming jobs and access the resources you need to deliver
@@ -206,6 +222,111 @@ export function HandymanDashboardPage() {
                         }}
                       >
                         Open job sheet
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+              <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm p-5 space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <h2 className="text-lg font-semibold text-foreground">Badge roadmap</h2>
+                  </div>
+                  <Badge className={cn('rounded-full px-3 py-1 text-xs font-semibold', badge.className)}>
+                    {badge.label} badge
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Track how close you are to the next tier. Hit the targets below to unlock upgrades.
+                </p>
+                <div className="space-y-3">
+                  {badge.progress.map((item) => {
+                    const targetLabel = item.target ? `${item.current}${item.unit ?? ''} / ${item.target}${item.unit ?? ''}` : `${item.current}${item.unit ?? ''}`
+                    const completion = item.target ? Math.min(100, Math.round((item.current / item.target) * 100)) : 100
+                    return (
+                      <div key={item.key} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>{item.label}</span>
+                          <span className="font-medium text-foreground">{targetLabel}</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-muted/60 overflow-hidden">
+                          <div
+                            className={cn(
+                              'h-full rounded-full transition-all',
+                              item.met ? 'bg-primary' : 'bg-primary/50'
+                            )}
+                            style={{ width: `${completion}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {handymanBadgeTiers.map((tier) => (
+                    <div key={tier.id} className="rounded-xl border border-border/60 bg-muted/40 p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-foreground">{tier.label}</span>
+                        <Badge className={cn('rounded-full px-2.5 py-0.5 text-[11px]', tier.className)}>{tier.label}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{tier.description}</p>
+                      <ul className="text-[11px] text-muted-foreground space-y-1">
+                        {tier.requirements.map((req) => (
+                          <li key={req} className="flex items-start gap-2">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-primary mt-0.5" />
+                            <span>{req}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+            <Card className="rounded-2xl border border-border/60 bg-background/80 shadow-sm">
+              <div className="p-5 border-b border-border/50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Open jobs nearby</h2>
+                    <p className="text-xs text-muted-foreground">Claim high-intent tickets while you wrap current calls.</p>
+                  </div>
+                </div>
+                <Badge className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs">Fast pickup</Badge>
+              </div>
+              <div className="p-5 space-y-3">
+                {jobBoard.slice(0, 3).map((job) => (
+                  <div
+                    key={job.id}
+                    className="rounded-xl border border-border/60 bg-muted/40 p-3 space-y-2"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{job.title}</p>
+                        <p className="text-xs text-muted-foreground">{job.location} • {job.shift}</p>
+                      </div>
+                      <Badge className="rounded-full bg-emerald-500/10 text-emerald-600 px-2.5 py-0.5 text-[11px]">
+                        {job.payout}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {job.badges.slice(0, 2).map((badgeLabel) => (
+                        <Badge
+                          key={badgeLabel}
+                          className="rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-[11px]"
+                        >
+                          {badgeLabel}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{job.responseWindow}</span>
+                      <Button variant="outline" size="sm" className="h-8 rounded-lg px-3 text-xs">
+                        Claim
                       </Button>
                     </div>
                   </div>
