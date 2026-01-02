@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LayoutGrid, List, ShieldCheck, Sparkles, Wrench, Home, Building2, CheckCircle2, Star, ArrowRight, Users, Clock, CreditCard } from 'lucide-react'
+import { LayoutGrid, List, ShieldCheck, Sparkles, Wrench, Home, Building2, ArrowRight, Clock, CreditCard } from 'lucide-react'
 import { Header } from '@/widgets/header'
 import { Footer } from '@/widgets/footer'
 import { SearchBar } from '@/widgets/search-bar'
@@ -137,7 +137,7 @@ export function HomePage() {
                       {
                         icon: Home,
                         title: 'Rentals',
-                        subtitle: 'Shortlet & Annual',
+                        subtitle: 'Monthly–Annual + Shortlet',
                         color: 'from-blue-500/20 to-blue-500/5',
                         borderColor: 'border-blue-500/30',
                         iconColor: 'text-blue-600',
@@ -159,7 +159,7 @@ export function HomePage() {
                         color: 'from-amber-500/20 to-amber-500/5',
                         borderColor: 'border-amber-500/30',
                         iconColor: 'text-amber-600',
-                        onClick: () => navigate(ROUTES.SERVICES),
+                        onClick: () => navigate(ROUTES.ARTISANS),
                       },
                       {
                         icon: Building2,
@@ -168,7 +168,7 @@ export function HomePage() {
                         color: 'from-emerald-500/20 to-emerald-500/5',
                         borderColor: 'border-emerald-500/30',
                         iconColor: 'text-emerald-600',
-                        onClick: () => navigate(ROUTES.SERVICES),
+                        onClick: () => navigate(ROUTES.PROPERTY_MANAGEMENT),
                       },
                     ].map((service) => (
                       <button
@@ -252,18 +252,18 @@ export function HomePage() {
                   {/* Trust Indicators */}
                   <div className="flex items-center justify-center gap-4 px-4 mb-6 animate-fade-in-up animation-delay-400">
                     <div className="flex items-center gap-1.5">
-                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                      <span className="text-xs font-semibold text-foreground">4.9/5</span>
+                      <CreditCard className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-semibold text-foreground">Monthly–Annual terms</span>
                     </div>
                     <div className="h-4 w-px bg-border" />
                     <div className="flex items-center gap-1.5">
-                      <Users className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-semibold text-foreground">10K+ Users</span>
+                      <Sparkles className="h-4 w-4 text-amber-500" />
+                      <span className="text-xs font-semibold text-foreground">Points on services</span>
                     </div>
                     <div className="h-4 w-px bg-border" />
                     <div className="flex items-center gap-1.5">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                      <span className="text-xs font-semibold text-foreground">Verified</span>
+                      <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                      <span className="text-xs font-semibold text-foreground">Verified landlords</span>
                     </div>
                   </div>
 
@@ -332,10 +332,10 @@ export function HomePage() {
                     {/* Service Quick Links */}
                     <div className="grid grid-cols-2 gap-3 pt-2">
                       {[
-                        { icon: Home, label: 'Rentals', desc: 'Shortlet & Annual', route: ROUTES.PROPERTIES, color: 'from-blue-500/20 to-blue-500/5 border-blue-500/30' },
+                        { icon: Home, label: 'Rentals', desc: 'Monthly–Annual + Shortlet', route: ROUTES.PROPERTIES, color: 'from-blue-500/20 to-blue-500/5 border-blue-500/30' },
                         { icon: Sparkles, label: 'Services', desc: 'Cleaning & Moving', route: ROUTES.SERVICES, color: 'from-purple-500/20 to-purple-500/5 border-purple-500/30' },
-                        { icon: Wrench, label: 'Artisans', desc: 'Plumbing & Electrical', route: ROUTES.SERVICES, color: 'from-amber-500/20 to-amber-500/5 border-amber-500/30' },
-                        { icon: Building2, label: 'Management', desc: 'Property Care', route: ROUTES.SERVICES, color: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30' },
+                        { icon: Wrench, label: 'Artisans', desc: 'Plumbing & Electrical', route: ROUTES.ARTISANS, color: 'from-amber-500/20 to-amber-500/5 border-amber-500/30' },
+                        { icon: Building2, label: 'Management', desc: 'Property Care', route: ROUTES.PROPERTY_MANAGEMENT, color: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30' },
                       ].map((service) => (
                         <button
                           key={service.label}
@@ -358,26 +358,26 @@ export function HomePage() {
                     {/* Trust Indicators */}
                     <div className="flex items-center gap-6 pt-2">
                       <div className="flex items-center gap-2">
-                        <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                        <CreditCard className="h-5 w-5 text-primary" />
                         <div>
-                          <div className="text-sm font-bold text-foreground">4.9/5</div>
-                          <div className="text-xs text-muted-foreground">Rating</div>
+                          <div className="text-sm font-bold text-foreground">Monthly–Annual</div>
+                          <div className="text-xs text-muted-foreground">Flexible rent terms</div>
                         </div>
                       </div>
                       <div className="h-12 w-px bg-border" />
                       <div className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-primary" />
+                        <Sparkles className="h-5 w-5 text-amber-500" />
                         <div>
-                          <div className="text-sm font-bold text-foreground">10K+</div>
-                          <div className="text-xs text-muted-foreground">Active Users</div>
+                          <div className="text-sm font-bold text-foreground">Points on services</div>
+                          <div className="text-xs text-muted-foreground">Earn and redeem faster</div>
                         </div>
                       </div>
                       <div className="h-12 w-px bg-border" />
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                        <ShieldCheck className="h-5 w-5 text-emerald-600" />
                         <div>
-                          <div className="text-sm font-bold text-foreground">100%</div>
-                          <div className="text-xs text-muted-foreground">Verified</div>
+                          <div className="text-sm font-bold text-foreground">Verified landlords</div>
+                          <div className="text-xs text-muted-foreground">Background-checked</div>
                         </div>
                       </div>
                     </div>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react'
-import { Check, Home, MessageCircle, MapPin, LogOut, Settings, Camera, X, Save, Upload, Trash2, AlertCircle, FileText } from 'lucide-react'
+import { Check, Home, MessageCircle, MapPin, LogOut, Settings, Camera, X, Save, Upload, Trash2, AlertCircle, FileText, Star, Sparkles } from 'lucide-react'
 import BackgroundCheckIcon from '@/assets/icons/background_check.svg?react'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -89,6 +89,11 @@ export function ProfilePage() {
   })
   const [documentFiles, setDocumentFiles] = useState<File[]>([])
   const [isSubmittingBackground, setIsSubmittingBackground] = useState(false)
+
+  const averageRating = user?.averageRating ?? 5
+  const ratingCount = user?.ratingCount ?? 0
+  const pointsBalance = user?.pointsBalance ?? 0
+  const lifetimePoints = user?.lifetimePoints ?? pointsBalance
 
   useEffect(() => {
     if (user) {
@@ -400,6 +405,36 @@ export function ProfilePage() {
             />
           </div>
         </div>
+
+        {/* Ratings and Points */}
+        <Card className="p-4 lg:p-5 rounded-2xl border border-border bg-surface">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background px-4 py-3">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Your rating</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-foreground">{averageRating.toFixed(1)}</span>
+                  <span className="text-sm text-muted-foreground">({ratingCount} reviews)</span>
+                </div>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <Star className="h-5 w-5 fill-primary/80" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background px-4 py-3">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Loyalty points</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-foreground">{pointsBalance.toLocaleString('en-NG')}</span>
+                  <span className="text-sm text-muted-foreground">of {lifetimePoints.toLocaleString('en-NG')} earned</span>
+                </div>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-accent/10 text-accent flex items-center justify-center">
+                <Sparkles className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* User Information Cards */}
         <div className="grid lg:grid-cols-2 gap-4 lg:gap-6">

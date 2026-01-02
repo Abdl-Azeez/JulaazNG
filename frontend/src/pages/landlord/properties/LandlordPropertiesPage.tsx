@@ -176,6 +176,25 @@ export function LandlordPropertiesPage() {
             </div>
           </div>
 
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card className="rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-start gap-3 shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-primary font-semibold">Ratings drive occupancy</p>
+                <p className="text-sm text-muted-foreground">Show your 4.7★+ host score across listings to attract premium tenants.</p>
+              </div>
+            </Card>
+            <Card className="rounded-2xl border border-amber-300/50 bg-amber-50 p-4 flex items-start gap-3 shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-semibold">₦</div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-amber-700 font-semibold">Flex rent terms</p>
+                <p className="text-sm text-muted-foreground">Offer monthly, quarterly, 6-month or annual plans; we display terms per listing automatically.</p>
+              </div>
+            </Card>
+          </div>
+
           {/* KPI Dashboard Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             {heroMetrics.cards.map((metric) => (

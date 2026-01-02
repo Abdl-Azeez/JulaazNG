@@ -11,7 +11,8 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Star
 } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import HouseIcon from '@/assets/icons/house.svg?react'
@@ -69,6 +70,13 @@ export function PropertyDetailsPage() {
   const favouritePropertyIds = useFavouritesStore((state) => state.favouritePropertyIds)
 
   const property: PropertyDetail | undefined = id ? samplePropertyDetails[id] : undefined
+  const allowedRentTerms = property?.allowedRentTerms ?? ['annually']
+  const formatRentTerm = (term: string) => {
+    if (term === 'monthly') return 'Monthly'
+    if (term === 'quarterly') return 'Quarterly'
+    if (term === 'six_months') return '6 months'
+    return 'Annual'
+  }
 
   const galleryImages = useMemo(() => {
     if (!property) return []
@@ -557,6 +565,15 @@ export function PropertyDetailsPage() {
                       <span className="text-muted-foreground"> / night</span>
                     </p>
                   )}
+                  {hasLongTerm && (
+                    <div className="flex flex-wrap gap-1.5 mt-2 justify-end">
+                      {allowedRentTerms.map((term) => (
+                        <Badge key={term} className="rounded-full bg-primary/5 text-primary px-2 py-1 text-[11px]">
+                          {formatRentTerm(term)}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -816,6 +833,13 @@ export function PropertyDetailsPage() {
                       )}
                     </p>
                     <p className="text-sm text-muted-foreground">{property.propertyType}</p>
+                    {property.owner.averageRating && (
+                      <div className="flex items-center gap-1 text-sm text-foreground">
+                        <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                        <span>{property.owner.averageRating.toFixed(1)}</span>
+                        <span className="text-muted-foreground">({property.owner.ratingCount ?? 0} ratings)</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {!isLandlordRole && (

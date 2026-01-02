@@ -30,6 +30,38 @@ enum UserStatus {
   PENDING_VERIFICATION
 }
 
+enum LoyaltyLedgerType {
+  EARN
+  REDEEM
+  ADJUST
+  REVERSAL
+}
+
+enum LoyaltySourceType {
+  SERVICE_BOOKING
+  RENTAL_BOOKING
+  SERVICE_PAYMENT
+  ADMIN_ADJUST
+  PROMOTION
+}
+
+enum LoyaltyLedgerStatus {
+  PENDING
+  POSTED
+  REVERSED
+}
+
+enum LoyaltyCreatedBy {
+  SYSTEM
+  ADMIN
+}
+
+enum FirstEarnSource {
+  RENTAL_BOOKING
+  SERVICE_BOOKING
+  SERVICE_PAYMENT
+}
+
 // User Model
 model User {
   id            String       @id @default(uuid())
@@ -46,7 +78,49 @@ model User {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
+  // Relations
+  loyaltyBalance LoyaltyBalance?
+  loyaltyLedger  LoyaltyLedger[]
+
   @@map("users")
+}
+
+// Loyalty Balance Model
+model LoyaltyBalance {
+  userId         String           @id
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spendablePoints Int             @default(0)
+  lifetimePoints  Int             @default(0)
+  firstEarnedAt   DateTime?
+  firstEarnSource FirstEarnSource?
+  updatedAt       DateTime         @updatedAt
+
+  @@map("loyalty_balances")
+}
+
+// Loyalty Ledger Model
+model LoyaltyLedger {
+  id                String              @id @default(uuid())
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              LoyaltyLedgerType
+  sourceType        LoyaltySourceType
+  sourceId          String
+  rateNairaPerPoint Int
+  pointsDelta       Int
+  currency          String              @default("NGN")
+  status            LoyaltyLedgerStatus @default(PENDING)
+  balanceAfter      Int
+  idempotencyKey    String              @unique
+  metadata          Json?
+  createdBy         LoyaltyCreatedBy    @default(SYSTEM)
+  createdAt         DateTime            @default(now())
+
+  @@index([userId])
+  @@index([sourceId, sourceType])
+  @@index([idempotencyKey])
+  @@index([createdAt])
+  @@map("loyalty_ledger")
 }
 
 // Add more models as you develop

@@ -96,6 +96,27 @@ export function HandymanDashboardPage() {
                 </p>
               </Card>
             </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 mt-6">
+              <Card className="rounded-2xl border border-border/60 bg-primary/5 p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-primary font-semibold">Ratings fuel referrals</p>
+                    <p className="text-sm text-muted-foreground">Keep a 4.7★+ average to stay in priority rotation.</p>
+                  </div>
+                  <Badge className="bg-primary text-primary-foreground">Elite target: 4.7★</Badge>
+                </div>
+              </Card>
+              <Card className="rounded-2xl border border-border/60 bg-amber-50 p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-amber-700 font-semibold">Service points</p>
+                    <p className="text-sm text-muted-foreground">Earn 1pt per ₦10k job value; redeem for tools & boosts.</p>
+                  </div>
+                  <Badge className="bg-amber-600 text-amber-50">Points apply to services</Badge>
+                </div>
+              </Card>
+            </div>
           </div>
         </section>
 

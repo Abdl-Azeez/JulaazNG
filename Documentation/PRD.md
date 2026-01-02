@@ -41,9 +41,16 @@ JulaazNG is a mobile-first web application that serves as Nigeria's premier prop
   - **Payments Page:** Paginated and sortable payments table, payment details view, refund initiation with confirmation, payment approval/rejection workflows, and receipt download.
   - **Disputes Page:** Paginated disputes listing, comprehensive case management, group chat creation for dispute parties, clickable message badges for chat history, document management with 2x2 grid layout, and improved document card UI.
   - **Background Checks Page:** Paginated listings, document viewing with dedicated viewer, improved document card visibility with larger icons and better hover states, document approval/rejection workflows, and progress tracking.
+- **Admin Ratings & Loyalty (January 2026):** Dashboard cards for average rating and points in circulation, plus recent loyalty ledger (earn/redeem with user, context, and rating) and guidance that points are service-only redemptions.
 - **Messaging Integration:** Admin can create direct chats from user details and group chats from disputes, with conversation titles following "Admin - {user name}" or "Admin - {dispute reference}" format.
 - **Documentation:** Booking management, service management, landlord flows, background check, shortlet support, and comprehensive admin dashboard features captured in PRD with updated sections ensuring stakeholder alignment.
 - **Next Milestone:** Backend API development (authentication, property CRUD, booking management, payment processing, messaging, notifications, admin workflows).
+
+### 1.6 Status Update — January 2026
+- **Loyalty & Ratings UX:** Profile surfaces 5.0 default rating (if unset) plus ratings/points balances; service intake flow shows earn estimate (1 pt per ₦10k) and lets users redeem points on services (first rental/booking/service awards 1 pt per ₦20k). Points are non-cash and service-only redemptions.
+- **Flexible Leasing Terms:** Properties can advertise monthly, quarterly, six-month, or annual terms; property cards and details show the allowed terms (compressed when many), and viewing requests must pick an allowed term.
+- **Marketing Surfaces:** Home, landlord, and handyman dashboards include tiles highlighting ratings/points incentives and flexible rent terms; home quick links now route distinctly to Services, Artisans, and Property Management.
+- **Admin Oversight:** Admin dashboard adds ratings/loyalty health cards plus a recent points ledger with user, action (earn/redeem), and rating context.
 
 ---
 
@@ -330,6 +337,7 @@ Projected Annual Revenue: ₦800,000,000+ (~$1.71M)
   - Verification status
   - Preferences and settings
   - Document uploads
+  - Ratings and loyalty: display user rating (default 5.0 if unset) and points balance/lifetime points; landlord rating visible on property details.
 
 #### 5.1.2 Property Management
 - **Property Listings**
@@ -339,6 +347,7 @@ Projected Annual Revenue: ₦800,000,000+ (~$1.71M)
   - Amenity checklists
   - Pricing and availability
   - Neighborhood information
+  - Allowed rent terms (monthly, quarterly, six-month, annual) stored per listing and surfaced on cards/details with compressed badges when many options.
 
 - **Search & Discovery**
   - Advanced filtering (price, location, type, amenities)
@@ -352,6 +361,7 @@ Projected Annual Revenue: ₦800,000,000+ (~$1.71M)
 #### 5.1.3 Booking System
 - **Rental Booking**
   - Viewing appointment scheduling
+  - Required rent-term selection during viewing requests, limited to the listing’s allowed terms.
   - Application submission
   - Document upload
   - Agreement signing
@@ -363,6 +373,7 @@ Projected Annual Revenue: ₦800,000,000+ (~$1.71M)
   - Scheduling system
   - Recurring booking options
   - Real-time tracking
+  - Loyalty rules: earn 1 point per ₦10,000 on services; first rental/booking/service awards 1 point per ₦20,000; points redeemable on services only (no cashout). Service checkout shows balance, estimated earn, redeem input, and payable after redemption.
 
 #### 5.1.4 Short-let Module (Airbnb-style)
 
@@ -2019,6 +2030,36 @@ Chatbot: OpenAI Assistants API LangChain (custom logic)
 - PCI-DSS (via payment processors)
 
 ---
+
+### 9.5 Backend Acceptance Criteria — Loyalty Balances & Ledger
+
+- **Schemas**
+  - `loyalty_balances`: `userId` (unique, FK), `spendablePoints` (int, default 0), `lifetimePoints` (int, default 0), `firstEarnedAt` (timestamp, nullable), `firstEarnSource` (enum: `rental_booking` | `service_booking` | `service_payment`), `updatedAt`.
+  - `loyalty_ledger`: `id`, `userId`, `type` (enum: `earn` | `redeem` | `adjust` | `reversal`), `sourceType` (enum: `service_booking` | `rental_booking` | `service_payment` | `admin_adjust` | `promotion`), `sourceId` (FK to booking/payment/promo), `rateNairaPerPoint` (int), `pointsDelta` (int; earn > 0, redeem < 0), `currency` (`NGN`), `status` (`pending` | `posted` | `reversed`), `balanceAfter` (int snapshot), `idempotencyKey` (unique per source event), `metadata` (JSON for rating context/notes), `createdBy` (`system` | `admin`), `createdAt`.
+
+- **Earning rules**
+  - Services earn 1 point per ₦10,000; first rental/booking/service earn is 1 point per ₦20,000. Award uses `floor(amount / rateNairaPerPoint)` with `rateNairaPerPoint` stored on each ledger row to keep history immutable.
+  - First-earn detection: if no prior `earn` ledger for `sourceType` in (`rental_booking`, `service_booking`, `service_payment`), use the ₦20,000 rate and set `firstEarnSource` + `firstEarnedAt`; otherwise default to ₦10,000 (services).
+  - Earn events are triggered by `payment.succeeded` for services and by initial rental/booking charge; each event is idempotent per `sourceId` + `sourceType` to avoid double minting.
+
+- **Redemption rules**
+  - Redeem is allowed only on service bookings; rejects if requested points exceed `spendablePoints` at transaction start.
+  - Redemption posts a `redeem` ledger (negative `pointsDelta`, `status=pending`), reduces `spendablePoints`, and locks the user balance row in a single transaction to prevent race conditions.
+  - If the checkout/payment fails or is refunded, emit a `reversal` ledger tied to the same `idempotencyKey` and restore `spendablePoints`.
+
+- **Ledger invariants**
+  - `spendablePoints` can never drop below 0; ledger + balance updates are atomic (DB transaction with row-level lock on `loyalty_balances`).
+  - All ledger entries record the applied rate, resulting points, and the `balanceAfter` snapshot for auditability; no edits after posting—use `reversal` + `adjust` entries.
+  - Every ledger row must include the acting rating context in `metadata` when available (e.g., rating given with the transaction) to support admin audits.
+
+- **APIs & exposure**
+  - User-facing: `GET /loyalty/balance` returns `spendablePoints`, `lifetimePoints`, `pendingPoints`, `lastUpdated`; `GET /loyalty/ledger?cursor&limit` returns paginated ledger rows (most recent first); service checkout endpoint accepts `pointsToRedeem` with an `idempotencyKey`.
+  - Admin-facing: `GET /admin/loyalty/summary` returns points in circulation, lifetime minted, and avg rating; `GET /admin/loyalty/ledger?limit=50` returns the recent ledger with `user`, `action (earn/redeem/adjust/reversal)`, `sourceType`, `pointsDelta`, `rateNairaPerPoint`, `ratingContext`.
+
+- **Event handling**
+  - Ingest payment webhooks (`service_payment.succeeded`, `rental_payment.succeeded`, `service_payment.refunded`) to emit `earn` or `reversal` ledger rows with idempotency enforced.
+  - Checkout flow publishes a `redeem` ledger before charging; charge failure triggers `reversal`.
+  - Adjustments (fraud fixes, manual grants) are `adjust` ledger entries by admins and must also update `loyalty_balances` in the same transaction.
 
 
 ## 10. Admin Dashboard Requirements

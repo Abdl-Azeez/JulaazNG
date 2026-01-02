@@ -40,6 +40,10 @@ export interface User {
   backgroundCheckStatus?: BackgroundCheckStatus
   backgroundCheckData?: Record<string, unknown>
   status?: UserStatus
+  averageRating?: number
+  ratingCount?: number
+  pointsBalance?: number
+  lifetimePoints?: number
   createdAt: string | Date
   updatedAt: string | Date
   lastLoginAt?: string | Date

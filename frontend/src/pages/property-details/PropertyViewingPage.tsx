@@ -53,6 +53,12 @@ const TIME_OPTIONS = [
 ]
 
 const TENANCY_DURATION_OPTIONS = ['6 months', '12 months', '18 months', '24 months', 'Flexible']
+const RENT_TERM_LABELS: Record<string, string> = {
+  monthly: 'Monthly',
+  quarterly: 'Quarterly',
+  six_months: '6 months',
+  annually: 'Annually'
+}
 
 const MAX_PREFERRED_SLOTS = 3
 const MIN_LEAD_HOURS = 24
@@ -90,6 +96,7 @@ export function PropertyViewingPage() {
   const [minimumBudget, setMinimumBudget] = useState<string>('')
 
   const property = id ? samplePropertyDetails[id] : undefined
+  const allowedRentTerms = property?.allowedRentTerms ?? ['annually']
 
   const [rentalPreference, setRentalPreference] = useState<'long_term' | 'shortlet'>(() => {
     if (property?.rentalCategories.includes('long_term')) {
@@ -100,6 +107,7 @@ export function PropertyViewingPage() {
     }
     return 'long_term'
   })
+  const [rentTerm, setRentTerm] = useState<string>(allowedRentTerms[0] ?? 'annually')
   const [shortletStayNights, setShortletStayNights] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const earliestSelectableDay = startOfDay(addDays(new Date(), 1))
@@ -241,9 +249,15 @@ export function PropertyViewingPage() {
         toast.error('Tell us how many nights you would like to stay')
         return
       }
-    } else if (!tenancyDuration) {
-      toast.error('Select how long you plan to stay')
-      return
+    } else {
+      if (!tenancyDuration) {
+        toast.error('Select how long you plan to stay')
+        return
+      }
+      if (!rentTerm) {
+        toast.error('Select a rent payment term')
+        return
+      }
     }
 
     const parsedBudget = Number(minimumBudget.replace(/,/g, ''))
@@ -261,7 +275,7 @@ export function PropertyViewingPage() {
       ? stayLengthNights
         ? `${stayLengthNights} night stay`
         : 'Shortlet stay'
-      : tenancyDuration
+      : `${tenancyDuration} • ${RENT_TERM_LABELS[rentTerm] ?? rentTerm}`
 
     setIsSubmitting(true)
     try {
@@ -281,6 +295,7 @@ export function PropertyViewingPage() {
         moveInDate,
         tenancyDuration: tenancySummary,
         minimumBudget: parsedBudget,
+        rentTerm,
         rentalPreference,
         shortletStayLengthNights: stayLengthNights,
         note: note.trim() ? note.trim() : undefined,
@@ -387,7 +402,7 @@ export function PropertyViewingPage() {
                     : 'Share your expected move-in timeline so the landlord can prepare the apartment for you.'}
                 </p>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className={cn('grid gap-4', isShortletPreference ? 'sm:grid-cols-2' : 'sm:grid-cols-3')}>
                 <div className="space-y-1.5">
                   <Label htmlFor="move-in-date" className="text-sm text-foreground">
                     {isShortletPreference ? 'Preferred check-in date' : 'Preferred move-in date'}
@@ -444,6 +459,26 @@ export function PropertyViewingPage() {
                     </>
                   )}
                 </div>
+
+                {!isShortletPreference && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="rent-term" className="text-sm text-foreground">
+                      Rent term
+                    </Label>
+                    <Select value={rentTerm} onValueChange={setRentTerm}>
+                      <SelectTrigger id="rent-term" className="h-11 rounded-xl">
+                        <SelectValue placeholder="Select rent term" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allowedRentTerms.map((term) => (
+                          <SelectItem key={term} value={term} className="capitalize">
+                            {RENT_TERM_LABELS[term] ?? term.replace('_', ' ')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="minimum-budget" className="text-sm text-foreground">

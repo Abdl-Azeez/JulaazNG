@@ -49,6 +49,27 @@ export function AdminDashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [approvals, setApprovals] = useState(samplePendingApprovals)
   const [reviewApproval, setReviewApproval] = useState<PendingApproval | null>(null)
+  const loyaltySnapshot = useMemo(
+    () => ({
+      avgRating: 4.6,
+      ratingCount: 18420,
+      totalPoints: 128_500,
+      last24hEarned: 4_350,
+      last24hRedeemed: 2_100,
+    }),
+    []
+  )
+
+  const pointsLedger = useMemo(
+    () => [
+      { id: 'lg-001', user: 'Tosin Adeyemi', action: 'Earned', context: 'AC service booking', points: 180, rating: 4.9 },
+      { id: 'lg-002', user: 'Chioma Nwosu', action: 'Redeemed', context: 'Deep cleaning', points: -250, rating: 4.8 },
+      { id: 'lg-003', user: 'Adebayo Johnson', action: 'Earned', context: 'Quarterly rent paid', points: 320, rating: 4.7 },
+      { id: 'lg-004', user: 'Halima Bello', action: 'Earned', context: 'Generator service', points: 120, rating: 4.6 },
+      { id: 'lg-005', user: 'Grace Eze', action: 'Redeemed', context: 'Move-in cleaning', points: -150, rating: 4.9 },
+    ],
+    []
+  )
 
   const getApprovalTypeIcon = (type: PendingApproval['type']) => {
     switch (type) {
@@ -307,6 +328,61 @@ export function AdminDashboardPage() {
             </Card>
           </div>
         </section>
+          {/* Ratings & Points Oversight */}
+          <section className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
+            <div className="grid gap-4 lg:grid-cols-[0.9fr,1.1fr]">
+              <Card className="rounded-3xl border border-border/60 bg-background shadow-sm p-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Ratings & loyalty</p>
+                    <h3 className="text-lg font-semibold text-foreground">Marketplace health</h3>
+                  </div>
+                  <Badge className="bg-primary/10 text-primary">Admin view</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl border border-border/60 bg-surface p-3">
+                    <p className="text-xs text-muted-foreground">Avg user rating</p>
+                    <p className="text-2xl font-bold text-foreground">{loyaltySnapshot.avgRating.toFixed(1)}★</p>
+                    <p className="text-xs text-muted-foreground">{loyaltySnapshot.ratingCount.toLocaleString()} reviews</p>
+                  </div>
+                  <div className="rounded-2xl border border-border/60 bg-surface p-3">
+                    <p className="text-xs text-muted-foreground">Points in circulation</p>
+                    <p className="text-2xl font-bold text-foreground">{loyaltySnapshot.totalPoints.toLocaleString('en-NG')} pts</p>
+                    <p className="text-xs text-muted-foreground">+{loyaltySnapshot.last24hEarned.toLocaleString('en-NG')} / -{loyaltySnapshot.last24hRedeemed.toLocaleString('en-NG')} (24h)</p>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
+                  Ratings drive search boost; points can only be redeemed on services. Monitor spikes and adjust earn rates.
+                </div>
+              </Card>
+
+              <Card className="rounded-3xl border border-border/60 bg-background shadow-sm p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Recent loyalty activity</p>
+                    <h3 className="text-lg font-semibold text-foreground">Point ledger</h3>
+                  </div>
+                  <Button variant="outline" size="sm" className="rounded-xl">Export CSV</Button>
+                </div>
+                <div className="divide-y divide-border/60">
+                  {pointsLedger.map((entry) => (
+                    <div key={entry.id} className="py-3 flex items-center justify-between gap-3 text-sm">
+                      <div className="space-y-0.5">
+                        <p className="font-semibold text-foreground">{entry.user}</p>
+                        <p className="text-xs text-muted-foreground">{entry.context}</p>
+                      </div>
+                      <div className="text-right space-y-0.5">
+                        <p className={cn('font-semibold', entry.points < 0 ? 'text-destructive' : 'text-emerald-600')}>
+                          {entry.points > 0 ? '+' : ''}{entry.points.toLocaleString('en-NG')} pts
+                        </p>
+                        <p className="text-xs text-muted-foreground">{entry.action} • {entry.rating.toFixed(1)}★</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </section>
 
         {/* User Breakdown */}
         <section className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-6">

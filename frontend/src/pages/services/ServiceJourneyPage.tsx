@@ -282,7 +282,7 @@ export function ServiceJourneyPage() {
   const navigate = useNavigate()
   const { journeySlug } = useParams<{ journeySlug: string }>()
   const [searchParams] = useSearchParams()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isAuthOpen, setIsAuthOpen] = useState(false)
 
@@ -310,6 +310,7 @@ export function ServiceJourneyPage() {
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false)
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false)
+  const [redeemPoints, setRedeemPoints] = useState(0)
 
   const resetRequestForm = useCallback(() => {
     setRequestForm(createDefaultRequestFormState(matchedService?.service?.title))
@@ -382,6 +383,16 @@ export function ServiceJourneyPage() {
     if (!config.secondaryCta?.to) return
     navigate(config.secondaryCta.to)
   }
+
+  const pointsBalance = user?.pointsBalance ?? 0
+  const lifetimePoints = user?.lifetimePoints ?? pointsBalance
+  const estimatedBase = matchedService?.service?.priceFrom ?? 150000
+  const earnPoints = Math.floor(estimatedBase / 10000)
+  const redemptionValuePerPoint = 100
+  const maxRedeemable = pointsBalance
+  const clampedRedeemPoints = Math.min(Math.max(redeemPoints, 0), maxRedeemable)
+  const redeemValue = clampedRedeemPoints * redemptionValuePerPoint
+  const estimatedPayable = Math.max(estimatedBase - redeemValue, 0)
 
   const handleMenuClick = () => setIsSidebarOpen(true)
 
@@ -659,6 +670,53 @@ export function ServiceJourneyPage() {
                     required
                   />
                 </div>
+
+                <Card className="border border-primary/20 bg-primary/5 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-primary font-semibold">Loyalty</p>
+                      <p className="text-sm text-muted-foreground">Earn 1pt per ₦10,000 on services • first rental/booking/service: 1pt per ₦20,000</p>
+                    </div>
+                    <div className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
+                      {pointsBalance.toLocaleString('en-NG')} pts
+                    </div>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="rounded-xl border border-border/60 bg-background/80 p-3 space-y-1">
+                      <p className="text-xs text-muted-foreground">Estimated billable</p>
+                      <p className="text-lg font-semibold text-foreground">₦{estimatedBase.toLocaleString('en-NG')}</p>
+                      <p className="text-xs text-muted-foreground">Earn ≈ {earnPoints} pts</p>
+                    </div>
+                    <div className="rounded-xl border border-border/60 bg-background/80 p-3 space-y-1">
+                      <p className="text-xs text-muted-foreground">Redeem points on services</p>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min={0}
+                          max={maxRedeemable}
+                          value={clampedRedeemPoints}
+                          onChange={(event) => {
+                            const next = Number(event.target.value)
+                            if (Number.isNaN(next)) {
+                              setRedeemPoints(0)
+                              return
+                            }
+                            setRedeemPoints(Math.min(Math.max(next, 0), maxRedeemable))
+                          }}
+                          className="h-10"
+                        />
+                        <div className="text-xs text-muted-foreground whitespace-nowrap">
+                          ₦{redeemValue.toLocaleString('en-NG')} off
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Balance after redeem: {(pointsBalance - clampedRedeemPoints).toLocaleString('en-NG')} pts</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                    <span className="text-muted-foreground">Lifetime earned: {lifetimePoints.toLocaleString('en-NG')} pts</span>
+                    <span className="font-semibold text-foreground">Estimated payable: ₦{estimatedPayable.toLocaleString('en-NG')}</span>
+                  </div>
+                </Card>
                 <div className="grid gap-2">
                   <Label htmlFor="addressLine2">
                     Additional address details <span className="text-xs text-muted-foreground">(optional)</span>

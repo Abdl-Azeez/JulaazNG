@@ -64,6 +64,13 @@ const longTermOverrides: Record<string, Partial<LongTermOffering>> = {
   }
 }
 
+const defaultAllowedRentTerms: Array<'monthly' | 'quarterly' | 'six_months' | 'annually'> = [
+  'monthly',
+  'quarterly',
+  'six_months',
+  'annually',
+]
+
 const shortletOverrides: Record<string, Partial<ShortletOffering>> = {
   '1': {
     headline: 'Ikoyi skyline shortlet with concierge',
@@ -181,16 +188,16 @@ const buildMoveInBreakdown = (annualRent: number): MoveInItem[] => {
 }
 
 const ownersById: Record<string, PropertyOwner> = {
-  '1': { name: 'Chidinma Eze', phone: '+234 817 000 2100', initials: 'CE', verified: true },
-  '2': { name: 'Ibrahim Musa', phone: '+234 803 000 1920', initials: 'IM', verified: true },
-  '3': { name: 'Ngozi Okafor', phone: '+234 809 115 7800', initials: 'NO', verified: true },
-  '4': { name: 'Emeka Johnson', phone: '+234 701 889 3400', initials: 'EJ', verified: true },
-  '5': { name: 'Aisha Kazeem', phone: '+234 805 660 9321', initials: 'AK', verified: true },
-  '6': { name: 'Vincent Anthony', phone: '+234 701 234 5678', initials: 'VA', verified: true },
-  '7': { name: 'Bola Fashola', phone: '+234 814 995 7701', initials: 'BF', verified: true },
-  '8': { name: 'Halima Bello', phone: '+234 706 882 1134', initials: 'HB', verified: true },
-  '9': { name: 'Tunde Balogun', phone: '+234 802 776 4455', initials: 'TB', verified: true },
-  '10': { name: 'Sarah James', phone: '+234 815 222 9911', initials: 'SJ', verified: true }
+  '1': { name: 'Chidinma Eze', phone: '+234 817 000 2100', initials: 'CE', verified: true, averageRating: 4.6, ratingCount: 52 },
+  '2': { name: 'Ibrahim Musa', phone: '+234 803 000 1920', initials: 'IM', verified: true, averageRating: 4.3, ratingCount: 41 },
+  '3': { name: 'Ngozi Okafor', phone: '+234 809 115 7800', initials: 'NO', verified: true, averageRating: 4.8, ratingCount: 63 },
+  '4': { name: 'Emeka Johnson', phone: '+234 701 889 3400', initials: 'EJ', verified: true, averageRating: 4.5, ratingCount: 38 },
+  '5': { name: 'Aisha Kazeem', phone: '+234 805 660 9321', initials: 'AK', verified: true, averageRating: 4.7, ratingCount: 74 },
+  '6': { name: 'Vincent Anthony', phone: '+234 701 234 5678', initials: 'VA', verified: true, averageRating: 4.2, ratingCount: 29 },
+  '7': { name: 'Bola Fashola', phone: '+234 814 995 7701', initials: 'BF', verified: true, averageRating: 4.4, ratingCount: 33 },
+  '8': { name: 'Halima Bello', phone: '+234 706 882 1134', initials: 'HB', verified: true, averageRating: 4.9, ratingCount: 88 },
+  '9': { name: 'Tunde Balogun', phone: '+234 802 776 4455', initials: 'TB', verified: true, averageRating: 4.1, ratingCount: 24 },
+  '10': { name: 'Sarah James', phone: '+234 815 222 9911', initials: 'SJ', verified: true, averageRating: 4.5, ratingCount: 47 }
 }
 
 const locationMeta: Record<
@@ -346,13 +353,16 @@ export const samplePropertyDetails: Record<string, PropertyDetail> = samplePrope
     name: 'Julaaz Agent',
     phone: '+234 700 000 0000',
     initials: 'JA',
-    verified: true
+    verified: true,
+    averageRating: 4.5,
+    ratingCount: 12
   }
 
   const transactionType = meta.transactionType ?? 'Rent'
   const propertyType = meta.propertyType ?? 'Modern Apartment'
   const neighbourhood = meta.neighbourhood ?? 'Lekki'
   const rentalCategories = (property.rentalCategories ?? []) as RentalCategory[]
+  const allowedRentTerms = property.allowedRentTerms ?? defaultAllowedRentTerms
   const hasLongTerm = rentalCategories.includes('long_term')
   const hasShortlet = rentalCategories.includes('shortlet')
 
@@ -451,6 +461,7 @@ export const samplePropertyDetails: Record<string, PropertyDetail> = samplePrope
     weeklyRate: shortletOffering?.weeklyRate ?? property.weeklyRate,
     minimumStayNights: shortletOffering?.minimumStayNights ?? property.minimumStayNights,
     maximumStayNights: shortletOffering?.maximumStayNights ?? property.maximumStayNights,
+    allowedRentTerms,
     rentalCategories,
     transactionType,
     propertyType,

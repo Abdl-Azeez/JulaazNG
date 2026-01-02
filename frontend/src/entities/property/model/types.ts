@@ -65,6 +65,8 @@ export interface PropertyOwner {
   avatar?: string
   initials?: string
   verified?: boolean
+  averageRating?: number
+  ratingCount?: number
 }
 
 export interface MoveInItem {
@@ -94,4 +96,5 @@ export interface PropertyDetail extends Property {
   longTermOffering?: LongTermOffering
   shortletOffering?: ShortletOffering
 }
+  allowedRentTerms?: Array<'monthly' | 'quarterly' | 'six_months' | 'annually'>
 
