@@ -113,6 +113,7 @@ export const ROUTES = {
   COOKIES: '/cookies',
   DISCLAIMER: '/disclaimer',
   CONTACT: '/contact',
+  NOT_FOUND: '/404',
  
   // Profile routes
   PROFILE: '/profile',

@@ -59,6 +59,7 @@ import { LandlordEarningsPage } from '@/pages/landlord/earnings'
 import { ROUTES } from '@/shared/constants/routes'
 import { useThemeStore } from '@/shared/store/theme.store'
 import { AboutPage, LandlordFaqPage, SitemapPage, BuildingsPage, TermsPage, CookiesPage, DisclaimerPage, ContactPage } from '@/pages/info'
+import { NotFoundPage } from '@/pages/not-found'
 import { LoginModal } from '@/pages/auth/login/LoginModal'
 import { SignupModal } from '@/pages/auth/signup/SignupModal'
 import { PasswordModal } from '@/pages/auth/password/PasswordModal'
@@ -412,7 +413,8 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
         <Route path={ROUTES.COOKIES} element={<CookiesPage />} />
         <Route path={ROUTES.DISCLAIMER} element={<DisclaimerPage />} />
         <Route path={ROUTES.CONTACT} element={<ContactPage />} />
-        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
+        <Route path="*" element={<Navigate to={ROUTES.NOT_FOUND} replace />} />
       </Routes>
 
       {showModalOverlay && (
