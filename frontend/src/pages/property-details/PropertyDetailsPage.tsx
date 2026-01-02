@@ -693,14 +693,14 @@ export function PropertyDetailsPage() {
               <div className="flex flex-col gap-2">
                 <h2 className="text-xl lg:text-2xl font-semibold text-foreground">Rental options</h2>
                 <p className="text-sm text-muted-foreground">
-                  Choose the plan that suits your stay. We support flexible short-term bookings alongside traditional annual leases where available.
+                  Choose the plan that suits your stay. We support flexible short-term bookings alongside flexible rent terms where available.
                 </p>
               </div>
               <div className="grid gap-4 lg:grid-cols-2">
                 {hasLongTerm && longTermOffering && (
                   <Card className="p-5 lg:p-6 rounded-2xl border border-border bg-surface space-y-4">
                     <div className="space-y-1">
-                      <p className="text-xs uppercase tracking-wide font-semibold text-primary">Annual lease</p>
+                      <p className="text-xs uppercase tracking-wide font-semibold text-primary">Rent</p>
                       <h3 className="text-lg font-semibold text-foreground">
                         {formatCurrency(longTermOffering.annualRent)} per year
                       </h3>

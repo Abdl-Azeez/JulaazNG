@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronRight, Globe } from 'lucide-react'
+import { ChevronRight, Globe, Mail } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import { Button } from '@/shared/ui/button'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
 import { useLocation, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 interface AuthModalProps {
   open: boolean
@@ -20,6 +21,17 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const location = useLocation()
   const baseState = { backgroundLocation: location, modal: true }
   const [language, setLanguage] = useState('en')
+
+  const handleGmailSSO = () => {
+    const apiUrl = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '')
+    if (!apiUrl) {
+      toast.error('SSO is not configured')
+      return
+    }
+
+    const next = encodeURIComponent(sessionStorage.getItem('intendedDestination') || ROUTES.HOME)
+    window.location.assign(`${apiUrl}/auth/google?next=${next}`)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -49,6 +61,26 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
             </div>
             <ChevronRight className="h-4 w-4" />
           </Button>
+
+          {/* SSO */}
+          <div className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full h-14 justify-center rounded-xl text-base"
+              onClick={() => {
+                handleGmailSSO()
+                onOpenChange(false)
+              }}
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Continue with Gmail
+            </Button>
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">or</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          </div>
 
           {/* Login and Signup Buttons */}
           <div className="space-y-3">

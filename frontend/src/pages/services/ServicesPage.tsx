@@ -1,5 +1,11 @@
 import { useMemo, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Autoplay, Navigation, Pagination } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/autoplay'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Input } from '@/shared/ui/input'
@@ -26,6 +32,42 @@ const badges = [
   { id: 'response', label: 'Under 90 min response', icon: Clock },
   { id: 'vetted', label: 'Vetted artisans only', icon: ShieldCheck },
   { id: 'guarantee', label: '14-day workmanship guarantee', icon: BadgeCheck },
+]
+
+const testimonials = [
+  {
+    id: 'landlord-multi',
+    quote:
+      'As a landlord with multiple units across Lagos, JulaazNG has become my service command center. One tap and vetted technicians appear on-site, share photo updates and close jobs with digital reports. It feels premium, yet so effortless.',
+    name: 'Anita Okon',
+    role: 'Landlord • Victoria Island',
+    badge: 'Multi-unit portfolio',
+    avatar: 'AO',
+    statsTitle: '4.9★ satisfaction',
+    statsCaption: 'From 8,000+ verified jobs',
+  },
+  {
+    id: 'facility-ops',
+    quote:
+      'We run four estates and JulaazNG keeps the service bench humming. Their crews send progress photos, close tickets with punch-lists, and loop us in only when approvals are needed. Response times are predictable, even on rainy weekends.',
+    name: 'Uche Eze',
+    role: 'Facility Ops Lead • Lekki',
+    badge: 'Estates & FM',
+    avatar: 'UE',
+    statsTitle: '30% faster turnarounds',
+    statsCaption: 'Across preventive and emergency jobs',
+  },
+  {
+    id: 'tenant-comfort',
+    quote:
+      'I book repairs from my desk and get a digital report before the technician leaves. Payments, warranties and service history sit in one place, so renewals are simple. It feels like having an in-house maintenance desk.',
+    name: 'Moyin Ola',
+    role: 'Tenant • Yaba',
+    badge: 'Everyday fixes',
+    avatar: 'MO',
+    statsTitle: '24/7 coverage',
+    statsCaption: 'Concierge support for urgent calls',
+  },
 ]
 
 export function ServicesPage() {
@@ -170,7 +212,7 @@ export function ServicesPage() {
                   className="rounded-[12px] h-12 px-6"
                   onClick={() => navigate(ROUTES.SERVICE_MAINTENANCE_PLANS)}
                 >
-                  Explore maintenance plans
+                  Check out our plans
                 </Button>
               </div>
               <div className="flex flex-wrap gap-3 pt-4">
@@ -196,36 +238,114 @@ export function ServicesPage() {
                 <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/15 blur-3xl" />
                 <div className="absolute -bottom-28 -left-28 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
                 <div className="relative z-10 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <LogoSvg className="h-40 w-40 md:h-44 md:w-44 text-primary" />
-                    <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Service Desk</span>
-                  </div>
-                  <div className="rounded-2xl border border-border/50 bg-background/80 p-4 shadow-inner">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      “As a landlord with multiple units across Lagos, JulaazNG has become my service command
-                      center. One tap and vetted technicians appear on-site, share photo updates and close jobs
-                      with digital reports. It feels premium, yet so effortless.”
-                    </p>
-                    <div className="mt-4 flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
-                        AO
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold">Anita Okon</p>
-                        <p className="text-xs text-muted-foreground">Landlord • Victoria Island</p>
-                      </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-black uppercase tracking-[0.12em] text-primary/80">
+                        What people say about Julaaz Service
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        General reviews from landlords, tenants, and facility teams across Nigeria.
+                      </p>
                     </div>
+                    <LogoSvg className="h-32 w-32 md:h-36 md:w-36 text-primary flex-shrink-0" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+
+                  <div className="relative overflow-clip">
+                    <Swiper
+                      modules={[Autoplay, Navigation, Pagination]}
+                      slidesPerView={1}
+                      spaceBetween={0}
+                      centeredSlides={false}
+                      autoplay={{
+                        delay: 6500,
+                        disableOnInteraction: false,
+                      }}
+                      pagination={{
+                        clickable: true,
+                        bulletClass: 'swiper-pagination-bullet',
+                        bulletActiveClass: 'swiper-pagination-bullet-active',
+                      }}
+                      navigation={false}
+                      className="testimonials-swiper relative"
+                    >
+                      {testimonials.map((testimonial) => (
+                        <SwiperSlide key={testimonial.id}>
+                          <div className="rounded-2xl border border-border/50 bg-background/85 p-5 shadow-inner min-h-[240px] flex flex-col justify-between">
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.35, ease: 'easeOut' }}
+                              className="space-y-4"
+                            >
+                              <p className="text-sm text-foreground leading-relaxed">
+                                "{testimonial.quote}"
+                              </p>
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 flex-1">
+                                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary flex-shrink-0">
+                                    {testimonial.avatar}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-semibold truncate">{testimonial.name}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{testimonial.role}</p>
+                                  </div>
+                                </div>
+                                <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary flex-shrink-0">
+                                  {testimonial.badge}
+                                </span>
+                              </div>
+                            </motion.div>
+                          </div>
+                        </SwiperSlide>
+                      ))}
+
+                      {/* Navigation arrows removed per request */}
+                    </Swiper>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 text-sm text-muted-foreground">
                     <div>
-                      <p className="text-2xl font-bold text-foreground">4.9★</p>
-                      <p>Average rating from 8,000+ verified jobs.</p>
+                      <p className="text-lg font-bold text-foreground">4.9★</p>
+                      <p className="text-xs">satisfaction</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-foreground">24/7</p>
-                      <p>Concierge available round the clock for emergencies.</p>
+                      <p className="text-lg font-bold text-foreground">8,000+</p>
+                      <p className="text-xs">verified jobs</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">24/7</p>
+                      <p className="text-xs">concierge available</p>
                     </div>
                   </div>
+
+                  <style>{`
+                    .testimonials-swiper {
+                      width: 100% !important;
+                      overflow: hidden !important;
+                    }
+                    .testimonials-swiper .swiper-wrapper {
+                      width: 100% !important;
+                    }
+                    .testimonials-swiper .swiper-slide {
+                      width: 100% !important;
+                      height: auto !important;
+                    }
+                    .swiper-pagination {
+                      position: relative !important;
+                      bottom: auto !important;
+                      margin-top: 1rem;
+                      height: auto !important;
+                    }
+                    .swiper-pagination-bullet {
+                      background-color: hsl(var(--muted-foreground));
+                      opacity: 0.4;
+                      margin: 0 4px;
+                    }
+                    .swiper-pagination-bullet-active {
+                      background-color: hsl(var(--primary));
+                      opacity: 1;
+                    }
+                  `}</style>
                 </div>
               </div>
             </motion.div>

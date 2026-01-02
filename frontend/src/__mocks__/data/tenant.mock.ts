@@ -21,6 +21,7 @@ export const mockTenantPayments: Payment[] = [
     propertyImage: home6,
     landlordId: 'landlord-001',
     landlordName: 'Vincent Anthony',
+    services: ['Monthly Rent', 'Julaaz Protect+'],
     items: [
       {
         id: 'item-001',
@@ -51,6 +52,7 @@ export const mockTenantPayments: Payment[] = [
     propertyImage: home9,
     landlordId: 'landlord-002',
     landlordName: 'Sarah Okafor',
+    services: ['Monthly Rent'],
     items: [
       {
         id: 'item-003',
@@ -66,6 +68,7 @@ export const mockTenantPayments: Payment[] = [
     dueDate: new Date('2024-12-01'),
     paidAt: new Date('2024-11-28'),
     paymentMethod: 'card',
+    pointsRedeemed: 1200,
     reference: 'JLZ-PAY-20241128-001',
     createdAt: new Date('2024-11-15'),
     updatedAt: new Date('2024-11-28'),
@@ -78,6 +81,7 @@ export const mockTenantPayments: Payment[] = [
     propertyImage: home6,
     landlordId: 'landlord-001',
     landlordName: 'Vincent Anthony',
+    services: ['Security Deposit', 'Legal Documentation', 'Service Charge'],
     items: [
       {
         id: 'item-004',
@@ -105,6 +109,35 @@ export const mockTenantPayments: Payment[] = [
     dueDate: new Date('2024-12-20'),
     createdAt: new Date('2024-12-01'),
     updatedAt: new Date('2024-12-01'),
+  },
+  {
+    id: 'pay-004',
+    tenantId: 'tenant-001',
+    propertyId: '9',
+    propertyName: 'Lekki Haven',
+    propertyImage: home9,
+    landlordId: 'landlord-002',
+    landlordName: 'Sarah Okafor',
+    services: ['AC Servicing', 'Preventive Maintenance'],
+    items: [
+      {
+        id: 'item-007',
+        type: 'maintenance',
+        description: 'Preventive maintenance - AC servicing and filters',
+        amount: 45000,
+      },
+    ],
+    subtotal: 45000,
+    processingFee: 846,
+    total: 45846,
+    status: 'completed',
+    dueDate: new Date('2024-10-10'),
+    paidAt: new Date('2024-10-08'),
+    paymentMethod: 'wallet',
+    pointsRedeemed: 600,
+    reference: 'JLZ-PAY-20241008-004',
+    createdAt: new Date('2024-10-01'),
+    updatedAt: new Date('2024-10-08'),
   },
 ]
 

@@ -60,6 +60,7 @@ export interface Payment {
   propertyImage?: string
   landlordId?: string
   landlordName?: string
+  services?: string[]
   items: PaymentItem[]
   subtotal: number
   processingFee: number
@@ -68,6 +69,7 @@ export interface Payment {
   dueDate: Date
   paidAt?: Date
   paymentMethod?: PaymentMethod
+  pointsRedeemed?: number
   reference?: string
   createdAt: Date
   updatedAt: Date

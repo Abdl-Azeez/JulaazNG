@@ -1075,6 +1075,7 @@ export interface AdminPayment {
   id: string
   reference: string
   type: 'rent' | 'service' | 'commission' | 'withdrawal' | 'refund'
+  services?: string[]
   amount: number
   fee: number
   status: 'completed' | 'pending' | 'failed' | 'refunded'
@@ -1083,6 +1084,7 @@ export interface AdminPayment {
   recipient: string
   recipientType: 'landlord' | 'platform' | 'service_provider' | 'homerunner'
   method: 'card' | 'bank_transfer' | 'wallet'
+  pointsRedeemed?: number
   date: string
   description: string
   transactionId?: string
@@ -1096,25 +1098,83 @@ export const generateAdminPayments = (): AdminPayment[] => {
   const methods: AdminPayment['method'][] = ['card', 'bank_transfer', 'wallet']
   const payers = ['Tosin Adeyemi', 'Chioma Nwosu', 'Grace Eze', 'Femi Ogunleye', 'Kunle Balogun', 'Michael Obi', 'Adebayo Johnson']
   const recipients = ['Femi Ogunleye', 'Kunle Balogun', 'Platform', 'Adebayo Johnson', 'Bank Account']
+  const serviceCatalog = [
+    'Deep Cleaning',
+    'AC Servicing',
+    'Plumbing Repair',
+    'Electrical Fix',
+    'Painting',
+    'Pest Control',
+    'Generator Maintenance',
+  ]
+  const rentCatalog = ['Monthly Rent']
+  const commissionCatalog = ['Platform Commission']
+  const withdrawalCatalog = ['Withdrawal']
+  const refundCatalog = ['Refund']
   
-  return Array.from({ length: 52 }, (_, i) => ({
-    id: `pay-${i + 1}`,
-    reference: `PAY-2024-${String(i + 1).padStart(6, '0')}`,
-    type: types[Math.floor(Math.random() * types.length)],
-    amount: Math.floor(Math.random() * 5000000) + 10000,
-    fee: Math.floor(Math.random() * 50000) + 1000,
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    payer: payers[Math.floor(Math.random() * payers.length)],
-    payerType: 'tenant' as const,
-    recipient: recipients[Math.floor(Math.random() * recipients.length)],
-    recipientType: 'landlord' as const,
-    method: methods[Math.floor(Math.random() * methods.length)],
-    date: new Date(2024, Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1, Math.floor(Math.random() * 24), Math.floor(Math.random() * 60)).toLocaleString('en-NG'),
-    description: `Payment for ${types[Math.floor(Math.random() * types.length)]} service`,
-    transactionId: `TXN${String(i + 1).padStart(10, '0')}`,
-    cardLast4: String(Math.floor(Math.random() * 9000) + 1000),
-    bankAccount: `****${String(Math.floor(Math.random() * 9000) + 1000)}`,
-  }))
+  return Array.from({ length: 52 }, (_, i) => {
+    const type = types[Math.floor(Math.random() * types.length)]
+    const status = statuses[Math.floor(Math.random() * statuses.length)]
+
+    const services = (() => {
+      switch (type) {
+        case 'service':
+          return [
+            serviceCatalog[Math.floor(Math.random() * serviceCatalog.length)],
+            ...(Math.random() > 0.75
+              ? [serviceCatalog[Math.floor(Math.random() * serviceCatalog.length)]]
+              : []),
+          ]
+        case 'rent':
+          return rentCatalog
+        case 'commission':
+          return commissionCatalog
+        case 'withdrawal':
+          return withdrawalCatalog
+        case 'refund':
+          return refundCatalog
+        default:
+          return undefined
+      }
+    })()
+
+    const pointsRedeemed =
+      status === 'completed' && Math.random() > 0.75
+        ? Math.floor(Math.random() * 2500) + 100
+        : undefined
+
+    const description =
+      type === 'service' && services && services.length > 0
+        ? `Payment for ${services.join(', ')}`
+        : `Payment for ${type}`
+
+    return {
+      id: `pay-${i + 1}`,
+      reference: `PAY-2024-${String(i + 1).padStart(6, '0')}`,
+      type,
+      services,
+      amount: Math.floor(Math.random() * 5000000) + 10000,
+      fee: Math.floor(Math.random() * 50000) + 1000,
+      status,
+      payer: payers[Math.floor(Math.random() * payers.length)],
+      payerType: 'tenant' as const,
+      recipient: recipients[Math.floor(Math.random() * recipients.length)],
+      recipientType: 'landlord' as const,
+      method: methods[Math.floor(Math.random() * methods.length)],
+      pointsRedeemed,
+      date: new Date(
+        2024,
+        Math.floor(Math.random() * 3),
+        Math.floor(Math.random() * 28) + 1,
+        Math.floor(Math.random() * 24),
+        Math.floor(Math.random() * 60)
+      ).toLocaleString('en-NG'),
+      description,
+      transactionId: `TXN${String(i + 1).padStart(10, '0')}`,
+      cardLast4: String(Math.floor(Math.random() * 9000) + 1000),
+      bankAccount: `****${String(Math.floor(Math.random() * 9000) + 1000)}`,
+    }
+  })
 }
 
 export const adminPayments = generateAdminPayments()

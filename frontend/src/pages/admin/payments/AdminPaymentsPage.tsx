@@ -435,6 +435,11 @@ export function AdminPaymentsPage() {
                       <td className="px-6 py-4">
                         <p className="font-mono text-sm text-foreground">{payment.reference}</p>
                         <p className="text-xs text-muted-foreground truncate max-w-[200px]">{payment.description}</p>
+                        {payment.services && payment.services.length > 0 && (
+                          <p className="text-xs text-muted-foreground truncate max-w-[220px]">
+                            Services: {payment.services.join(', ')}
+                          </p>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <Badge className={cn('rounded-full capitalize', typeColors[payment.type])}>
@@ -454,6 +459,11 @@ export function AdminPaymentsPage() {
                           <span className="text-sm text-muted-foreground">{payment.recipient}</span>
                         </div>
                         <p className="text-xs text-muted-foreground capitalize">{payment.method.replace('_', ' ')}</p>
+                        {typeof payment.pointsRedeemed === 'number' && payment.pointsRedeemed > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            Redeemed: {payment.pointsRedeemed.toLocaleString('en-NG')} pts
+                          </p>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <Badge
@@ -634,6 +644,18 @@ export function AdminPaymentsPage() {
                     <span className="text-muted-foreground">Method:</span>
                     <span className="text-foreground capitalize">{selectedPayment.method.replace('_', ' ')}</span>
                   </div>
+                  {selectedPayment.services && selectedPayment.services.length > 0 && (
+                    <div className="flex justify-between text-sm gap-6">
+                      <span className="text-muted-foreground">Services:</span>
+                      <span className="text-foreground text-right">{selectedPayment.services.join(', ')}</span>
+                    </div>
+                  )}
+                  {typeof selectedPayment.pointsRedeemed === 'number' && selectedPayment.pointsRedeemed > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Points Redeemed:</span>
+                      <span className="text-foreground">{selectedPayment.pointsRedeemed.toLocaleString('en-NG')} pts</span>
+                    </div>
+                  )}
                   {selectedPayment.cardLast4 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Card:</span>

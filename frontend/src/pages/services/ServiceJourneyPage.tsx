@@ -7,7 +7,7 @@ import { Header } from '@/widgets/header'
 import { Footer } from '@/widgets/footer'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
-import { ArrowLeft, CheckCircle2, NotebookPen, PhoneCall, Sparkles } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, NotebookPen, PhoneCall, Sparkles, Clock, ShieldCheck, BadgeCheck } from 'lucide-react'
 import { howItWorksSteps, type HowItWorksStepId } from './data/how-it-works'
 import { serviceCategories, type UIServiceCategory as ServiceCategory } from '@/__mocks__/data/services.mock'
 import { ROUTES } from '@/shared/constants/routes'
@@ -28,6 +28,20 @@ type StepDetail = {
   bullets?: string[]
   outcome?: string
   helper?: string
+}
+
+type MaintenancePlan = {
+  id: string
+  name: string
+  description: string
+  monthlyPrice: string
+  quarterlyPrice: string
+  cadence: string
+  coverage: string[]
+  responseTime: string
+  services: string[]
+  perks: string[]
+  geoFocus: string
 }
 
 type JourneyConfig = {
@@ -60,6 +74,8 @@ type FlowContext = {
 type RequestFormState = {
   whatToRepair: string
   issueDetails: string
+  frequency: 'one_off' | 'recurring'
+  geoZone: string
   addressLine1: string
   addressLine2: string
   city: string
@@ -70,12 +86,95 @@ type RequestFormState = {
 const createDefaultRequestFormState = (serviceTitle?: string): RequestFormState => ({
   whatToRepair: serviceTitle ?? '',
   issueDetails: '',
+  frequency: 'one_off',
+  geoZone: 'Lagos Island',
   addressLine1: '',
   addressLine2: '',
   city: '',
   state: '',
   accessNotes: '',
 })
+
+const maintenancePlanBundles: MaintenancePlan[] = [
+  {
+    id: 'island-haven',
+    name: 'Island Haven Plan',
+    description:
+      'For high-traffic homes and apartments across Lekki, Victoria Island and Ikoyi needing pristine finishes and chilled AC year-round.',
+    monthlyPrice: '₦95,000/mo',
+    quarterlyPrice: '₦255,000/qtr',
+    cadence: 'Bi-weekly deep clean + monthly AC servicing',
+    coverage: ['Lekki', 'VI', 'Ikoyi'],
+    responseTime: 'Same-day for urgent tickets (Lagos Island)',
+    services: [
+      'AC chemical wash and gas top-up checks',
+      'Bi-weekly housekeeping with linen flip',
+      'Water pump & pressure health checks',
+      'Light handyman fixes (hinges, bulbs, seals)',
+    ],
+    perks: ['Priority weekend slots', 'Tenant move-in/move-out quick turns', 'Concierge chat with geo-tagged crews'],
+    geoFocus: 'Island corridors (Lekki ⇄ Ikoyi)',
+  },
+  {
+    id: 'mainland-stability',
+    name: 'Mainland Stability Plan',
+    description:
+      'For family homes across Ikeja, Yaba and Surulere that want predictable bills and reliable utility uptime.',
+    monthlyPrice: '₦75,000/mo',
+    quarterlyPrice: '₦205,000/qtr',
+    cadence: 'Monthly preventive sweep + quarterly deep clean',
+    coverage: ['Ikeja', 'Yaba', 'Surulere'],
+    responseTime: 'Next-day guaranteed (Mainland hubs)',
+    services: [
+      'AC filter refresh & drain clearing',
+      'Plumbing leak tracing and pressure tests',
+      'Generator quick diagnostics & load test',
+      'Pest and humidity spot checks',
+    ],
+    perks: ['WhatsApp updates with geotagged arrival ETAs', 'Bulk pricing on parts sourced locally', 'Dashboard for ticket history'],
+    geoFocus: 'Mainland clusters (Ikeja ⇄ Surulere)',
+  },
+  {
+    id: 'abuja-airy',
+    name: 'Abuja Airy Plan',
+    description:
+      'For smart apartments and townhomes in Wuse, Gwarinpa and Asokoro with focus on uptime and dust control.',
+    monthlyPrice: '₦82,000/mo',
+    quarterlyPrice: '₦220,000/qtr',
+    cadence: 'Monthly AC + quarterly interior refresh',
+    coverage: ['Wuse', 'Gwarinpa', 'Asokoro'],
+    responseTime: 'Same-day critical support (Abuja core)',
+    services: [
+      'AC coil cleaning and condensate flush',
+      'Water heater and pressure audit',
+      'Window/door alignment & seal checks',
+      'Electrical safety sweep (RCD, sockets, breakers)',
+    ],
+    perks: ['Dust-control housekeeping playbook', 'Dedicated Abuja lead technician', 'Geo-tagged SLA tracking'],
+    geoFocus: 'Abuja metro (Wuse ⇄ Asokoro)',
+  },
+  {
+    id: 'pets-and-plant-care',
+    name: 'Pets & Plant Care Plan',
+    description:
+      'For pet owners and plant lovers who travel often. We pair pet walkers with home-care crews so your space stays fresh.',
+    monthlyPrice: '₦68,000/mo',
+    quarterlyPrice: '₦180,000/qtr',
+    cadence: 'Weekly pet walking + bi-weekly tidy + monthly AC check',
+    coverage: ['Lekki', 'Ikoyi', 'Ikeja GRA', 'Wuse 2'],
+    responseTime: 'Same-day sitter swap for travel changes',
+    services: [
+      'Pet walking/feeding schedule with GPS check-ins',
+      'Plant watering & humidity balance',
+      'Odor control and filter refresh',
+      'Quick handyman fixes during visits',
+    ],
+    perks: ['Live location pings for walkers', 'Estate/concierge coordination', 'Key handoff and access protocol management'],
+    geoFocus: 'City cores where walkers are stationed',
+  },
+]
+
+const geoZones = ['Lagos Island', 'Lagos Mainland', 'Abuja', 'Port Harcourt', 'Ibadan', 'Remote / Virtual']
 
 const flowConfigFactories: Record<string, (ctx: FlowContext) => JourneyConfig> = {
   'maintenance-plans': () => ({
@@ -85,15 +184,6 @@ const flowConfigFactories: Record<string, (ctx: FlowContext) => JourneyConfig> =
     description:
       'Lock in predictable maintenance costs, proactive inspections and rapid response support tailored to your property portfolio.',
     heroHighlight: 'We craft aligned plans within 24 hours of your briefing.',
-    primaryCta: {
-      label: 'Start maintenance assessment',
-      to: `${ROUTES.MY_SERVICES}?intent=maintenance-plan`,
-      requiresAuth: true,
-    },
-    secondaryCta: {
-      label: 'Speak with a concierge',
-      to: ROUTES.CONTACT,
-    },
     steps: {
       connect: {
         description:
@@ -307,6 +397,7 @@ export function ServiceJourneyPage() {
   const [requestForm, setRequestForm] = useState<RequestFormState>(() =>
     createDefaultRequestFormState(matchedService?.service?.title)
   )
+  const [selectedPlanId, setSelectedPlanId] = useState<string>(maintenancePlanBundles[0].id)
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false)
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false)
@@ -333,7 +424,7 @@ export function ServiceJourneyPage() {
   }, [slug, matchedService])
 
   useEffect(() => {
-    if (slug !== 'request') {
+    if (slug !== 'request' && slug !== 'maintenance-plans') {
       setIsRequestFormOpen(false)
     }
   }, [slug])
@@ -348,12 +439,18 @@ export function ServiceJourneyPage() {
     category: matchedService?.category,
   })
 
+  const selectedPlan = useMemo(
+    () => maintenancePlanBundles.find((plan) => plan.id === selectedPlanId) ?? maintenancePlanBundles[0]!,
+    [selectedPlanId]
+  )
+
   const orderedSteps = howItWorksSteps.map((step) => ({
     ...step,
     detail: config.steps[step.id],
   }))
 
   const isRequestJourney = config.slug === 'request'
+  const isPlanJourney = config.slug === 'maintenance-plans'
 
   const handlePrimaryCta = () => {
     if (!config.primaryCta) return
@@ -365,6 +462,24 @@ export function ServiceJourneyPage() {
       }
 
       resetRequestForm()
+      setIsRequestFormOpen(true)
+      return
+    }
+
+    if (isPlanJourney) {
+      if (!isAuthenticated) {
+        setIsAuthOpen(true)
+        return
+      }
+
+      setRequestForm((prev) => ({
+        ...prev,
+        whatToRepair: selectedPlan.name,
+        issueDetails: prev.issueDetails || selectedPlan.description,
+        frequency: 'recurring',
+        geoZone: selectedPlan.coverage[0] ?? prev.geoZone,
+        city: prev.city || selectedPlan.coverage[0] || '',
+      }))
       setIsRequestFormOpen(true)
       return
     }
@@ -382,6 +497,28 @@ export function ServiceJourneyPage() {
   const handleSecondaryCta = () => {
     if (!config.secondaryCta?.to) return
     navigate(config.secondaryCta.to)
+  }
+
+  const handlePlanSelect = (planId: string) => {
+    setSelectedPlanId(planId)
+  }
+
+  const handleRequestPlan = (plan: MaintenancePlan) => {
+    if (!isAuthenticated) {
+      setIsAuthOpen(true)
+      return
+    }
+
+    setSelectedPlanId(plan.id)
+    setRequestForm((prev) => ({
+      ...prev,
+      whatToRepair: plan.name,
+      issueDetails: prev.issueDetails || plan.description,
+      frequency: 'recurring',
+      geoZone: plan.coverage[0] ?? prev.geoZone,
+      city: prev.city || plan.coverage[0] || '',
+    }))
+    setIsRequestFormOpen(true)
   }
 
   const pointsBalance = user?.pointsBalance ?? 0
@@ -452,61 +589,241 @@ export function ServiceJourneyPage() {
                 Back to services
               </Button>
             </div>
-            <div className="space-y-6">
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary">
-                <Sparkles className="h-4 w-4" />
-                {config.eyebrow}
-              </span>
-              <div className="space-y-4">
-                <h1 className="text-3xl md:text-4xl font-bold leading-tight">{config.title}</h1>
-                <p className="text-base md:text-lg text-muted-foreground max-w-3xl">{config.description}</p>
-              </div>
-              {config.heroHighlight && (
-                <Card className="border border-primary/20 bg-primary/10 text-primary p-6 rounded-3xl shadow-none">
-                  <p className="text-sm md:text-base font-medium">{config.heroHighlight}</p>
-                  {config.heroHelper && <p className="mt-2 text-xs md:text-sm text-primary/80">{config.heroHelper}</p>}
-                </Card>
-              )}
 
-              {config.serviceSummary && (
-                <Card className="border border-border/60 bg-background/80 rounded-3xl p-6 shadow-sm">
-                  <div className="space-y-4 md:space-y-0 md:flex md:items-start md:justify-between gap-6">
-                    <div className="space-y-1">
-                      <p className="text-xs font-semibold uppercase text-muted-foreground">Crew snapshot</p>
-                      <h2 className="text-2xl font-semibold">{config.serviceSummary.title}</h2>
-                      <p className="text-sm text-muted-foreground max-w-xl">{config.serviceSummary.blurb}</p>
-                    </div>
-                    {config.serviceSummary.stats && (
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        {config.serviceSummary.stats.map(({ label, value }) => (
-                          <div key={label} className="rounded-2xl bg-muted/60 px-4 py-3 text-sm">
-                            <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-                            <p className="text-sm font-semibold text-foreground">{value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+            {/* Custom hero for maintenance plans */}
+            {isPlanJourney ? (
+              <div className="space-y-8">
+                <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
+                  <div className="space-y-6">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary">
+                      <Sparkles className="h-4 w-4" />
+                      {config.eyebrow}
+                    </span>
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+                      Stop chasing repairs.<br />
+                      <span className="text-primary">Start preventing them.</span>
+                    </h1>
+                    <p className="text-base md:text-lg text-muted-foreground max-w-xl">
+                      Lock in predictable maintenance costs with geo-tagged crews who know your neighbourhood. We handle everything from AC servicing to pet walking — so you never worry about upkeep again.
+                    </p>
                   </div>
-                </Card>
-              )}
 
-              <div className="flex flex-wrap items-center gap-3">
-                {config.primaryCta && (
-                  <Button className="rounded-xl h-11 px-6" onClick={handlePrimaryCta}>
-                    <NotebookPen className="mr-2 h-4 w-4" />
-                    {config.primaryCta.label}
-                  </Button>
-                )}
-                {config.secondaryCta && (
-                  <Button variant="outline" className="rounded-xl h-11 px-6" onClick={handleSecondaryCta}>
-                    <PhoneCall className="mr-2 h-4 w-4" />
-                    {config.secondaryCta.label}
-                  </Button>
-                )}
+                  <div className="rounded-3xl border border-border bg-gradient-to-br from-primary/5 via-background to-muted/30 p-6 space-y-5">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-full bg-primary/10 p-3">
+                        <Clock className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Instant plan activation</p>
+                        <p className="text-xs text-muted-foreground">Pick a plan, confirm your address, and we start</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-full bg-primary/10 p-3">
+                        <ShieldCheck className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Vetted crews only</p>
+                        <p className="text-xs text-muted-foreground">Background-checked technicians assigned to your zone</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-full bg-primary/10 p-3">
+                        <BadgeCheck className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Workmanship guarantee</p>
+                        <p className="text-xs text-muted-foreground">14-day warranty on every completed job</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-border/60">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Plans starting from</p>
+                          <p className="text-2xl font-bold text-foreground">₦68,000<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground">Save up to</p>
+                          <p className="text-lg font-semibold text-primary">15% quarterly</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick stats bar */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-bold text-foreground">4</p>
+                    <p className="text-xs text-muted-foreground">Plan bundles</p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-bold text-foreground">6+</p>
+                    <p className="text-xs text-muted-foreground">Geo zones covered</p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-bold text-foreground">Same-day</p>
+                    <p className="text-xs text-muted-foreground">Urgent response</p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-bold text-foreground">1,200+</p>
+                    <p className="text-xs text-muted-foreground">Active subscribers</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* Default hero for other journeys */
+              <div className="space-y-6">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary">
+                  <Sparkles className="h-4 w-4" />
+                  {config.eyebrow}
+                </span>
+                <div className="space-y-4">
+                  <h1 className="text-3xl md:text-4xl font-bold leading-tight">{config.title}</h1>
+                  <p className="text-base md:text-lg text-muted-foreground max-w-3xl">{config.description}</p>
+                </div>
+                {config.heroHighlight && (
+                  <Card className="border border-primary/20 bg-primary/10 text-primary p-6 rounded-3xl shadow-none">
+                    <p className="text-sm md:text-base font-medium">{config.heroHighlight}</p>
+                    {config.heroHelper && <p className="mt-2 text-xs md:text-sm text-primary/80">{config.heroHelper}</p>}
+                  </Card>
+                )}
+
+                {config.serviceSummary && (
+                  <Card className="border border-border/60 bg-background/80 rounded-3xl p-6 shadow-sm">
+                    <div className="space-y-4 md:space-y-0 md:flex md:items-start md:justify-between gap-6">
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold uppercase text-muted-foreground">Crew snapshot</p>
+                        <h2 className="text-2xl font-semibold">{config.serviceSummary.title}</h2>
+                        <p className="text-sm text-muted-foreground max-w-xl">{config.serviceSummary.blurb}</p>
+                      </div>
+                      {config.serviceSummary.stats && (
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          {config.serviceSummary.stats.map(({ label, value }) => (
+                            <div key={label} className="rounded-2xl bg-muted/60 px-4 py-3 text-sm">
+                              <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+                              <p className="text-sm font-semibold text-foreground">{value}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                )}
+
+                <div className="flex flex-wrap items-center gap-3">
+                  {config.primaryCta && (
+                    <Button className="rounded-xl h-11 px-6" onClick={handlePrimaryCta}>
+                      <NotebookPen className="mr-2 h-4 w-4" />
+                      {config.primaryCta.label}
+                    </Button>
+                  )}
+                  {config.secondaryCta && (
+                    <Button variant="outline" className="rounded-xl h-11 px-6" onClick={handleSecondaryCta}>
+                      <PhoneCall className="mr-2 h-4 w-4" />
+                      {config.secondaryCta.label}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </section>
+
+        {isPlanJourney && (
+          <section className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 py-12 md:py-16">
+            <div className="space-y-3 mb-8">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Recurring plans by location</p>
+              <h2 className="text-2xl md:text-3xl font-semibold">Pick a plan that fits your zone</h2>
+              <p className="text-sm md:text-base text-muted-foreground max-w-3xl">
+                We geo-tag crews to your neighbourhood so response times stay predictable. Choose a recurring bundle, then submit a quick brief so we can assign the right squad and schedule your cadence.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {maintenancePlanBundles.map((plan) => {
+                return (
+                  <div
+                    key={plan.id}
+                    className="rounded-3xl p-6 border border-border bg-card transition-all duration-200 hover:border-primary hover:shadow-lg flex flex-col h-full"
+                  >
+                    {/* Header */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground">{plan.geoFocus}</span>
+                        <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
+                          {plan.responseTime}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
+                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{plan.description}</p>
+                    </div>
+
+                    {/* Coverage Tags */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {plan.coverage.map((area) => (
+                        <span key={area} className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground">
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Pricing */}
+                    <div className="rounded-2xl border border-border bg-muted/30 p-4 mb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Monthly</p>
+                          <p className="text-lg font-bold text-foreground">{plan.monthlyPrice}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground mb-1">Quarterly</p>
+                          <p className="text-lg font-bold text-foreground">{plan.quarterlyPrice}</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-primary font-medium mt-3">{plan.cadence}</p>
+                    </div>
+
+                    {/* Services */}
+                    <div className="mb-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Included focus</p>
+                      <ul className="space-y-2">
+                        {plan.services.map((item) => (
+                          <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                            <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Perks */}
+                    <div className="mb-6">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Concierge perks</p>
+                      <div className="flex flex-wrap gap-2">
+                        {plan.perks.map((perk) => (
+                          <span
+                            key={perk}
+                            className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium"
+                          >
+                            {perk}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Actions - pushed to bottom */}
+                    <div className="mt-auto">
+                      <Button className="rounded-xl w-full h-11" onClick={() => handleRequestPlan(plan)}>
+                        Get started with this plan
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )}
 
         <section className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 py-12 md:py-16 space-y-8">
           <div className="space-y-2">
@@ -575,7 +892,7 @@ export function ServiceJourneyPage() {
       <Footer />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <AuthDialog open={isAuthOpen} onOpenChange={setIsAuthOpen} />
-      {isRequestJourney && isRequestFormOpen && (
+      {(isRequestJourney || isPlanJourney) && isRequestFormOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 py-6"
           onClick={handleCloseRequestForm}
@@ -588,9 +905,11 @@ export function ServiceJourneyPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Service intake
+                    {isPlanJourney ? 'Plan intake' : 'Service intake'}
                   </p>
-                  <h2 className="text-xl md:text-2xl font-semibold text-foreground">Confirm booking details</h2>
+                  <h2 className="text-xl md:text-2xl font-semibold text-foreground">
+                    {isPlanJourney ? 'Confirm plan request' : 'Confirm booking details'}
+                  </h2>
                 </div>
                 <Button variant="ghost" size="sm" onClick={handleCloseRequestForm}>
                   Close
@@ -599,186 +918,330 @@ export function ServiceJourneyPage() {
               <p className="mt-3 text-sm text-muted-foreground max-w-xl">
                 Share a quick brief so we can assign the right specialists and prepare for diagnostics.
               </p>
+              {isPlanJourney && (
+                <div className="mt-4 rounded-2xl border border-primary/20 bg-primary/5 p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs uppercase tracking-wide text-primary font-semibold">Selected plan</p>
+                    <span className="text-xs font-semibold text-primary/80">{selectedPlan.geoFocus}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-base font-semibold text-foreground">{selectedPlan.name}</p>
+                      <p className="text-xs text-muted-foreground">{selectedPlan.cadence}</p>
+                    </div>
+                    <div className="text-right text-sm">
+                      <p className="font-semibold text-foreground">{selectedPlan.monthlyPrice}</p>
+                      <p className="text-xs text-muted-foreground">{selectedPlan.quarterlyPrice} quarterly</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <form className="px-6 py-6 space-y-6 overflow-y-auto max-h-[75vh]" onSubmit={handleRequestSubmit}>
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="whatToRepair">What do you need us to work on?</Label>
-                  <Input
-                    id="whatToRepair"
-                    value={requestForm.whatToRepair}
-                    onChange={(event) =>
-                      setRequestForm((prev) => ({ ...prev, whatToRepair: event.target.value }))
-                    }
-                    placeholder="e.g. 3HP Split AC not cooling"
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="issueDetails">Helpful notes for diagnosis</Label>
-                  <Textarea
-                    id="issueDetails"
-                    value={requestForm.issueDetails}
-                    onChange={(event) =>
-                      setRequestForm((prev) => ({ ...prev, issueDetails: event.target.value }))
-                    }
-                    placeholder="Tell us the symptoms, previous fixes attempted, error codes, recurring issues..."
-                    required
-                    rows={4}
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="mediaFiles">Photos or videos (optional)</Label>
-                  <Input
-                    id="mediaFiles"
-                    type="file"
-                    accept="image/*,video/*"
-                    multiple
-                    onChange={handleMediaChange}
-                  />
-                  {mediaFiles.length > 0 && (
-                    <div className="rounded-2xl border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground space-y-1">
-                      <p className="font-medium text-foreground">Attached files</p>
-                      <ul className="space-y-1">
-                        {mediaFiles.map((file) => (
-                          <li key={file.name} className="truncate">
-                            {file.name} ({Math.round(file.size / 1024)} KB)
-                          </li>
-                        ))}
-                      </ul>
+              {/* Plan journey: streamlined form with pre-filled info */}
+              {isPlanJourney ? (
+                <div className="grid gap-4">
+                  {/* Pre-filled plan info (read-only summary) */}
+                  <div className="rounded-2xl border border-border bg-muted/30 p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-semibold uppercase tracking-wide text-primary">Plan selected</span>
                     </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Upload up to 5 files. Clear media helps us prep parts and the right crew.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="addressLine1">Service address</Label>
-                  <Input
-                    id="addressLine1"
-                    value={requestForm.addressLine1}
-                    onChange={(event) =>
-                      setRequestForm((prev) => ({ ...prev, addressLine1: event.target.value }))
-                    }
-                    placeholder="Street address or property name"
-                    required
-                  />
-                </div>
-
-                <Card className="border border-primary/20 bg-primary/5 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-primary font-semibold">Loyalty</p>
-                      <p className="text-sm text-muted-foreground">Earn 1pt per ₦10,000 on services • first rental/booking/service: 1pt per ₦20,000</p>
+                      <p className="text-sm font-semibold text-foreground">{requestForm.whatToRepair}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{requestForm.issueDetails}</p>
                     </div>
-                    <div className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
-                      {pointsBalance.toLocaleString('en-NG')} pts
-                    </div>
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <div className="rounded-xl border border-border/60 bg-background/80 p-3 space-y-1">
-                      <p className="text-xs text-muted-foreground">Estimated billable</p>
-                      <p className="text-lg font-semibold text-foreground">₦{estimatedBase.toLocaleString('en-NG')}</p>
-                      <p className="text-xs text-muted-foreground">Earn ≈ {earnPoints} pts</p>
-                    </div>
-                    <div className="rounded-xl border border-border/60 bg-background/80 p-3 space-y-1">
-                      <p className="text-xs text-muted-foreground">Redeem points on services</p>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="number"
-                          min={0}
-                          max={maxRedeemable}
-                          value={clampedRedeemPoints}
-                          onChange={(event) => {
-                            const next = Number(event.target.value)
-                            if (Number.isNaN(next)) {
-                              setRedeemPoints(0)
-                              return
-                            }
-                            setRedeemPoints(Math.min(Math.max(next, 0), maxRedeemable))
-                          }}
-                          className="h-10"
-                        />
-                        <div className="text-xs text-muted-foreground whitespace-nowrap">
-                          ₦{redeemValue.toLocaleString('en-NG')} off
-                        </div>
-                      </div>
-                      <p className="text-xs text-muted-foreground">Balance after redeem: {(pointsBalance - clampedRedeemPoints).toLocaleString('en-NG')} pts</p>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
+                        Recurring service
+                      </span>
+                      <span className="rounded-full bg-muted text-foreground px-3 py-1 text-xs font-medium">
+                        {requestForm.geoZone}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                    <span className="text-muted-foreground">Lifetime earned: {lifetimePoints.toLocaleString('en-NG')} pts</span>
-                    <span className="font-semibold text-foreground">Estimated payable: ₦{estimatedPayable.toLocaleString('en-NG')}</span>
-                  </div>
-                </Card>
-                <div className="grid gap-2">
-                  <Label htmlFor="addressLine2">
-                    Additional address details <span className="text-xs text-muted-foreground">(optional)</span>
-                  </Label>
-                  <Input
-                    id="addressLine2"
-                    value={requestForm.addressLine2}
-                    onChange={(event) =>
-                      setRequestForm((prev) => ({ ...prev, addressLine2: event.target.value }))
-                    }
-                    placeholder="Gate code, apartment number, floor..."
-                  />
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="grid gap-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      value={requestForm.city}
-                      onChange={(event) =>
-                        setRequestForm((prev) => ({ ...prev, city: event.target.value }))
-                      }
-                      placeholder="e.g. Lagos"
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="state">State</Label>
-                    <Input
-                      id="state"
-                      value={requestForm.state}
-                      onChange={(event) =>
-                        setRequestForm((prev) => ({ ...prev, state: event.target.value }))
-                      }
-                      placeholder="e.g. Lagos State"
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="accessNotes">
-                    Access / concierge notes <span className="text-xs text-muted-foreground">(optional)</span>
-                  </Label>
-                  <Textarea
-                    id="accessNotes"
-                    value={requestForm.accessNotes}
-                    onChange={(event) =>
-                      setRequestForm((prev) => ({ ...prev, accessNotes: event.target.value }))
-                    }
-                    placeholder="Who we should meet on arrival, power cut-off instructions, parking info..."
-                    rows={3}
-                  />
+                  {/* Only essential fields for plan journey */}
+                  <div className="grid gap-2">
+                    <Label htmlFor="addressLine1">Service address <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="addressLine1"
+                      value={requestForm.addressLine1}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, addressLine1: event.target.value }))
+                      }
+                      placeholder="Street address or property name"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="addressLine2">
+                      Additional details <span className="text-xs text-muted-foreground">(optional)</span>
+                    </Label>
+                    <Input
+                      id="addressLine2"
+                      value={requestForm.addressLine2}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, addressLine2: event.target.value }))
+                      }
+                      placeholder="Gate code, apartment number, floor..."
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="accessNotes">
+                      Access notes <span className="text-xs text-muted-foreground">(optional)</span>
+                    </Label>
+                    <Textarea
+                      id="accessNotes"
+                      value={requestForm.accessNotes}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, accessNotes: event.target.value }))
+                      }
+                      placeholder="Who we should meet on arrival, parking info, security protocols..."
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="mediaFiles">Photos of property (optional)</Label>
+                    <Input
+                      id="mediaFiles"
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      onChange={handleMediaChange}
+                    />
+                    {mediaFiles.length > 0 && (
+                      <div className="rounded-xl border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+                        <p className="font-medium text-foreground mb-1">Attached ({mediaFiles.length})</p>
+                        <ul className="space-y-0.5">
+                          {mediaFiles.map((file) => (
+                            <li key={file.name} className="truncate">
+                              {file.name}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* Service request journey: full form */
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="whatToRepair">What do you need us to work on?</Label>
+                    <Input
+                      id="whatToRepair"
+                      value={requestForm.whatToRepair}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, whatToRepair: event.target.value }))
+                      }
+                      placeholder="e.g. 3HP Split AC not cooling"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="issueDetails">Helpful notes for diagnosis</Label>
+                    <Textarea
+                      id="issueDetails"
+                      value={requestForm.issueDetails}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, issueDetails: event.target.value }))
+                      }
+                      placeholder="Tell us the symptoms, previous fixes attempted, error codes, recurring issues..."
+                      required
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label>Is this a one-off or recurring service?</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setRequestForm((prev) => ({ ...prev, frequency: 'one_off' }))}
+                        className={`rounded-xl border px-4 py-3 text-left transition ${
+                          requestForm.frequency === 'one_off'
+                            ? 'border-primary bg-primary/10 text-foreground shadow-sm'
+                            : 'border-border/70 bg-background/70 text-muted-foreground hover:border-border'
+                        }`}
+                        aria-pressed={requestForm.frequency === 'one_off'}
+                      >
+                        <p className="text-sm font-semibold">One-off visit</p>
+                        <p className="text-xs text-muted-foreground">Single request for this issue.</p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setRequestForm((prev) => ({ ...prev, frequency: 'recurring' }))}
+                        className={`rounded-xl border px-4 py-3 text-left transition ${
+                          requestForm.frequency === 'recurring'
+                            ? 'border-primary bg-primary/10 text-foreground shadow-sm'
+                            : 'border-border/70 bg-background/70 text-muted-foreground hover:border-border'
+                        }`}
+                        aria-pressed={requestForm.frequency === 'recurring'}
+                      >
+                        <p className="text-sm font-semibold">Recurring</p>
+                        <p className="text-xs text-muted-foreground">Set expectations for repeat work.</p>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="mediaFiles">Photos or videos (optional)</Label>
+                    <Input
+                      id="mediaFiles"
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      onChange={handleMediaChange}
+                    />
+                    {mediaFiles.length > 0 && (
+                      <div className="rounded-2xl border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground space-y-1">
+                        <p className="font-medium text-foreground">Attached files</p>
+                        <ul className="space-y-1">
+                          {mediaFiles.map((file) => (
+                            <li key={file.name} className="truncate">
+                              {file.name} ({Math.round(file.size / 1024)} KB)
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Upload up to 5 files. Clear media helps us prep parts and the right crew.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="addressLine1">Service address</Label>
+                    <Input
+                      id="addressLine1"
+                      value={requestForm.addressLine1}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, addressLine1: event.target.value }))
+                      }
+                      placeholder="Street address or property name"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="addressLine2">
+                      Additional address details <span className="text-xs text-muted-foreground">(optional)</span>
+                    </Label>
+                    <Input
+                      id="addressLine2"
+                      value={requestForm.addressLine2}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, addressLine2: event.target.value }))
+                      }
+                      placeholder="Gate code, apartment number, floor..."
+                    />
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-2">
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        value={requestForm.city}
+                        onChange={(event) =>
+                          setRequestForm((prev) => ({ ...prev, city: event.target.value }))
+                        }
+                        placeholder="e.g. Lagos"
+                        required
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="state">State</Label>
+                      <Input
+                        id="state"
+                        value={requestForm.state}
+                        onChange={(event) =>
+                          setRequestForm((prev) => ({ ...prev, state: event.target.value }))
+                        }
+                        placeholder="e.g. Lagos State"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="accessNotes">
+                      Access / concierge notes <span className="text-xs text-muted-foreground">(optional)</span>
+                    </Label>
+                    <Textarea
+                      id="accessNotes"
+                      value={requestForm.accessNotes}
+                      onChange={(event) =>
+                        setRequestForm((prev) => ({ ...prev, accessNotes: event.target.value }))
+                      }
+                      placeholder="Who we should meet on arrival, power cut-off instructions, parking info..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Loyalty card - shown for both journeys */}
+              <Card className="border border-primary/20 bg-primary/5 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-primary font-semibold">Loyalty</p>
+                    <p className="text-sm text-muted-foreground">Earn 1pt per ₦10,000 on services • first rental/booking/service: 1pt per ₦20,000</p>
+                  </div>
+                  <div className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
+                    {pointsBalance.toLocaleString('en-NG')} pts
+                  </div>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="rounded-xl border border-border/60 bg-background/80 p-3 space-y-1">
+                    <p className="text-xs text-muted-foreground">Estimated billable</p>
+                    <p className="text-lg font-semibold text-foreground">₦{estimatedBase.toLocaleString('en-NG')}</p>
+                    <p className="text-xs text-muted-foreground">Earn ≈ {earnPoints} pts</p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-background/80 p-3 space-y-1">
+                    <p className="text-xs text-muted-foreground">Redeem points on services</p>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        min={0}
+                        max={maxRedeemable}
+                        value={clampedRedeemPoints}
+                        onChange={(event) => {
+                          const next = Number(event.target.value)
+                          if (Number.isNaN(next)) {
+                            setRedeemPoints(0)
+                            return
+                          }
+                          setRedeemPoints(Math.min(Math.max(next, 0), maxRedeemable))
+                        }}
+                        className="h-10"
+                      />
+                      <div className="text-xs text-muted-foreground whitespace-nowrap">
+                        ₦{redeemValue.toLocaleString('en-NG')} off
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Balance after redeem: {(pointsBalance - clampedRedeemPoints).toLocaleString('en-NG')} pts</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                  <span className="text-muted-foreground">Lifetime earned: {lifetimePoints.toLocaleString('en-NG')} pts</span>
+                  <span className="font-semibold text-foreground">Estimated payable: ₦{estimatedPayable.toLocaleString('en-NG')}</span>
+                </div>
+              </Card>
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-2">
                 <Button variant="ghost" type="button" onClick={handleCloseRequestForm}>
                   Cancel
                 </Button>
                 <Button type="submit" className="sm:min-w-[160px]" disabled={isSubmittingRequest}>
-                  {isSubmittingRequest ? 'Submitting...' : 'Submit request'}
+                  {isSubmittingRequest ? 'Submitting...' : isPlanJourney ? 'Start my plan' : 'Submit request'}
                 </Button>
               </div>
             </form>

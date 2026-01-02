@@ -375,7 +375,7 @@ export function PropertyViewingPage() {
                           : 'text-muted-foreground hover:text-primary'
                       )}
                     >
-                      Annual lease
+                      Rent
                     </button>
                     <button
                       type="button"

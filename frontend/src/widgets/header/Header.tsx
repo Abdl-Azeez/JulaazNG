@@ -12,6 +12,7 @@ import {
   Calendar,
   Heart,
   FileText,
+  Receipt,
   Briefcase,
   CreditCard,
   RefreshCcw as RefreshCw,
@@ -185,6 +186,7 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
       return [
         ...base,
         { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
+        { icon: Heart, label: 'Favourites', path: ROUTES.FAVOURITES },
       ]
     }
 
@@ -206,11 +208,13 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
     if (role === 'tenant') {
       return [
         ...base,
-    { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
-    { icon: Heart, label: 'Favourites', path: ROUTES.FAVOURITES },
-    { icon: FileText, label: 'My Bookings', path: ROUTES.MY_BOOKINGS },
-    { icon: Briefcase, label: 'My Services', path: ROUTES.MY_SERVICES },
-  ]
+        { icon: Calendar, label: 'Calendar', path: ROUTES.EVENTS },
+        { icon: Heart, label: 'Favourites', path: ROUTES.FAVOURITES },
+        { icon: FileText, label: 'My Bookings', path: ROUTES.MY_BOOKINGS },
+        { icon: Briefcase, label: 'My Services', path: ROUTES.MY_SERVICES },
+        { icon: Receipt, label: 'Agreements', path: ROUTES.AGREEMENTS },
+        { icon: CreditCard, label: 'Payments', path: ROUTES.PAYMENTS },
+      ]
     }
 
     return base

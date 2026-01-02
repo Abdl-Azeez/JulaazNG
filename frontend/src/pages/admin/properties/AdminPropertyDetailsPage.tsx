@@ -547,7 +547,7 @@ export function AdminPropertyDetailsPage() {
                 {hasLongTerm && longTermOffering && (
                   <Card className="p-5 lg:p-6 rounded-2xl border border-border bg-surface space-y-4">
                     <div className="space-y-1">
-                      <p className="text-xs uppercase tracking-wide font-semibold text-primary">Annual lease</p>
+                      <p className="text-xs uppercase tracking-wide font-semibold text-primary">Rent</p>
                       <h3 className="text-lg font-semibold text-foreground">
                         {formatCurrency(longTermOffering.annualRent)} per year
                       </h3>

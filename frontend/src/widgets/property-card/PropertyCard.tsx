@@ -95,16 +95,11 @@ export function PropertyCard({ property, onRequestViewing, onShare, onSelect, la
                   isRowLayout ? 'gap-1.5 px-2.5 py-1.5' : 'gap-1.5 px-2.5 py-1.5 md:gap-1.5 md:px-2.5 md:py-1.5'
                 }`}>
                   <Calendar className={`text-primary ${isRowLayout ? 'h-3.5 w-3.5' : 'h-4 w-4 md:h-3.5 md:w-3.5'}`} />
-                  <div className="flex flex-col leading-tight">
-                    <span className={`font-bold text-primary uppercase tracking-wider ${
-                      isRowLayout ? 'text-[10px]' : 'hidden md:inline text-[10px]'
-                    }`}>
-                      Rent
-                    </span>
-                    <span className="text-[10px] text-foreground/80">
-                      {rentTermsLabel}
-                    </span>
-                  </div>
+                  <span className={`font-bold text-primary uppercase tracking-wider ${
+                    isRowLayout ? 'text-[10px]' : 'hidden md:inline text-[10px]'
+                  }`}>
+                    Rent
+                  </span>
                 </div>
               </div>
             )}

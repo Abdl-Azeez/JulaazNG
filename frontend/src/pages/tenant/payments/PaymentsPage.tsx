@@ -348,6 +348,25 @@ export function PaymentsPage() {
                                 Pay Now
                               </Button>
                             </div>
+
+                            {/* Services */}
+                            {payment.services && payment.services.length > 0 && (
+                              <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <span className="text-xs text-muted-foreground">Services:</span>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {payment.services.slice(0, 3).map((service) => (
+                                    <Badge key={service} variant="secondary" className="text-[10px] rounded-full">
+                                      {service}
+                                    </Badge>
+                                  ))}
+                                  {payment.services.length > 3 && (
+                                    <Badge variant="secondary" className="text-[10px] rounded-full">
+                                      +{payment.services.length - 3}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </Card>
@@ -421,8 +440,30 @@ export function PaymentsPage() {
                                 <span>Paid on {format(payment.paidAt, 'MMM dd, yyyy')}</span>
                                 {payment.reference && <span>Ref: {payment.reference}</span>}
                                 {payment.paymentMethod && (
-                                  <span className="capitalize">{payment.paymentMethod.replace('_', ' ')}</span>
+                                  <span className="capitalize">Method: {payment.paymentMethod.replace('_', ' ')}</span>
                                 )}
+                                {typeof payment.pointsRedeemed === 'number' && payment.pointsRedeemed > 0 && (
+                                  <span>Redeemed: {payment.pointsRedeemed.toLocaleString('en-NG')} pts</span>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Services */}
+                            {payment.services && payment.services.length > 0 && (
+                              <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <span className="text-xs text-muted-foreground">Services:</span>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {payment.services.slice(0, 3).map((service) => (
+                                    <Badge key={service} variant="secondary" className="text-[10px] rounded-full">
+                                      {service}
+                                    </Badge>
+                                  ))}
+                                  {payment.services.length > 3 && (
+                                    <Badge variant="secondary" className="text-[10px] rounded-full">
+                                      +{payment.services.length - 3}
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
                             )}
 

@@ -20,10 +20,13 @@ import LogoSvg from '@/assets/images/logo.svg?react'
 import { ROUTES } from '@/shared/constants/routes'
 import { Textarea } from '@/shared/ui/textarea'
 import { serviceCategories } from '@/__mocks__/data/services.mock'
+import { Mail } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 interface ModalState {
   backgroundLocation?: Location
   modal?: boolean
+  intendedDestination?: string
 }
 
 export function SignupModal() {
@@ -65,6 +68,7 @@ export function SignupModal() {
   const [handymanWorkshopAddress, setHandymanWorkshopAddress] = useState('')
   const [handymanWorkshopCity, setHandymanWorkshopCity] = useState('')
   const [errors, setErrors] = useState<{
+    userType?: string
     firstName?: string
     lastName?: string
     ageRange?: string
@@ -101,6 +105,10 @@ export function SignupModal() {
 
   const validateForm = () => {
     const newErrors: typeof errors = {}
+
+    if (!userType) {
+      newErrors.userType = 'Select your user type'
+    }
 
     if (!firstName.trim()) {
       newErrors.firstName = 'First name is required'
@@ -164,6 +172,25 @@ export function SignupModal() {
   }
 
   const preserveState = modalState ? { ...modalState } : backgroundLocation ? { backgroundLocation, modal: true } : undefined
+
+  const handleGoogleSSO = () => {
+    if (!userType) {
+      toast.error('Select user type first')
+      setErrors((prev) => ({ ...prev, userType: 'Select your user type' }))
+      return
+    }
+
+    const apiUrl = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '')
+    if (!apiUrl) {
+      toast.error('SSO is not configured')
+      return
+    }
+
+    const next = encodeURIComponent(
+      modalState?.intendedDestination || sessionStorage.getItem('intendedDestination') || ROUTES.HOME
+    )
+    window.location.assign(`${apiUrl}/auth/google?role=${encodeURIComponent(userType)}&next=${next}`)
+  }
 
   const handleSignup = () => {
     if (validateForm()) {
@@ -246,6 +273,26 @@ export function SignupModal() {
                   </Label>
                 </div>
               </RadioGroup>
+              {errors.userType && (
+                <p className="text-xs text-destructive">{errors.userType}</p>
+              )}
+            </div>
+
+            {/* SSO (requires user type) */}
+            <div className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full h-12 rounded-lg focus-visible:ring-1 focus-visible:ring-offset-1"
+                onClick={handleGoogleSSO}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Continue with Gmail
+              </Button>
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted-foreground">or</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
             </div>
 
             {userType === 'handyman' && (
