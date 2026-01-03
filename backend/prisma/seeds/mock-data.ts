@@ -1,0 +1,49 @@
+import { UserRole } from '@prisma/client'
+
+export const demoUsers = [
+  {
+    email: 'tenant@julaaz.com',
+    phone: '08010000001',
+    password: 'tenant123',
+    firstName: 'Tosin',
+    lastName: 'Adeyemi',
+    roles: [UserRole.TENANT],
+    preferredRole: UserRole.TENANT,
+  },
+  {
+    email: 'landlord@julaaz.com',
+    phone: '08010000002',
+    password: 'landlord123',
+    firstName: 'Femi',
+    lastName: 'Ogunleye',
+    roles: [UserRole.LANDLORD],
+    preferredRole: UserRole.LANDLORD,
+  },
+  {
+    email: 'hybrid@julaaz.com',
+    phone: '08010000003',
+    password: 'hybrid123',
+    firstName: 'Chioma',
+    lastName: 'Nwosu',
+    roles: [UserRole.TENANT, UserRole.LANDLORD],
+    preferredRole: UserRole.TENANT,
+  },
+  {
+    email: 'homerunner@julaaz.com',
+    phone: '08010000006',
+    password: 'homerunner123',
+    firstName: 'Adebayo',
+    lastName: 'Johnson',
+    roles: [UserRole.HOMERUNNER],
+    preferredRole: UserRole.HOMERUNNER,
+  },
+  {
+    email: 'admin@julaaz.com',
+    phone: '08010000007',
+    password: 'admin123',
+    firstName: 'Super',
+    lastName: 'Admin',
+    roles: [UserRole.ADMIN],
+    preferredRole: UserRole.ADMIN,
+  },
+]

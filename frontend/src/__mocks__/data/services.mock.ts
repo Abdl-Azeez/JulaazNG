@@ -45,6 +45,18 @@ export interface UIServiceCategory {
   }>
 }
 
+export interface ServicePlan {
+  id: string
+  name: string
+  description: string
+  price: number
+  period: string
+  tag: 'maintenance' | 'emergency' | 'subscription' | 'project' | 'security' | 'comfort'
+  perks: string[]
+  badge?: string
+  savings?: string
+}
+
 export const serviceCategories: UIServiceCategory[] = [
   {
     id: 'repairs',
@@ -245,6 +257,91 @@ export const serviceCategories: UIServiceCategory[] = [
         priceFrom: 75000,
       },
     ],
+  },
+]
+
+// ============================================================
+// SERVICE PLANS / PROMOTIONS (UI)
+// ============================================================
+
+export const servicePlans: ServicePlan[] = [
+  {
+    id: 'essential-fix',
+    name: 'Essential Fix Pack',
+    description: 'One-off urgent repairs with vetted pros and photo proof on completion.',
+    price: 15000,
+    period: 'per visit',
+    tag: 'maintenance',
+    perks: ['90-minute response goal', 'Includes diagnostics', 'Pay after acceptance'],
+    badge: 'Popular',
+  },
+  {
+    id: 'home-care',
+    name: 'Home Care Monthly',
+    description: 'Two scheduled visits monthly covering cleaning, AC checks and plumbing spot-fixes.',
+    price: 45000,
+    period: 'monthly',
+    tag: 'subscription',
+    perks: ['2 visits + concierge', 'Emergency hotline', 'Parts at cost price'],
+    badge: 'Best value',
+    savings: 'Save 18% vs. one-offs',
+  },
+  {
+    id: 'emergency-priority',
+    name: 'Priority Response',
+    description: '24/7 emergency cover with priority dispatch for power, leaks and security issues.',
+    price: 30000,
+    period: 'per incident',
+    tag: 'emergency',
+    perks: ['Dispatch under 60 mins', 'Background-checked team', 'Incident report included'],
+  },
+  {
+    id: 'estate-fm',
+    name: 'Estate FM Lite',
+    description: 'For estates/blocks needing weekly rounds, issue logging and supervisor sign-off.',
+    price: 120000,
+    period: 'monthly',
+    tag: 'project',
+    perks: ['Weekly rounds', 'Digital logs + photos', 'Supervisor included'],
+    savings: 'Covers up to 3 blocks',
+  },
+  {
+    id: 'renovation-ready',
+    name: 'Renovation Ready',
+    description: 'Pre-renovation assessment, scope, and cost planning with project manager.',
+    price: 85000,
+    period: 'fixed',
+    tag: 'project',
+    perks: ['Site visit + report', 'Bill of quantities draft', 'Preferred contractor bench'],
+  },
+  {
+    id: 'smart-comfort',
+    name: 'Smart Comfort+',
+    description: 'HVAC servicing plus smart-home setup audit and quick wins in one visit.',
+    price: 65000,
+    period: 'per visit',
+    tag: 'comfort',
+    perks: ['2 AC units serviced', 'Smart hub audit', 'Energy efficiency checklist'],
+  },
+  {
+    id: 'secure-home',
+    name: 'Secure Home Bundle',
+    description: 'Alarm + CCTV assessment, placement plan, and starter hardware credit.',
+    price: 110000,
+    period: 'bundle',
+    tag: 'security',
+    perks: ['On-site security survey', 'Placement map + quote', '₦25k hardware credit'],
+    badge: 'New',
+  },
+  {
+    id: 'move-in-shine',
+    name: 'Move-in Shine',
+    description: 'Deep clean, fumigation, and handyman fixes before handover day.',
+    price: 90000,
+    period: 'one-time',
+    tag: 'maintenance',
+    perks: ['Full deep clean', 'Fumigation with 30-day cover', '2-hour handyman block'],
+    savings: 'Bundle saves ₦18k',
   },
 ]
 

@@ -7,9 +7,9 @@ import { Header } from '@/widgets/header'
 import { Footer } from '@/widgets/footer'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
-import { ArrowLeft, CheckCircle2, NotebookPen, PhoneCall, Sparkles, Clock, ShieldCheck, BadgeCheck } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, NotebookPen, PhoneCall, Sparkles, Clock, ShieldCheck, BadgeCheck, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { howItWorksSteps, type HowItWorksStepId } from './data/how-it-works'
-import { serviceCategories, type UIServiceCategory as ServiceCategory } from '@/__mocks__/data/services.mock'
+import { serviceCategories, servicePlans, type UIServiceCategory as ServiceCategory } from '@/__mocks__/data/services.mock'
 import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { Label } from '@/shared/ui/label'
@@ -28,20 +28,6 @@ type StepDetail = {
   bullets?: string[]
   outcome?: string
   helper?: string
-}
-
-type MaintenancePlan = {
-  id: string
-  name: string
-  description: string
-  monthlyPrice: string
-  quarterlyPrice: string
-  cadence: string
-  coverage: string[]
-  responseTime: string
-  services: string[]
-  perks: string[]
-  geoFocus: string
 }
 
 type JourneyConfig = {
@@ -95,84 +81,6 @@ const createDefaultRequestFormState = (serviceTitle?: string): RequestFormState 
   accessNotes: '',
 })
 
-const maintenancePlanBundles: MaintenancePlan[] = [
-  {
-    id: 'island-haven',
-    name: 'Island Haven Plan',
-    description:
-      'For high-traffic homes and apartments across Lekki, Victoria Island and Ikoyi needing pristine finishes and chilled AC year-round.',
-    monthlyPrice: '₦95,000/mo',
-    quarterlyPrice: '₦255,000/qtr',
-    cadence: 'Bi-weekly deep clean + monthly AC servicing',
-    coverage: ['Lekki', 'VI', 'Ikoyi'],
-    responseTime: 'Same-day for urgent tickets (Lagos Island)',
-    services: [
-      'AC chemical wash and gas top-up checks',
-      'Bi-weekly housekeeping with linen flip',
-      'Water pump & pressure health checks',
-      'Light handyman fixes (hinges, bulbs, seals)',
-    ],
-    perks: ['Priority weekend slots', 'Tenant move-in/move-out quick turns', 'Concierge chat with geo-tagged crews'],
-    geoFocus: 'Island corridors (Lekki ⇄ Ikoyi)',
-  },
-  {
-    id: 'mainland-stability',
-    name: 'Mainland Stability Plan',
-    description:
-      'For family homes across Ikeja, Yaba and Surulere that want predictable bills and reliable utility uptime.',
-    monthlyPrice: '₦75,000/mo',
-    quarterlyPrice: '₦205,000/qtr',
-    cadence: 'Monthly preventive sweep + quarterly deep clean',
-    coverage: ['Ikeja', 'Yaba', 'Surulere'],
-    responseTime: 'Next-day guaranteed (Mainland hubs)',
-    services: [
-      'AC filter refresh & drain clearing',
-      'Plumbing leak tracing and pressure tests',
-      'Generator quick diagnostics & load test',
-      'Pest and humidity spot checks',
-    ],
-    perks: ['WhatsApp updates with geotagged arrival ETAs', 'Bulk pricing on parts sourced locally', 'Dashboard for ticket history'],
-    geoFocus: 'Mainland clusters (Ikeja ⇄ Surulere)',
-  },
-  {
-    id: 'abuja-airy',
-    name: 'Abuja Airy Plan',
-    description:
-      'For smart apartments and townhomes in Wuse, Gwarinpa and Asokoro with focus on uptime and dust control.',
-    monthlyPrice: '₦82,000/mo',
-    quarterlyPrice: '₦220,000/qtr',
-    cadence: 'Monthly AC + quarterly interior refresh',
-    coverage: ['Wuse', 'Gwarinpa', 'Asokoro'],
-    responseTime: 'Same-day critical support (Abuja core)',
-    services: [
-      'AC coil cleaning and condensate flush',
-      'Water heater and pressure audit',
-      'Window/door alignment & seal checks',
-      'Electrical safety sweep (RCD, sockets, breakers)',
-    ],
-    perks: ['Dust-control housekeeping playbook', 'Dedicated Abuja lead technician', 'Geo-tagged SLA tracking'],
-    geoFocus: 'Abuja metro (Wuse ⇄ Asokoro)',
-  },
-  {
-    id: 'pets-and-plant-care',
-    name: 'Pets & Plant Care Plan',
-    description:
-      'For pet owners and plant lovers who travel often. We pair pet walkers with home-care crews so your space stays fresh.',
-    monthlyPrice: '₦68,000/mo',
-    quarterlyPrice: '₦180,000/qtr',
-    cadence: 'Weekly pet walking + bi-weekly tidy + monthly AC check',
-    coverage: ['Lekki', 'Ikoyi', 'Ikeja GRA', 'Wuse 2'],
-    responseTime: 'Same-day sitter swap for travel changes',
-    services: [
-      'Pet walking/feeding schedule with GPS check-ins',
-      'Plant watering & humidity balance',
-      'Odor control and filter refresh',
-      'Quick handyman fixes during visits',
-    ],
-    perks: ['Live location pings for walkers', 'Estate/concierge coordination', 'Key handoff and access protocol management'],
-    geoFocus: 'City cores where walkers are stationed',
-  },
-]
 
 const flowConfigFactories: Record<string, (ctx: FlowContext) => JourneyConfig> = {
   'maintenance-plans': () => ({
@@ -395,11 +303,13 @@ export function ServiceJourneyPage() {
   const [requestForm, setRequestForm] = useState<RequestFormState>(() =>
     createDefaultRequestFormState(matchedService?.service?.title)
   )
-  const [selectedPlanId, setSelectedPlanId] = useState<string>(maintenancePlanBundles[0].id)
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false)
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false)
   const [redeemPoints, setRedeemPoints] = useState(0)
+  const [promotionSearch, setPromotionSearch] = useState('')
+  const [promotionFilter, setPromotionFilter] = useState<string>('all')
+  const [promotionPage, setPromotionPage] = useState(1)
 
   const resetRequestForm = useCallback(() => {
     setRequestForm(createDefaultRequestFormState(matchedService?.service?.title))
@@ -427,6 +337,10 @@ export function ServiceJourneyPage() {
     }
   }, [slug])
 
+  useEffect(() => {
+    setPromotionPage(1)
+  }, [promotionFilter, promotionSearch])
+
   if (!configFactory) {
     return null
   }
@@ -437,10 +351,34 @@ export function ServiceJourneyPage() {
     category: matchedService?.category,
   })
 
-  const selectedPlan = useMemo(
-    () => maintenancePlanBundles.find((plan) => plan.id === selectedPlanId) ?? maintenancePlanBundles[0]!,
-    [selectedPlanId]
-  )
+  const promotionTags = useMemo(() => ['all', ...Array.from(new Set(servicePlans.map((plan) => plan.tag)))], [])
+
+  const filteredPromotions = useMemo(() => {
+    const query = promotionSearch.toLowerCase().trim()
+
+    return servicePlans.filter((plan) => {
+      const matchesTag = promotionFilter === 'all' || plan.tag === promotionFilter
+      if (!query) return matchesTag
+
+      return (
+        matchesTag &&
+        (
+          plan.name.toLowerCase().includes(query) ||
+          plan.description.toLowerCase().includes(query) ||
+          plan.perks.some((perk) => perk.toLowerCase().includes(query))
+        )
+      )
+    })
+  }, [promotionFilter, promotionSearch])
+
+  const promotionPageSize = 4
+  const totalPromotionPages = Math.max(1, Math.ceil(filteredPromotions.length / promotionPageSize))
+  const currentPromotionPage = Math.min(promotionPage, totalPromotionPages)
+
+  const paginatedPromotions = useMemo(() => {
+    const start = (currentPromotionPage - 1) * promotionPageSize
+    return filteredPromotions.slice(start, start + promotionPageSize)
+  }, [filteredPromotions, currentPromotionPage])
 
   const orderedSteps = howItWorksSteps.map((step) => ({
     ...step,
@@ -470,14 +408,7 @@ export function ServiceJourneyPage() {
         return
       }
 
-      setRequestForm((prev) => ({
-        ...prev,
-        whatToRepair: selectedPlan.name,
-        issueDetails: prev.issueDetails || selectedPlan.description,
-        frequency: 'recurring',
-        geoZone: selectedPlan.coverage[0] ?? prev.geoZone,
-        city: prev.city || selectedPlan.coverage[0] || '',
-      }))
+      resetRequestForm()
       setIsRequestFormOpen(true)
       return
     }
@@ -495,24 +426,6 @@ export function ServiceJourneyPage() {
   const handleSecondaryCta = () => {
     if (!config.secondaryCta?.to) return
     navigate(config.secondaryCta.to)
-  }
-
-  const handleRequestPlan = (plan: MaintenancePlan) => {
-    if (!isAuthenticated) {
-      setIsAuthOpen(true)
-      return
-    }
-
-    setSelectedPlanId(plan.id)
-    setRequestForm((prev) => ({
-      ...prev,
-      whatToRepair: plan.name,
-      issueDetails: prev.issueDetails || plan.description,
-      frequency: 'recurring',
-      geoZone: plan.coverage[0] ?? prev.geoZone,
-      city: prev.city || plan.coverage[0] || '',
-    }))
-    setIsRequestFormOpen(true)
   }
 
   const pointsBalance = user?.pointsBalance ?? 0
@@ -728,93 +641,134 @@ export function ServiceJourneyPage() {
         {isPlanJourney && (
           <section className="container mx-auto max-w-6xl px-4 lg:px-6 xl:px-8 py-12 md:py-16">
             <div className="space-y-3 mb-8">
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Recurring plans by location</p>
-              <h2 className="text-2xl md:text-3xl font-semibold">Pick a plan that fits your zone</h2>
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Service plans & promotions</p>
+              <h2 className="text-2xl md:text-3xl font-semibold">Browse our maintenance plans</h2>
               <p className="text-sm md:text-base text-muted-foreground max-w-3xl">
-                We geo-tag crews to your neighbourhood so response times stay predictable. Choose a recurring bundle, then submit a quick brief so we can assign the right squad and schedule your cadence.
+                From one-off emergency fixes to recurring maintenance subscriptions, find the plan that fits your needs. All plans include vetted crews, transparent pricing, and our workmanship guarantee.
               </p>
             </div>
 
+            {/* Search and Filter */}
+            <div className="space-y-4 mb-8">
+              <div className="relative max-w-xl">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={promotionSearch}
+                  onChange={(e) => setPromotionSearch(e.target.value)}
+                  placeholder="Search plans or perks..."
+                  className="pl-10 h-11 rounded-xl"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {promotionTags.map((tag) => {
+                  const isActive = promotionFilter === tag
+                  const label = tag === 'all' ? 'All offers' : tag.charAt(0).toUpperCase() + tag.slice(1)
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => setPromotionFilter(tag)}
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-all border ${
+                        isActive
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-muted text-muted-foreground border-border hover:text-foreground'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {maintenancePlanBundles.map((plan) => {
-                return (
-                  <div
-                    key={plan.id}
-                    className="rounded-3xl p-6 border border-border bg-card transition-all duration-200 hover:border-primary hover:shadow-lg flex flex-col h-full"
-                  >
-                    {/* Header */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs uppercase tracking-wide text-muted-foreground">{plan.geoFocus}</span>
-                        <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
-                          {plan.responseTime}
-                        </span>
+              {paginatedPromotions.length > 0 ? (
+                paginatedPromotions.map((plan) => (
+                  <Card key={plan.id} className="border border-border/70 bg-background/80 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        {plan.badge && (
+                          <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-[10px] font-semibold px-2 py-1 mb-2">
+                            {plan.badge}
+                          </span>
+                        )}
+                        <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
                       </div>
-                      <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{plan.description}</p>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-foreground">₦{plan.price.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">{plan.period}</p>
+                        {plan.savings && <p className="text-xs text-emerald-600 mt-1">{plan.savings}</p>}
+                      </div>
                     </div>
 
-                    {/* Coverage Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {plan.coverage.map((area) => (
-                        <span key={area} className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground">
-                          {area}
-                        </span>
+                    <div className="space-y-2">
+                      {plan.perks.map((perk) => (
+                        <div key={perk} className="inline-flex items-center gap-2 text-xs text-foreground bg-muted/60 px-3 py-2 rounded-full">
+                          <BadgeCheck className="h-4 w-4 text-primary" />
+                          <span>{perk}</span>
+                        </div>
                       ))}
                     </div>
 
-                    {/* Pricing */}
-                    <div className="rounded-2xl border border-border bg-muted/30 p-4 mb-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Monthly</p>
-                          <p className="text-lg font-bold text-foreground">{plan.monthlyPrice}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-muted-foreground mb-1">Quarterly</p>
-                          <p className="text-lg font-bold text-foreground">{plan.quarterlyPrice}</p>
-                        </div>
-                      </div>
-                      <p className="text-xs text-primary font-medium mt-3">{plan.cadence}</p>
-                    </div>
-
-                    {/* Services */}
-                    <div className="mb-4">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Included focus</p>
-                      <ul className="space-y-2">
-                        {plan.services.map((item) => (
-                          <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                            <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Perks */}
-                    <div className="mb-6">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Concierge perks</p>
-                      <div className="flex flex-wrap gap-2">
-                        {plan.perks.map((perk) => (
-                          <span
-                            key={perk}
-                            className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium"
-                          >
-                            {perk}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Actions - pushed to bottom */}
-                    <div className="mt-auto">
-                      <Button className="rounded-xl w-full h-11" onClick={() => handleRequestPlan(plan)}>
-                        Get started with this plan
+                    <div className="flex items-center justify-between gap-3 mt-auto">
+                      <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                        {plan.tag} plan
+                      </span>
+                      <Button
+                        className="rounded-xl"
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            setIsAuthOpen(true)
+                            return
+                          }
+                          setRequestForm((prev) => ({
+                            ...prev,
+                            whatToRepair: plan.name,
+                            issueDetails: plan.description,
+                            frequency: 'recurring',
+                          }))
+                          setIsRequestFormOpen(true)
+                        }}
+                      >
+                        Request this plan
                       </Button>
                     </div>
-                  </div>
-                )
-              })}
+                  </Card>
+                ))
+              ) : (
+                <div className="md:col-span-2 text-center py-10 border border-dashed border-border/70 rounded-2xl">
+                  <p className="text-muted-foreground mb-2">No plans match your search.</p>
+                  <p className="text-sm text-muted-foreground">Try a different keyword or clear filters.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex items-center justify-between gap-4 mt-8">
+              <p className="text-sm text-muted-foreground">
+                Page {currentPromotionPage} of {totalPromotionPages}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  disabled={currentPromotionPage === 1}
+                  onClick={() => setPromotionPage((prev) => Math.max(1, prev - 1))}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  disabled={currentPromotionPage >= totalPromotionPages}
+                  onClick={() => setPromotionPage((prev) => Math.min(totalPromotionPages, prev + 1))}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </div>
           </section>
         )}
@@ -916,16 +870,11 @@ export function ServiceJourneyPage() {
                 <div className="mt-4 rounded-2xl border border-primary/20 bg-primary/5 p-4 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs uppercase tracking-wide text-primary font-semibold">Selected plan</p>
-                    <span className="text-xs font-semibold text-primary/80">{selectedPlan.geoFocus}</span>
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="text-base font-semibold text-foreground">{selectedPlan.name}</p>
-                      <p className="text-xs text-muted-foreground">{selectedPlan.cadence}</p>
-                    </div>
-                    <div className="text-right text-sm">
-                      <p className="font-semibold text-foreground">{selectedPlan.monthlyPrice}</p>
-                      <p className="text-xs text-muted-foreground">{selectedPlan.quarterlyPrice} quarterly</p>
+                      <p className="text-base font-semibold text-foreground">{requestForm.whatToRepair}</p>
+                      <p className="text-xs text-muted-foreground">{requestForm.issueDetails}</p>
                     </div>
                   </div>
                 </div>

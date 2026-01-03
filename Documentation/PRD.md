@@ -51,6 +51,10 @@ JulaazNG is a mobile-first web application that serves as Nigeria's premier prop
 - **Flexible Leasing Terms:** Properties can advertise monthly, quarterly, six-month, or annual terms; property cards and details show the allowed terms (compressed when many), and viewing requests must pick an allowed term.
 - **Marketing Surfaces:** Home, landlord, and handyman dashboards include tiles highlighting ratings/points incentives and flexible rent terms; home quick links now route distinctly to Services, Artisans, and Property Management.
 - **Admin Oversight:** Admin dashboard adds ratings/loyalty health cards plus a recent points ledger with user, action (earn/redeem), and rating context.
+- **Resilience & Recovery:** Dedicated 404/not-found page with creative recovery actions (home, services, properties), URL search-to-navigate, and support CTA; router now sends unknown paths here instead of silent redirects.
+- **Backend Mock Data Hygiene:** Demo user seed data is centralized in prisma/seeds/mock-data.ts; inline sample credentials removed from the seed script to keep fixtures in one place.
+- **Frontend Mock Consolidation:** All UI sample data now lives in frontend/src/__mocks__/ (no inline blobs in page components), keeping fixtures centralized and API-shaped for easy backend handoff.
+- **Request-to-Rent Workflow:** Property details now expose a Request-to-Rent CTA that captures move-in window, preferred lease term, budget, verification status, and contact preference; submissions create a tracked request (status: new → reviewing → scheduled → accepted/declined), notify landlords/admin, and auto-open a conversation thread for next actions.
 
 ---
 
@@ -362,6 +366,7 @@ Projected Annual Revenue: ₦800,000,000+ (~$1.71M)
 - **Rental Booking**
   - Viewing appointment scheduling
   - Required rent-term selection during viewing requests, limited to the listing’s allowed terms.
+  - Request-to-Rent submissions from property details capturing move-in window, preferred lease term, budget, verification status, and contact preference; request statuses progress through new → reviewing → scheduled → accepted/declined with notifications to landlord/admin and an auto-created conversation thread.
   - Application submission
   - Document upload
   - Agreement signing

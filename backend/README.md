@@ -3,6 +3,10 @@
 ## 🎯 Overview
 Production-ready NestJS + TypeScript backend API for JulaazNG - Nigeria's comprehensive property rental and services marketplace platform.
 
+## 🆕 January 2026 Updates
+- **Request-to-Rent API Surface:** Capture tenant intent from property details with fields for move-in window, preferred lease term, budget, verification status, and contact preference. Requests progress through `new → reviewing → scheduled → accepted/declined`, trigger landlord/admin notifications, and auto-create a conversation thread for follow-up.
+- **Mock Data Hygiene:** Demo credentials live in `prisma/seeds/mock-data.ts`; frontend sample fixtures are centralized in `frontend/src/__mocks__` (no inline sample blobs in page components). Use these sources when demoing or developing without the API.
+
 ## 🏗️ Architecture
 This project uses **Domain-Driven Design (DDD)** with **Clean Architecture** principles:
 - **Clear separation** between business logic and infrastructure
@@ -53,10 +57,12 @@ This project uses **Domain-Driven Design (DDD)** with **Clean Architecture** pri
 ## 🔐 Multi-Role Authentication Expectations
 - Authentication responses must include the complete list of user roles (`roles: UserRole[]`) and the most recent `preferredRole`.
 - All protected routes expect clients to send `X-Active-Role` header containing one of the user's assigned roles; middleware should enforce the mapping between header and stored roles.
-- Seed script (`npm run prisma:seed`) provisions demo accounts:
+- Seed script (`npm run prisma:seed`) provisions demo accounts (fixtures live in prisma/seeds/mock-data.ts):
   - `tenant@julaaz.com` / `tenant123` → Tenant
   - `landlord@julaaz.com` / `landlord123` → Landlord
   - `hybrid@julaaz.com` / `hybrid123` → Tenant + Landlord
+  - `homerunner@julaaz.com` / `homerunner123` → Homerunner
+  - `admin@julaaz.com` / `admin123` → Admin
 - Update authorization guards to read the active role from the header rather than a single-role field.
 
 ## 📁 Project Structure

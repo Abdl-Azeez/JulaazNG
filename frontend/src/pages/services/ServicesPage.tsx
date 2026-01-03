@@ -43,9 +43,7 @@ const testimonials = [
     name: 'Anita Okon',
     role: 'Landlord • Victoria Island',
     badge: 'Multi-unit portfolio',
-    avatar: 'AO',
-    statsTitle: '4.9★ satisfaction',
-    statsCaption: 'From 8,000+ verified jobs',
+    avatar: 'AO'
   },
   {
     id: 'facility-ops',
@@ -54,9 +52,7 @@ const testimonials = [
     name: 'Uche Eze',
     role: 'Facility Ops Lead • Lekki',
     badge: 'Estates & FM',
-    avatar: 'UE',
-    statsTitle: '30% faster turnarounds',
-    statsCaption: 'Across preventive and emergency jobs',
+    avatar: 'UE'
   },
   {
     id: 'tenant-comfort',
@@ -65,9 +61,7 @@ const testimonials = [
     name: 'Moyin Ola',
     role: 'Tenant • Yaba',
     badge: 'Everyday fixes',
-    avatar: 'MO',
-    statsTitle: '24/7 coverage',
-    statsCaption: 'Concierge support for urgent calls',
+    avatar: 'MO'
   },
 ]
 
@@ -213,7 +207,7 @@ export function ServicesPage() {
                   className="rounded-[12px] h-12 px-6"
                   onClick={() => navigate(ROUTES.SERVICE_MAINTENANCE_PLANS)}
                 >
-                  Check out our plans
+                  Check out our promotions
                 </Button>
               </div>
               <div className="flex flex-wrap gap-3 pt-4">
@@ -311,7 +305,7 @@ export function ServicesPage() {
                     </div>
                     <div>
                       <p className="text-lg font-bold text-foreground">8,000+</p>
-                      <p className="text-xs">verified jobs</p>
+                      <p className="text-xs">completed services</p>
                     </div>
                     <div>
                       <p className="text-lg font-bold text-foreground">24/7</p>
