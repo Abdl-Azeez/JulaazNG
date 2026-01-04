@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LayoutGrid, List, ShieldCheck, Sparkles, Wrench, Home, Building2, ArrowRight, Clock, CreditCard } from 'lucide-react'
+import { LayoutGrid, List, ShieldCheck, Sparkles, Home, Building2, ArrowRight, Clock, CreditCard, Gift } from 'lucide-react'
 import { Header } from '@/widgets/header'
 import { Footer } from '@/widgets/footer'
 import { SearchBar } from '@/widgets/search-bar'
@@ -147,7 +147,7 @@ export function HomePage() {
                       {
                         icon: Home,
                         title: 'Rentals',
-                        subtitle: 'Monthly–Annual + Shortlet',
+                        subtitle: 'Find Your Space',
                         color: 'from-blue-500/20 to-blue-500/5',
                         borderColor: 'border-blue-500/30',
                         iconColor: 'text-blue-600',
@@ -156,29 +156,29 @@ export function HomePage() {
                       {
                         icon: Sparkles,
                         title: 'Services',
-                        subtitle: 'Cleaning & Moving',
+                        subtitle: 'Trusted Artisans',
                         color: 'from-purple-500/20 to-purple-500/5',
                         borderColor: 'border-purple-500/30',
                         iconColor: 'text-purple-600',
                         onClick: () => navigate(ROUTES.SERVICES),
                       },
                       {
-                        icon: Wrench,
-                        title: 'Artisans',
-                        subtitle: 'Plumbing & Electrical',
+                        icon: Building2,
+                        title: 'Landlord',
+                        subtitle: 'List & Manage',
                         color: 'from-amber-500/20 to-amber-500/5',
                         borderColor: 'border-amber-500/30',
                         iconColor: 'text-amber-600',
-                        onClick: () => navigate(ROUTES.ARTISANS),
+                        onClick: () => navigate(ROUTES.DASHBOARD_LANDLORD),
                       },
                       {
-                        icon: Building2,
-                        title: 'Management',
-                        subtitle: 'Property Care',
+                        icon: Gift,
+                        title: 'Rewards',
+                        subtitle: 'Earn Points',
                         color: 'from-emerald-500/20 to-emerald-500/5',
                         borderColor: 'border-emerald-500/30',
                         iconColor: 'text-emerald-600',
-                        onClick: () => navigate(ROUTES.PROPERTY_MANAGEMENT),
+                        onClick: () => navigate(ROUTES.PROFILE),
                       },
                     ].map((service) => (
                       <button
@@ -342,10 +342,10 @@ export function HomePage() {
                     {/* Service Quick Links */}
                     <div className="grid grid-cols-2 gap-3 pt-2">
                       {[
-                        { icon: Home, label: 'Rentals', desc: 'Monthly–Annual + Shortlet', route: ROUTES.PROPERTIES, color: 'from-blue-500/20 to-blue-500/5 border-blue-500/30' },
-                        { icon: Sparkles, label: 'Services', desc: 'Cleaning & Moving', route: ROUTES.SERVICES, color: 'from-purple-500/20 to-purple-500/5 border-purple-500/30' },
-                        { icon: Wrench, label: 'Artisans', desc: 'Plumbing & Electrical', route: ROUTES.ARTISANS, color: 'from-amber-500/20 to-amber-500/5 border-amber-500/30' },
-                        { icon: Building2, label: 'Management', desc: 'Property Care', route: ROUTES.PROPERTY_MANAGEMENT, color: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30' },
+                        { icon: Home, label: 'Rentals', desc: 'Find Your Space', route: ROUTES.PROPERTIES, color: 'from-blue-500/20 to-blue-500/5 border-blue-500/30' },
+                        { icon: Sparkles, label: 'Services', desc: 'Trusted Artisans', route: ROUTES.SERVICES, color: 'from-purple-500/20 to-purple-500/5 border-purple-500/30' },
+                        { icon: Building2, label: 'Landlord', desc: 'List & Manage', route: ROUTES.DASHBOARD_LANDLORD, color: 'from-amber-500/20 to-amber-500/5 border-amber-500/30' },
+                        { icon: Gift, label: 'Rewards', desc: 'Earn Points', route: ROUTES.PROFILE, color: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30' },
                       ].map((service) => (
                         <button
                           key={service.label}
