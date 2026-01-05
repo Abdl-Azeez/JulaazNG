@@ -69,6 +69,7 @@ export const ROUTES = {
   ADMIN_PROPERTY_DETAILS: (id: string) => `/admin/properties/${id}`,
   ADMIN_SERVICES: '/admin/services',
   ADMIN_APPROVALS: '/admin/approvals',
+  ADMIN_APPLICATIONS: '/admin/applications',
   ADMIN_ANALYTICS: '/admin/analytics',
   ADMIN_PAYMENTS: '/admin/payments',
   ADMIN_DISPUTES: '/admin/disputes',

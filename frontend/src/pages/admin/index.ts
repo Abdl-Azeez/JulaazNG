@@ -1,5 +1,6 @@
 export { AdminDashboardPage } from './AdminDashboardPage'
 export { AdminApprovalsPage } from './AdminApprovalsPage'
+export { AdminApplicationsPage } from './applications/AdminApplicationsPage'
 export { AdminAnalyticsPage } from './AdminAnalyticsPage'
 export { AdminUsersPage } from './users'
 export { AdminPropertiesPage, AdminPropertyDetailsPage } from './properties'

@@ -93,6 +93,14 @@ interface PropertyApplication {
     phoneNumber: string
     avatar?: string
   }
+  landlord?: {
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    avatar?: string
+  }
   property?: {
     id: string
     title: string
@@ -186,6 +194,14 @@ export const mockLandlordApplications: PropertyApplication[] = [
       phoneNumber: mockUsers.tenant1.phoneNumber,
       avatar: mockUsers.tenant1.profilePicture,
     },
+    landlord: {
+      id: mockUsers.landlord1.id,
+      firstName: mockUsers.landlord1.firstName,
+      lastName: mockUsers.landlord1.lastName,
+      email: mockUsers.landlord1.email,
+      phoneNumber: mockUsers.landlord1.phoneNumber,
+      avatar: mockUsers.landlord1.profilePicture,
+    },
     property: {
       id: 'prop_001',
       title: 'Luxury 3BR Apartment in Marina',
@@ -216,6 +232,14 @@ export const mockLandlordApplications: PropertyApplication[] = [
       email: 'folake.adeleke@example.com',
       phoneNumber: '+2348098765432',
       avatar: 'https://i.pravatar.cc/150?img=45',
+    },
+    landlord: {
+      id: mockUsers.landlord1.id,
+      firstName: mockUsers.landlord1.firstName,
+      lastName: mockUsers.landlord1.lastName,
+      email: mockUsers.landlord1.email,
+      phoneNumber: mockUsers.landlord1.phoneNumber,
+      avatar: mockUsers.landlord1.profilePicture,
     },
     property: {
       id: 'prop_001',

@@ -1203,11 +1203,30 @@ export interface AdminUserItem {
   rating: number
   joinedAt: string
   lastActive: string
+  // Tenant Analytics
   propertiesCount?: number
   bookingsCount?: number
   viewingsRequested?: number
+  viewingsSuccessful?: number
+  servicesRequested?: number
   currentRentals?: number
   shortletsUsed?: number
+  totalSpent?: number
+  activeLeases?: number
+  
+  // Landlord Analytics
+  totalApplicationsReceived?: number
+  occupancyRate?: number
+  totalEarnings?: number
+  maintenanceRequests?: number
+
+  // Homerunner Analytics
+  totalHomerunnerEarnings?: number
+
+  // Handyman/Service Provider Analytics
+  jobsCompleted?: number
+  repeatClients?: number
+
   badgeInfo?:
     | {
         type: 'handyman'
@@ -1238,6 +1257,10 @@ export const adminUsersList: AdminUserItem[] = [
     lastActive: '2 hours ago',
     bookingsCount: 3,
     viewingsRequested: 12,
+    viewingsSuccessful: 5,
+    servicesRequested: 8,
+    totalSpent: 4500000,
+    activeLeases: 1,
     currentRentals: 1,
     shortletsUsed: 2,
     backgroundCheck: {
@@ -1263,6 +1286,10 @@ export const adminUsersList: AdminUserItem[] = [
     joinedAt: '2023-11-20',
     lastActive: '1 day ago',
     propertiesCount: 5,
+    totalApplicationsReceived: 45,
+    occupancyRate: 85,
+    totalEarnings: 12500000,
+    maintenanceRequests: 12,
     backgroundCheck: {
       status: 'completed',
       progress: 100,
@@ -1284,6 +1311,7 @@ export const adminUsersList: AdminUserItem[] = [
     rating: 4.6,
     joinedAt: '2024-02-01',
     lastActive: '30 minutes ago',
+    totalHomerunnerEarnings: 450000,
     badgeInfo: {
       type: 'homerunner',
       metrics: {
@@ -1341,6 +1369,8 @@ export const adminUsersList: AdminUserItem[] = [
     rating: 4.2,
     joinedAt: '2023-12-05',
     lastActive: '3 days ago',
+    jobsCompleted: 64,
+    repeatClients: 15,
     badgeInfo: {
       type: 'handyman',
       metrics: {
@@ -1370,6 +1400,8 @@ export const adminUsersList: AdminUserItem[] = [
     rating: 4.9,
     joinedAt: '2024-01-28',
     lastActive: '1 hour ago',
+    jobsCompleted: 120,
+    repeatClients: 45,
     backgroundCheck: {
       status: 'completed',
       progress: 100,

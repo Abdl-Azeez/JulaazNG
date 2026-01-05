@@ -183,6 +183,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       roles: ['admin'],
     },
     {
+      icon: FileText,
+      label: 'Applications',
+      path: ROUTES.ADMIN_APPLICATIONS,
+      requiresAuth: true,
+      roles: ['admin'],
+    },
+    {
       icon: BarChart3,
       label: 'Analytics',
       path: ROUTES.ADMIN_ANALYTICS,

@@ -107,10 +107,8 @@ export function LandlordEarningsPage() {
   }, [financialSummary])
 
   const recentTransactions = useMemo(() => {
-    return incomeExpenseEntries
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 10)
-  }, [incomeExpenseEntries])
+    return filteredTransactions.slice(0, 10)
+  }, [filteredTransactions])
 
   const handleMenuClick = () => setIsSidebarOpen(true)
   const handleProfileClick = () => {
@@ -695,7 +693,7 @@ export function LandlordEarningsPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/40">
-                        {filteredTransactions.map((transaction) => (
+                        {recentTransactions.map((transaction) => (
                           <tr key={transaction.id} className="hover:bg-muted/20 transition-colors">
                             <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
                               {format(new Date(transaction.date), 'MMM d, yyyy')}
@@ -733,7 +731,7 @@ export function LandlordEarningsPage() {
                             </td>
                           </tr>
                         ))}
-                        {filteredTransactions.length === 0 && (
+                        {recentTransactions.length === 0 && (
                           <tr>
                             <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                               No transactions found for the selected filter.

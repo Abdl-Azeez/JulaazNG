@@ -146,6 +146,7 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
       return [
         { icon: ShieldCheck, label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD },
         { icon: CheckCircle, label: 'Approvals', path: ROUTES.ADMIN_APPROVALS },
+        { icon: FileText, label: 'Applications', path: ROUTES.ADMIN_APPLICATIONS },
         { icon: BarChart3, label: 'Analytics', path: ROUTES.ADMIN_ANALYTICS },
         { icon: Users, label: 'Users', path: ROUTES.ADMIN_USERS },
         { icon: Building2, label: 'Properties', path: ROUTES.ADMIN_PROPERTIES },

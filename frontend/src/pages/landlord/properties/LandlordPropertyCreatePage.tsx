@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
@@ -21,7 +21,21 @@ import {
   SelectValue,
 } from '@/shared/ui/select'
 import { cn } from '@/shared/lib/utils/cn'
-import { Upload, CheckCircle2, Building2, Video, Sparkles, ArrowLeft } from 'lucide-react'
+import {
+  Upload,
+  CheckCircle2,
+  Building2,
+  Video,
+  Sparkles,
+  ArrowLeft,
+  MapPin,
+  Home,
+  ShieldCheck,
+  Coins,
+  Image as ImageIcon,
+  Info,
+  CalendarRange,
+} from 'lucide-react'
 
 type StepKey = 'address' | 'details' | 'pricing' | 'media' | 'summary'
 
@@ -167,6 +181,7 @@ export function LandlordPropertyCreatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmAccurate, setConfirmAccurate] = useState(false)
   const [nearbyCustom, setNearbyCustom] = useState('')
+  const stepContentRef = useRef<HTMLDivElement | null>(null)
 
   const currentStepIndex = useMemo(() => stepOrder.indexOf(step), [step])
 
@@ -221,14 +236,31 @@ export function LandlordPropertyCreatePage() {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (!files) return
-    const selectedFiles = Array.from(files).slice(0, 4)
-    const mapped = selectedFiles.map((file) => ({
-      id: `${file.name}-${file.size}-${file.lastModified}`,
-      url: URL.createObjectURL(file),
-      file,
-    }))
-    setForm((prev) => ({ ...prev, images: mapped }))
+    if (!files || files.length === 0) return
+
+    const incomingFiles = Array.from(files)
+    setForm((prev) => {
+      const existing = prev.images ?? []
+      const existingIds = new Set(existing.map((image) => image.id))
+      const newImages = incomingFiles.reduce<Array<{ id: string; url: string; file: File }>>((acc, file) => {
+        const id = `${file.name}-${file.size}-${file.lastModified}`
+        if (existingIds.has(id)) {
+          return acc
+        }
+        acc.push({
+          id,
+          url: URL.createObjectURL(file),
+          file,
+        })
+        return acc
+      }, [])
+      return {
+        ...prev,
+        images: [...existing, ...newImages],
+      }
+    })
+
+    event.target.value = ''
   }
 
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,6 +283,29 @@ export function LandlordPropertyCreatePage() {
     })
   }, [form.utilities])
 
+  const propertyUseLabel = useMemo(() => {
+    return form.propertyUse.charAt(0).toUpperCase() + form.propertyUse.slice(1)
+  }, [form.propertyUse])
+
+  const formattedRentAmount = useMemo(() => {
+    if (!form.rentAmount) return 'Not provided'
+    const numeric = Number(form.rentAmount)
+    if (Number.isNaN(numeric)) return form.rentAmount
+    return `₦${numeric.toLocaleString('en-NG')}`
+  }, [form.rentAmount])
+
+  const carparkLabel = useMemo(() => {
+    if (!form.carpark) return 'Parking not specified'
+    if (form.carpark === '0') return 'No dedicated parking'
+    if (form.carpark === '1') return '1 Carpark'
+    return `${form.carpark} Carparks`
+  }, [form.carpark])
+
+  const preferredPaymentLabel = useMemo(() => {
+    const match = preferredPaymentOptions.find((option) => option.value === form.preferredPayment)
+    return match?.label ?? 'Not specified'
+  }, [form.preferredPayment])
+
   useEffect(() => {
     setForm((prev) => {
       if (prev.propertyUse === 'shortlet' && !prev.allowShortlet) {
@@ -262,6 +317,20 @@ export function LandlordPropertyCreatePage() {
       return prev
     })
   }, [form.propertyUse])
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    const container = stepContentRef.current
+    if (!container) return
+    const firstInteractive = container.querySelector<HTMLElement>(
+      'input:not([type="hidden"]), select, textarea, button'
+    )
+    if (firstInteractive) {
+      requestAnimationFrame(() => {
+        firstInteractive.focus({ preventScroll: true })
+      })
+    }
+  }, [step])
 
   const goNext = () => {
     if (currentStepIndex === stepOrder.length - 1) return
@@ -347,7 +416,10 @@ export function LandlordPropertyCreatePage() {
           </div>
 
           {/* Step content */}
-          <div className="rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg p-6 space-y-6">
+          <div
+            ref={stepContentRef}
+            className="rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg p-6 space-y-6"
+          >
             {step === 'address' && (
               <div className="space-y-4">
                 <div>
@@ -803,57 +875,203 @@ export function LandlordPropertyCreatePage() {
             )}
 
             {step === 'summary' && (
-              <div className="space-y-5">
-                <div className="space-y-2">
-                  <h2 className="text-base font-semibold text-foreground">Summary</h2>
-                  <p className="text-sm text-muted-foreground">
-                    Ensure all details are accurate. Once submitted, the listing will be queued for Julaaz inspection
-                    before going live.
-                  </p>
-                </div>
-                <div className="space-y-3 text-sm text-muted-foreground">
-                  <div>
-                    <h3 className="font-semibold text-foreground">Address</h3>
-                    <p>{form.propertyName}</p>
-                    <p>{form.address}</p>
-                    <p>{form.postcode}</p>
+              <div className="space-y-6">
+                <div className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-surface/95 to-background p-6 shadow-xl space-y-5">
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-primary">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Listing Preview</span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Details</h3>
-                    <p>Listing type: {form.propertyUse.charAt(0).toUpperCase() + form.propertyUse.slice(1)}</p>
-                    <p>{form.propertyType} • {form.bedrooms} • {form.bathrooms}</p>
-                    <p>{form.buildUpSize ? `${form.buildUpSize} sqft` : 'Size not provided'}</p>
-                    <p>Furnishing: {form.furnishing}</p>
-                    <p>Facilities: {form.facilities.length ? form.facilities.join(', ') : 'None selected'}</p>
-                    <p>
-                      Utilities: Electricity {form.utilities.electricity}
-                      {form.utilities.electricity !== 'No' && form.electricityType ? ` (${electricityTypeOptions.find(e => e.value === form.electricityType)?.label})` : ''},
-                      Water {form.utilities.water}, Internet {form.utilities.internet}, Security {form.utilities.security}
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-semibold text-foreground">
+                        {form.propertyName || 'Untitled Property'}
+                      </h2>
+                      <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>{form.address || 'Address will be added before publishing'}</span>
+                        {form.postcode && (
+                          <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground/80">
+                            • {form.postcode}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] shadow">
+                        <Home className="h-4 w-4" />
+                        <span>{propertyUseLabel}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/80 px-4 py-1 text-xs font-semibold text-foreground">
+                        {form.propertyType}
+                      </span>
+                      {form.propertyUse !== 'hotel' && (
+                        <span
+                          className={cn(
+                            'inline-flex items-center gap-2 rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.15em] border',
+                            form.allowShortlet
+                              ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
+                              : 'border-amber-200 bg-amber-100 text-amber-700'
+                          )}
+                        >
+                          <Sparkles className="h-3.5 w-3.5" />
+                          <span>{form.allowShortlet ? 'Shortlet Enabled' : 'Long-term Focus'}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {[
+                      { label: 'Bedrooms', value: form.bedrooms || 'Not set' },
+                      { label: 'Bathrooms', value: form.bathrooms || 'Not set' },
+                      { label: 'Parking', value: carparkLabel },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-2xl border border-border/60 bg-background/80 px-4 py-3 shadow-sm"
+                      >
+                        <p className="text-sm font-semibold text-foreground">{item.value}</p>
+                        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">{item.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-border/60 bg-background/90 p-5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      <Info className="h-4 w-4 text-primary" />
+                      <span>Property Overview</span>
+                    </div>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p>
+                        {form.buildUpSize
+                          ? `${form.buildUpSize} sqft of living space`
+                          : 'Build-up size not provided yet'}
+                      </p>
+                      <p>{form.floorLevel ? `Located on ${form.floorLevel}` : 'Floor level not specified'}</p>
+                      <p>
+                        Nearby highlights:
+                        {form.nearby.length ? '' : ' None added'}
+                      </p>
+                    </div>
+                    {form.nearby.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {form.nearby.map((place) => (
+                          <span
+                            key={place}
+                            className="inline-flex items-center rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-xs font-medium text-foreground"
+                          >
+                            {place}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="rounded-2xl border border-border/60 bg-background/90 p-5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      <ShieldCheck className="h-4 w-4 text-primary" />
+                      <span>Utilities & Comfort</span>
+                    </div>
+                    <div className="grid gap-2 text-sm">
+                      {Object.entries(form.utilities).map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex items-center justify-between rounded-2xl border border-border/40 bg-muted/20 px-3 py-2"
+                        >
+                          <span className="uppercase tracking-[0.15em] text-xs text-muted-foreground">{key}</span>
+                          <span className="font-medium text-foreground">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {form.utilities.electricity !== 'No' && form.electricityType && (
+                      <p className="text-xs text-muted-foreground">
+                        Electricity source: {electricityTypeOptions.find((option) => option.value === form.electricityType)?.label}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {form.facilities.length ? (
+                        form.facilities.map((facility) => (
+                          <span
+                            key={facility}
+                            className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                          >
+                            {facility}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          Add headline facilities to boost tenant interest.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-border/60 bg-background/90 p-5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      <Coins className="h-4 w-4 text-primary" />
+                      <span>Pricing & Payments</span>
+                    </div>
+                    <div className="grid gap-3">
+                      <div className="rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3">
+                        <p className="text-2xl font-semibold text-primary">{formattedRentAmount}</p>
+                        <p className="text-xs uppercase tracking-[0.2em] text-primary/80">Annual Rent</p>
+                      </div>
+                      <div className="rounded-2xl border border-border/40 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          <CalendarRange className="h-4 w-4 text-primary" />
+                          <span className="font-medium text-foreground">Preferred Tenancy</span>
+                        </div>
+                        <p className="mt-2">
+                          {form.tenancyDurations.length ? form.tenancyDurations.join(', ') : 'Not specified yet'}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                        <span className="inline-flex items-center rounded-full border border-border/40 bg-background/80 px-3 py-1">
+                          Payment cadence: {preferredPaymentLabel}
+                        </span>
+                        <span className="inline-flex items-center rounded-full border border-border/40 bg-background/80 px-3 py-1">
+                          {form.negotiable ? 'Open to negotiation' : 'Fixed rate'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-border/60 bg-background/90 p-5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      <ImageIcon className="h-4 w-4 text-primary" />
+                      <span>Media & Availability</span>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                      <span className="inline-flex items-center gap-2 rounded-2xl border border-border/40 bg-muted/20 px-3 py-2">
+                        <ImageIcon className="h-4 w-4 text-primary" />
+                        <span>{form.images.length} photo(s) uploaded</span>
+                      </span>
+                      <span className="inline-flex items-center gap-2 rounded-2xl border border-border/40 bg-muted/20 px-3 py-2">
+                        <Video className="h-4 w-4 text-primary" />
+                        <span>{form.video ? 'Video tour attached' : 'No video yet'}</span>
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Arrange images in your preferred order. Videos appear last in the gallery carousel.
                     </p>
-                    <p>Nearby (within 2km): {form.nearby.length ? form.nearby.join(', ') : 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Pricing</h3>
-                    <p>Annual rent: ₦{form.rentAmount || '0'}{form.negotiable ? ' (Negotiable)' : ''}</p>
-                    <p>Preferred payment: {preferredPaymentOptions.find(p => p.value === form.preferredPayment)?.label || 'Not specified'}</p>
-                    <p>Preferred tenancy: {form.tenancyDurations.length ? form.tenancyDurations.join(', ') : 'Not specified'}</p>
-                    <p>Shortlet ready: {form.propertyUse === 'hotel' ? 'Not applicable' : form.allowShortlet ? 'Yes' : 'No'}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Media</h3>
-                    <p>{form.images.length} photo(s) uploaded • {form.video ? '1 video attached' : 'No video'}</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs uppercase text-muted-foreground">Listing description</Label>
+
+                <div className="rounded-3xl border border-border/60 bg-background/90 p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs uppercase text-muted-foreground">Listing Description</Label>
+                    <span className="text-xs text-muted-foreground/80">Tell your property's story</span>
+                  </div>
                   <Textarea
                     placeholder="Write a detailed description highlighting amenities, neighbourhood, policies…"
                     value={form.description}
                     onChange={(e) => setField('description', e.target.value)}
-                    className="min-h-[140px] resize-none rounded-2xl"
+                    className="min-h-[160px] resize-none rounded-2xl border border-border/40 bg-muted/20"
                   />
                 </div>
-                <div className="flex items-start gap-3 rounded-2xl border-2 border-border/60 bg-muted/40 p-4 hover:bg-muted/60 hover:border-primary/20 transition-all">
+
+                <div className="flex items-start gap-3 rounded-3xl border-2 border-primary/30 bg-primary/5 p-4 shadow-sm transition-all hover:border-primary/50 hover:bg-primary/10">
                   <Checkbox
                     id="confirm-accurate"
                     checked={confirmAccurate}
@@ -868,7 +1086,7 @@ export function LandlordPropertyCreatePage() {
                   </Label>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 text-sm text-primary">
+                <div className="rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 text-sm text-primary shadow-inner">
                   <p>
                     After submission, a Julaaz inspector will review the property physically. Once approved, the listing
                     will appear in the marketplace. You’ll receive updates in Notifications & Messages.

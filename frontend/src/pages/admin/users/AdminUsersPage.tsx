@@ -46,7 +46,21 @@ import {
   AlertCircle,
   Download,
   Sparkles,
+  Wallet,
+  Wrench,
+  CheckCircle2,
+  Percent,
 } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/ui/table'
+import { mockIncomeExpenseEntries, earningSnapshots, mockLandlordProperties } from '@/__mocks__/data/landlord.mock'
+import { format } from 'date-fns'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
@@ -1079,6 +1093,7 @@ export function AdminUsersPage() {
 
                 {/* Role-specific Stats */}
                 {selectedUser.role === 'tenant' && (
+                  <>
                   <Card className="p-4 rounded-xl border border-border/60">
                     <h4 className="text-sm font-semibold mb-3">Tenant Activity</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -1088,32 +1103,212 @@ export function AdminUsersPage() {
                         <p className="text-xs text-muted-foreground">Viewings Requested</p>
                       </div>
                       <div className="text-center p-3 rounded-lg bg-muted/50">
-                        <Home className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">{selectedUser.viewingsSuccessful ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Successful Viewings</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Wrench className="h-5 w-5 mx-auto mb-1 text-amber-600" />
+                        <p className="text-xl font-bold">{selectedUser.servicesRequested ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Services Requested</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Home className="h-5 w-5 mx-auto mb-1 text-purple-600" />
                         <p className="text-xl font-bold">{selectedUser.currentRentals ?? 0}</p>
                         <p className="text-xs text-muted-foreground">Current Rentals</p>
                       </div>
                       <div className="text-center p-3 rounded-lg bg-muted/50">
-                        <Calendar className="h-5 w-5 mx-auto mb-1 text-purple-600" />
+                        <FileText className="h-5 w-5 mx-auto mb-1 text-indigo-600" />
+                        <p className="text-xl font-bold">{selectedUser.activeLeases ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Active Leases</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Calendar className="h-5 w-5 mx-auto mb-1 text-pink-600" />
                         <p className="text-xl font-bold">{selectedUser.shortletsUsed ?? 0}</p>
                         <p className="text-xs text-muted-foreground">Shortlets Used</p>
                       </div>
                       <div className="text-center p-3 rounded-lg bg-muted/50">
-                        <FileText className="h-5 w-5 mx-auto mb-1 text-amber-600" />
+                        <FileText className="h-5 w-5 mx-auto mb-1 text-cyan-600" />
                         <p className="text-xl font-bold">{selectedUser.bookingsCount ?? 0}</p>
                         <p className="text-xs text-muted-foreground">Total Bookings</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Wallet className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">₦{(selectedUser.totalSpent ?? 0).toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">Total Spent</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 rounded-xl border border-border/60 mt-4">
+                    <h4 className="text-sm font-semibold mb-3">Payment History & Schedule</h4>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {earningSnapshots.slice(0, 5).map((payment, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{format(new Date(payment.paidDate || payment.dueDate), 'MMM d, yyyy')}</TableCell>
+                            <TableCell className="capitalize">{payment.bookingType} Booking</TableCell>
+                            <TableCell>₦{payment.amount.toLocaleString()}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className={`capitalize ${payment.status === 'received' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : ''}`}>
+                                {payment.status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                  </>
+                )}
+
+                {selectedUser.role === 'landlord' && (
+                  <>
+                  <Card className="p-4 rounded-xl border border-border/60">
+                    <h4 className="text-sm font-semibold mb-3">Landlord Analytics</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Building2 className="h-5 w-5 mx-auto mb-1 text-purple-600" />
+                        <p className="text-xl font-bold">{selectedUser.propertiesCount ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Listed Properties</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <FileText className="h-5 w-5 mx-auto mb-1 text-blue-600" />
+                        <p className="text-xl font-bold">{selectedUser.totalApplicationsReceived ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Applications Received</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Percent className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">{selectedUser.occupancyRate ?? 0}%</p>
+                        <p className="text-xs text-muted-foreground">Occupancy Rate</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Wrench className="h-5 w-5 mx-auto mb-1 text-amber-600" />
+                        <p className="text-xl font-bold">{selectedUser.maintenanceRequests ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Maintenance Requests</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50 col-span-2">
+                        <Wallet className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">₦{(selectedUser.totalEarnings ?? 0).toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">Total Earnings</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 rounded-xl border border-border/60 mt-4">
+                    <h4 className="text-sm font-semibold mb-3">Properties</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {mockLandlordProperties.map((property) => (
+                        <div key={property.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <img src={property.image} alt={property.name} className="w-16 h-16 rounded-lg object-cover" />
+                          <div>
+                            <p className="font-medium text-sm line-clamp-1">{property.name}</p>
+                            <p className="text-xs text-muted-foreground line-clamp-1">{property.location}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className={cn(
+                                  "text-[10px] h-5 px-1.5 capitalize",
+                                  property.status === 'active' && "bg-emerald-100 text-emerald-700 border-emerald-200",
+                                  property.status === 'rented' && "bg-blue-100 text-blue-700 border-blue-200",
+                                  property.status === 'inactive' && "bg-gray-100 text-gray-700 border-gray-200"
+                                )}>
+                                    {property.status}
+                                </Badge>
+                                <span className="text-xs font-medium">{property.priceLabel}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 rounded-xl border border-border/60 mt-4">
+                    <h4 className="text-sm font-semibold mb-3">Income & Expenditure</h4>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Property</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Amount</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockIncomeExpenseEntries.slice(0, 5).map((entry) => (
+                          <TableRow key={entry.id}>
+                            <TableCell>{format(new Date(entry.date), 'MMM d, yyyy')}</TableCell>
+                            <TableCell className="max-w-[150px] truncate" title={entry.propertyName}>{entry.propertyName}</TableCell>
+                            <TableCell>{entry.description}</TableCell>
+                            <TableCell>
+                              <Badge variant={entry.type === 'income' ? 'outline' : 'destructive'} className={`capitalize ${entry.type === 'income' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : ''}`}>
+                                {entry.type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>₦{entry.amount.toLocaleString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                  </>
+                )}
+
+                {selectedUser.role === 'homerunner' && (
+                  <Card className="p-4 rounded-xl border border-border/60">
+                    <h4 className="text-sm font-semibold mb-3">Homerunner Analytics</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Eye className="h-5 w-5 mx-auto mb-1 text-blue-600" />
+                        <p className="text-xl font-bold">{selectedUser.badgeInfo?.type === 'homerunner' ? selectedUser.badgeInfo.metrics.viewingsHosted : 0}</p>
+                        <p className="text-xs text-muted-foreground">Viewings Hosted</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">{selectedUser.badgeInfo?.type === 'homerunner' ? selectedUser.badgeInfo.metrics.inspectionsCompleted : 0}</p>
+                        <p className="text-xs text-muted-foreground">Inspections Completed</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Percent className="h-5 w-5 mx-auto mb-1 text-purple-600" />
+                        <p className="text-xl font-bold">{selectedUser.badgeInfo?.type === 'homerunner' ? selectedUser.badgeInfo.metrics.conversionRate : 0}%</p>
+                        <p className="text-xs text-muted-foreground">Conversion Rate</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50 col-span-3">
+                        <Wallet className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">₦{(selectedUser.totalHomerunnerEarnings ?? 0).toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">Total Earnings</p>
                       </div>
                     </div>
                   </Card>
                 )}
 
-                {selectedUser.role === 'landlord' && (
+                {(selectedUser.role === 'handyman' || selectedUser.role === 'service_provider') && (
                   <Card className="p-4 rounded-xl border border-border/60">
-                    <h4 className="text-sm font-semibold mb-3">Properties</h4>
-                    <div className="flex items-center gap-4">
-                      <div className="text-center p-3 rounded-lg bg-muted/50 flex-1">
-                        <Building2 className="h-5 w-5 mx-auto mb-1 text-purple-600" />
-                        <p className="text-xl font-bold">{selectedUser.propertiesCount ?? 0}</p>
-                        <p className="text-xs text-muted-foreground">Listed Properties</p>
+                    <h4 className="text-sm font-semibold mb-3">Service Analytics</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">{selectedUser.jobsCompleted ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Jobs Completed</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Users className="h-5 w-5 mx-auto mb-1 text-blue-600" />
+                        <p className="text-xl font-bold">{selectedUser.repeatClients ?? 0}</p>
+                        <p className="text-xs text-muted-foreground">Repeat Clients</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-muted/50">
+                        <Wallet className="h-5 w-5 mx-auto mb-1 text-emerald-600" />
+                        <p className="text-xl font-bold">
+                          ₦{selectedUser.badgeInfo?.type === 'handyman' ? selectedUser.badgeInfo.metrics.companyRevenueNgn.toLocaleString() : '0'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">Total Revenue</p>
                       </div>
                     </div>
                   </Card>

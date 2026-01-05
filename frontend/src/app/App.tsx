@@ -26,6 +26,7 @@ import {
 import {
   AdminDashboardPage,
   AdminApprovalsPage,
+  AdminApplicationsPage,
   AdminAnalyticsPage,
   AdminUsersPage,
   AdminPropertiesPage,
@@ -266,6 +267,14 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
           element={
             <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
               <AdminApprovalsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_APPLICATIONS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminApplicationsPage />
             </RoleGuard>
           }
         />
