@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
@@ -26,6 +26,7 @@ import { Upload, CheckCircle2, Building2, Video, Sparkles, ArrowLeft } from 'luc
 type StepKey = 'address' | 'details' | 'pricing' | 'media' | 'summary'
 
 interface FormState {
+  propertyUse: 'rental' | 'shortlet' | 'hotel'
   unitNumber: string
   propertyName: string
   address: string
@@ -38,16 +39,19 @@ interface FormState {
   buildUpSize: string
   furnishing: string
   facilities: string[]
+  nearby: string[]
   utilities: {
     electricity: string
     water: string
     internet: string
     security: string
   }
+  electricityType: '' | 'generator' | 'solar' | 'government'
   allowShortlet: boolean
   rentAmount: string
   negotiable: boolean
   tenancyDurations: string[]
+  preferredPayment: '' | 'monthly' | 'quarterly' | 'six-monthly' | 'annually'
   description: string
   images: Array<{ id: string; url: string; file?: File }>
   video?: { id: string; url: string; file?: File }
@@ -80,6 +84,11 @@ const stepMeta: Record<StepKey, { title: string; subtitle: string }> = {
   },
 }
 
+const propertyUseOptions: Array<{ value: FormState['propertyUse']; label: string; helper: string }> = [
+  { value: 'rental', label: 'Rental', helper: 'Annual or multi-month stays, can also allow shortlet' },
+  { value: 'shortlet', label: 'Shortlet', helper: 'Nightly/weekly bookings, must have essential utilities' },
+  { value: 'hotel', label: 'Hotel', helper: 'Hotel-style operations with full amenities' },
+]
 const propertyTypes = ['Apartment', 'Highrise', 'Townhouse', 'Duplex', 'Bungalow', 'Studio']
 const carparks = ['0', '1', '2', '3', '4+']
 const bedroomOptions = ['1 Bedroom', '2 Bedrooms', '3 Bedrooms', '4 Bedrooms', '5+ Bedrooms']
@@ -87,9 +96,37 @@ const bathroomOptions = ['1 Bathroom', '2 Bathrooms', '3 Bathrooms', '4 Bathroom
 const furnishingOptions = ['Furnished', 'Semi-furnished', 'Unfurnished']
 const facilityOptions = ['Gym', 'Pool', '24/7 Power', 'Concierge', 'Smart Access', 'Workspace']
 const utilityOptions = ['Yes', 'No', 'Included in Rent']
+const electricityTypeOptions: Array<{ value: FormState['electricityType']; label: string }> = [
+  { value: 'generator', label: 'Generator' },
+  { value: 'solar', label: 'Solar' },
+  { value: 'government', label: 'Government electricity' },
+]
 const tenancyDurations = ['3 months', '6 months', '9 months', '12 months', '24 months']
+const preferredPaymentOptions: Array<{ value: FormState['preferredPayment']; label: string }> = [
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+  { value: 'six-monthly', label: 'Every 6 months' },
+  { value: 'annually', label: 'Annually' },
+]
+const nearbyOptions = [
+  'School (basic or higher)',
+  'Church',
+  'Mosque',
+  'Open Market',
+  'Supermarket',
+  'Mall',
+  'Cinema',
+  'Hospital',
+  'Pharmacy',
+  'Restaurant',
+  'Children Playground',
+  'Public Transport / BRT',
+  'Police Station',
+  'Park / Garden',
+]
 
 const defaultState: FormState = {
+  propertyUse: 'rental',
   unitNumber: '',
   propertyName: '',
   address: '',
@@ -102,16 +139,19 @@ const defaultState: FormState = {
   buildUpSize: '',
   furnishing: furnishingOptions[0],
   facilities: [],
+  nearby: [],
   utilities: {
     electricity: 'Yes',
     water: 'Yes',
     internet: 'Yes',
     security: 'Yes',
   },
+  electricityType: 'government',
   allowShortlet: false,
   rentAmount: '',
   negotiable: false,
   tenancyDurations: [],
+  preferredPayment: 'annually',
   description: '',
   images: [],
 }
@@ -125,6 +165,8 @@ export function LandlordPropertyCreatePage() {
   const [step, setStep] = useState<StepKey>('address')
   const [form, setForm] = useState<FormState>(defaultState)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [confirmAccurate, setConfirmAccurate] = useState(false)
+  const [nearbyCustom, setNearbyCustom] = useState('')
 
   const currentStepIndex = useMemo(() => stepOrder.indexOf(step), [step])
 
@@ -159,6 +201,24 @@ export function LandlordPropertyCreatePage() {
     }))
   }
 
+  const toggleNearby = (place: string) => {
+    setForm((prev) => ({
+      ...prev,
+      nearby: prev.nearby.includes(place)
+        ? prev.nearby.filter((p) => p !== place)
+        : [...prev.nearby, place],
+    }))
+  }
+
+  const handleAddCustomNearby = () => {
+    const trimmed = nearbyCustom.trim()
+    if (!trimmed) return
+    if (!form.nearby.includes(trimmed)) {
+      setForm((prev) => ({ ...prev, nearby: [...prev.nearby, trimmed] }))
+    }
+    setNearbyCustom('')
+  }
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (!files) return
@@ -190,6 +250,18 @@ export function LandlordPropertyCreatePage() {
       return form.utilities[key as keyof typeof form.utilities] !== 'No'
     })
   }, [form.utilities])
+
+  useEffect(() => {
+    setForm((prev) => {
+      if (prev.propertyUse === 'shortlet' && !prev.allowShortlet) {
+        return { ...prev, allowShortlet: true }
+      }
+      if (prev.propertyUse === 'hotel' && prev.allowShortlet) {
+        return { ...prev, allowShortlet: false }
+      }
+      return prev
+    })
+  }, [form.propertyUse])
 
   const goNext = () => {
     if (currentStepIndex === stepOrder.length - 1) return
@@ -226,7 +298,7 @@ export function LandlordPropertyCreatePage() {
               variant="ghost"
               size="icon"
               className="h-10 w-10 rounded-2xl border border-border/60 hover:bg-primary/10 hover:text-primary"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/landlord/properties")}
               aria-label="Go back"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -331,6 +403,29 @@ export function LandlordPropertyCreatePage() {
 
             {step === 'details' && (
               <div className="space-y-6">
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase text-muted-foreground">Listing type</Label>
+                  <p className="text-xs text-muted-foreground">Select what you are offering so we can tailor the form. Rentals can also opt into shortlet if utilities qualify.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {propertyUseOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setField('propertyUse', option.value)}
+                        className={cn(
+                          'w-full rounded-2xl border px-4 py-3 text-left transition-all',
+                          form.propertyUse === option.value
+                            ? 'border-primary bg-primary/10 text-primary shadow-lg'
+                            : 'border-border text-foreground hover:border-primary/40'
+                        )}
+                      >
+                        <p className="text-sm font-semibold">{option.label}</p>
+                        <p className="text-xs text-muted-foreground">{option.helper}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-xs uppercase text-muted-foreground">Property Type</Label>
@@ -460,6 +555,52 @@ export function LandlordPropertyCreatePage() {
                   </div>
                 </div>
 
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-xs uppercase text-muted-foreground">What's nearby (within 2km)</Label>
+                      <p className="text-xs text-muted-foreground">Tick what’s reachable within 2km. Add more landmarks relevant to Nigeria.</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {[...nearbyOptions, ...form.nearby.filter(p => !nearbyOptions.includes(p))].map((place) => {
+                      const active = form.nearby.includes(place)
+                      return (
+                        <button
+                          key={place}
+                          className={cn(
+                            'px-4 py-2 rounded-2xl text-sm font-semibold border transition-all',
+                            active
+                              ? 'bg-primary text-primary-foreground border-primary shadow-lg'
+                              : 'border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
+                          )}
+                          onClick={() => toggleNearby(place)}
+                          type="button"
+                        >
+                          {place}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      value={nearbyCustom}
+                      onChange={(e) => setNearbyCustom(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleAddCustomNearby()
+                        }
+                      }}
+                      placeholder="Add another nearby landmark"
+                      className="flex-1 rounded-2xl bg-muted/40 border-border/60"
+                    />
+                    <Button type="button" className="rounded-2xl" onClick={handleAddCustomNearby}>
+                      Add
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
                     Utilities
@@ -493,28 +634,56 @@ export function LandlordPropertyCreatePage() {
                             ))}
                           </SelectContent>
                         </Select>
+
+                        {key === 'electricity' && value !== 'No' && (
+                          <div className="mt-3 space-y-1">
+                            <Label className="text-xs uppercase text-muted-foreground">Electricity type</Label>
+                            <Select
+                              value={form.electricityType}
+                              onValueChange={(val) => setField('electricityType', val as FormState['electricityType'])}
+                            >
+                              <SelectTrigger className="rounded-2xl bg-muted/40 border-border/60">
+                                <SelectValue placeholder="Select electricity type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {electricityTypeOptions.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                   <div className="flex items-center gap-2 p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary text-sm">
                     <Sparkles className="h-4 w-4" />
                     <p>
-                      {hasEssentialAmenities
-                        ? 'This property qualifies for shortlet if you opt-in.'
-                        : 'Enable essential utilities (power, water, internet, security) to qualify for shortlet bookings.'}
+                      {form.propertyUse === 'shortlet'
+                        ? 'Shortlet selected: ensure power, water, internet, and security are available.'
+                        : form.propertyUse === 'hotel'
+                          ? 'Hotel selected: guests expect always-on utilities and services.'
+                          : hasEssentialAmenities
+                            ? 'This rental qualifies for shortlet if you opt-in.'
+                            : 'Enable essential utilities (power, water, internet, security) to qualify for shortlet bookings.'}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="allowShortlet"
-                      checked={form.allowShortlet}
-                      disabled={!hasEssentialAmenities}
-                      onChange={(event) => setField('allowShortlet', event.target.checked)}
-                    />
-                    <Label htmlFor="allowShortlet" className="text-sm text-foreground">
-                      Allow shortlet bookings while looking for a long-term tenant
-                    </Label>
-                  </div>
+                  {form.propertyUse === 'rental' && (
+                    <div className="flex items-start gap-3 p-3 rounded-2xl border border-border/60 bg-muted/20 hover:bg-muted/40 transition-colors">
+                      <Checkbox
+                        id="allowShortlet"
+                        checked={form.allowShortlet}
+                        disabled={!hasEssentialAmenities}
+                        onChange={(event) => setField('allowShortlet', typeof event.target.checked === 'boolean' ? event.target.checked : false)}
+                        className="mt-0.5"
+                      />
+                      <Label htmlFor="allowShortlet" className="text-sm text-foreground cursor-pointer leading-relaxed flex-1">
+                        Allow shortlet bookings while looking for a long-term tenant
+                      </Label>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -529,16 +698,35 @@ export function LandlordPropertyCreatePage() {
                     onChange={(e) => setField('rentAmount', e.target.value)}
                     type="number"
                   />
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 p-3 rounded-2xl border border-border/60 bg-muted/20 hover:bg-muted/40 transition-colors">
                     <Checkbox
                       id="negotiable"
                       checked={form.negotiable}
                       onChange={(event) => setField('negotiable', event.target.checked)}
                     />
-                    <Label htmlFor="negotiable" className="text-sm text-foreground">
+                    <Label htmlFor="negotiable" className="text-sm text-foreground cursor-pointer flex-1">
                       Negotiable
                     </Label>
                   </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase text-muted-foreground">Preferred rental payment duration</Label>
+                  <Select
+                    value={form.preferredPayment}
+                    onValueChange={(value) => setField('preferredPayment', value as FormState['preferredPayment'])}
+                  >
+                    <SelectTrigger className="rounded-2xl bg-muted/40 border-border/60">
+                      <SelectValue placeholder="Select how you want to receive rent" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {preferredPaymentOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-3">
@@ -632,17 +820,24 @@ export function LandlordPropertyCreatePage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Details</h3>
+                    <p>Listing type: {form.propertyUse.charAt(0).toUpperCase() + form.propertyUse.slice(1)}</p>
                     <p>{form.propertyType} • {form.bedrooms} • {form.bathrooms}</p>
                     <p>{form.buildUpSize ? `${form.buildUpSize} sqft` : 'Size not provided'}</p>
                     <p>Furnishing: {form.furnishing}</p>
                     <p>Facilities: {form.facilities.length ? form.facilities.join(', ') : 'None selected'}</p>
-                    <p>Utilities: Electricity {form.utilities.electricity}, Water {form.utilities.water}, Internet {form.utilities.internet}, Security {form.utilities.security}</p>
+                    <p>
+                      Utilities: Electricity {form.utilities.electricity}
+                      {form.utilities.electricity !== 'No' && form.electricityType ? ` (${electricityTypeOptions.find(e => e.value === form.electricityType)?.label})` : ''},
+                      Water {form.utilities.water}, Internet {form.utilities.internet}, Security {form.utilities.security}
+                    </p>
+                    <p>Nearby (within 2km): {form.nearby.length ? form.nearby.join(', ') : 'Not specified'}</p>
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Pricing</h3>
                     <p>Annual rent: ₦{form.rentAmount || '0'}{form.negotiable ? ' (Negotiable)' : ''}</p>
+                    <p>Preferred payment: {preferredPaymentOptions.find(p => p.value === form.preferredPayment)?.label || 'Not specified'}</p>
                     <p>Preferred tenancy: {form.tenancyDurations.length ? form.tenancyDurations.join(', ') : 'Not specified'}</p>
-                    <p>Shortlet ready: {form.allowShortlet ? 'Yes' : 'No'}</p>
+                    <p>Shortlet ready: {form.propertyUse === 'hotel' ? 'Not applicable' : form.allowShortlet ? 'Yes' : 'No'}</p>
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Media</h3>
@@ -658,6 +853,21 @@ export function LandlordPropertyCreatePage() {
                     className="min-h-[140px] resize-none rounded-2xl"
                   />
                 </div>
+                <div className="flex items-start gap-3 rounded-2xl border-2 border-border/60 bg-muted/40 p-4 hover:bg-muted/60 hover:border-primary/20 transition-all">
+                  <Checkbox
+                    id="confirm-accurate"
+                    checked={confirmAccurate}
+                    onChange={(e) => {
+                      const newValue = typeof e.target.checked === 'boolean' ? e.target.checked : false
+                      setConfirmAccurate(newValue)
+                    }}
+                    className="mt-0.5 flex-shrink-0"
+                  />
+                  <Label htmlFor="confirm-accurate" className="text-sm text-foreground cursor-pointer flex-1 leading-relaxed">
+                    I certify that all information provided in this listing is accurate, complete, and compliant with Julaaz's listing guidelines.
+                  </Label>
+                </div>
+
                 <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 text-sm text-primary">
                   <p>
                     After submission, a Julaaz inspector will review the property physically. Once approved, the listing
@@ -686,9 +896,9 @@ export function LandlordPropertyCreatePage() {
               </Button>
             ) : (
               <Button
-                className="h-12 rounded-2xl px-6 bg-primary text-primary-foreground shadow-lg hover:shadow-xl"
+                className="h-12 rounded-2xl px-6 bg-primary text-primary-foreground shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !confirmAccurate}
               >
                 {isSubmitting ? 'Submitting...' : 'Publish'}
               </Button>

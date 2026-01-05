@@ -9,7 +9,7 @@ import { LandlordNav } from '@/widgets/landlord-nav'
 import { landlordApplications as sampleApplications } from '@/__mocks__/data/landlord.mock'
 import { Button } from '@/shared/ui/button'
 import { Badge } from '@/shared/ui/badge'
-import { MessageSquare, Check, X, Filter, Users, TrendingUp, DollarSign, Calendar, Zap, AlertCircle } from 'lucide-react'
+import { MessageSquare, Check, X, Filter, Users, TrendingUp, DollarSign, Calendar, Zap, AlertCircle, User, Baby, Briefcase, Heart, Info } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
@@ -335,6 +335,79 @@ export function LandlordApplicationsPage() {
                             </p>
                           </div>
                         </div>
+
+                        {/* Enhanced Tenant Background Information */}
+                        {application.tenantDetails && (
+                          <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
+                            <div className="flex items-center gap-2 mb-3">
+                              <Info className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-semibold text-primary">Background Check Information</span>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <User className="h-3.5 w-3.5 text-muted-foreground/70" />
+                                  <span className="text-xs text-muted-foreground/80">Gender</span>
+                                </div>
+                                <p className="text-foreground font-medium capitalize">{application.tenantDetails.gender}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <Calendar className="h-3.5 w-3.5 text-muted-foreground/70" />
+                                  <span className="text-xs text-muted-foreground/80">Age</span>
+                                </div>
+                                <p className="text-foreground font-medium">{application.tenantDetails.age} years</p>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <Heart className="h-3.5 w-3.5 text-muted-foreground/70" />
+                                  <span className="text-xs text-muted-foreground/80">Marital Status</span>
+                                </div>
+                                <p className="text-foreground font-medium capitalize">{application.tenantDetails.maritalStatus}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <Baby className="h-3.5 w-3.5 text-muted-foreground/70" />
+                                  <span className="text-xs text-muted-foreground/80">Children</span>
+                                </div>
+                                <p className="text-foreground font-medium">{application.tenantDetails.numberOfChildren}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <Briefcase className="h-3.5 w-3.5 text-muted-foreground/70" />
+                                  <span className="text-xs text-muted-foreground/80">Occupation</span>
+                                </div>
+                                <p className="text-foreground font-medium">{application.tenantDetails.occupation}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <DollarSign className="h-3.5 w-3.5 text-muted-foreground/70" />
+                                  <span className="text-xs text-muted-foreground/80">Income</span>
+                                </div>
+                                <p className="text-foreground font-medium">
+                                  {application.tenantDetails.monthlyIncome 
+                                    ? `₦${(application.tenantDetails.monthlyIncome / 1000).toFixed(0)}K/mo`
+                                    : 'Not disclosed'
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                            {application.tenantDetails.employerName && (
+                              <div className="mt-3 pt-3 border-t border-primary/20">
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                  <div className="space-y-1">
+                                    <span className="text-xs text-muted-foreground/80">Employer</span>
+                                    <p className="text-foreground font-medium">{application.tenantDetails.employerName}</p>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <span className="text-xs text-muted-foreground/80">Years of Employment</span>
+                                    <p className="text-foreground font-medium">{application.tenantDetails.yearsOfEmployment} years</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                         
                         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 italic">
                           "{application.messagePreview}"

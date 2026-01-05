@@ -5,12 +5,12 @@ import { Footer } from '@/widgets/footer'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { LandlordNav } from '@/widgets/landlord-nav'
-import { earningsSummary, earningSnapshots } from '@/__mocks__/data/landlord.mock'
+import { earningsSummary, earningSnapshots, mockIncomeExpenseEntries, mockPropertyFinancialSummary } from '@/__mocks__/data/landlord.mock'
 import { Button } from '@/shared/ui/button'
 import { Badge } from '@/shared/ui/badge'
 import { cn } from '@/shared/lib/utils/cn'
-import type { EarningSnapshot } from '@/shared/types/landlord.types'
-import { Sparkles, Wallet, Clock, PiggyBank, TrendingUp, Calendar, DollarSign, Activity, Zap } from 'lucide-react'
+import type { EarningSnapshot, IncomeExpenseEntry, PropertyFinancialSummary } from '@/shared/types/landlord.types'
+import { Sparkles, Wallet, Clock, PiggyBank, TrendingUp, Calendar, DollarSign, Activity, Zap, ArrowUpRight, ArrowDownRight, Filter, BarChart3, Building2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
@@ -22,6 +22,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/shared/ui/sheet'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/ui/tabs'
 
 type FilterState = 'all' | 'received' | 'upcoming' | 'overdue'
 
@@ -38,6 +44,23 @@ export function LandlordEarningsPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [filter, setFilter] = useState<FilterState>('all')
   const [selectedEarning, setSelectedEarning] = useState<EarningSnapshot | null>(null)
+  const [activeTab, setActiveTab] = useState<'earnings' | 'financials'>('earnings')
+  const [propertyFilter, setPropertyFilter] = useState<string>('all')
+  const [incomeExpenseEntries] = useState<IncomeExpenseEntry[]>(mockIncomeExpenseEntries)
+  const [financialSummary] = useState<PropertyFinancialSummary[]>(mockPropertyFinancialSummary)
+
+  const filteredFinancialSummary = useMemo(() => {
+    if (propertyFilter === 'all') return financialSummary
+    return financialSummary.filter(p => p.propertyId === propertyFilter)
+  }, [financialSummary, propertyFilter])
+
+  const filteredTransactions = useMemo(() => {
+    let filtered = incomeExpenseEntries
+    if (propertyFilter !== 'all') {
+      filtered = filtered.filter(t => t.propertyId === propertyFilter)
+    }
+    return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  }, [incomeExpenseEntries, propertyFilter])
 
   const filteredSnapshots = useMemo(() => {
     if (filter === 'all') return earningSnapshots
@@ -66,6 +89,28 @@ export function LandlordEarningsPage() {
       { month: 'Aug', amount: 5400000 },
     ]
   }, [])
+
+  const totalPortfolioStats = useMemo(() => {
+    const totalIncome = financialSummary.reduce((sum, property) => sum + property.totalIncome, 0)
+    const totalExpenses = financialSummary.reduce((sum, property) => sum + property.totalExpenses, 0)
+    const netProfit = totalIncome - totalExpenses
+    const profitMargin = totalIncome > 0 ? (netProfit / totalIncome) * 100 : 0
+    
+    return {
+      totalIncome,
+      totalExpenses,
+      netProfit,
+      profitMargin,
+      profitableProperties: financialSummary.filter(p => p.netProfit > 0).length,
+      unprofitableProperties: financialSummary.filter(p => p.netProfit <= 0).length
+    }
+  }, [financialSummary])
+
+  const recentTransactions = useMemo(() => {
+    return incomeExpenseEntries
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 10)
+  }, [incomeExpenseEntries])
 
   const handleMenuClick = () => setIsSidebarOpen(true)
   const handleProfileClick = () => {
@@ -324,92 +369,384 @@ export function LandlordEarningsPage() {
             </div>
           </div>
 
-          {/* Filter tabs */}
-          <div className="flex items-center gap-3 overflow-x-auto pb-2">
-            {(['all', 'received', 'upcoming', 'overdue'] as FilterState[]).map((tab) => {
-              const active = filter === tab
-              const count = tab === 'all' ? earningSnapshots.length : earningSnapshots.filter(e => e.status === tab).length
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setFilter(tab)}
-                  className={cn(
-                    'px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border whitespace-nowrap',
-                    active
-                      ? 'bg-primary text-primary-foreground border-primary shadow-lg scale-105'
-                      : 'border-border text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5'
-                  )}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  <span className={cn(
-                    'ml-2 px-2 py-0.5 rounded-full text-xs',
-                    active ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'
-                  )}>
-                    {count}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+          {/* Navigation Tabs */}
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'earnings' | 'financials')} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 rounded-2xl bg-muted/50 p-1">
+              <TabsTrigger value="earnings" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Earnings Pipeline
+              </TabsTrigger>
+              <TabsTrigger value="financials" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                Income & Expenditure
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Earnings Transactions List */}
-          <div className="space-y-4">
-            {filteredSnapshots.map((earning) => (
-              <article
-                key={earning.id}
-                className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg hover:shadow-2xl hover:-translate-y-0.5 transition-all group"
-              >
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-primary/5 via-primary/5 to-transparent" />
-                <div className="relative p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                  <div className="flex-1 space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-                      <h2 className="text-xl font-bold text-foreground">{earning.propertyName}</h2>
-                      <Badge className={cn('rounded-full border px-3 py-1 text-xs font-semibold shadow-sm w-fit', statusTone[earning.status])}>
-                        {earning.status.charAt(0).toUpperCase() + earning.status.slice(1)}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      <div className="space-y-1">
-                        <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Tenant</span>
-                        <p className="text-foreground font-semibold">{earning.tenantName}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Amount</span>
-                        <p className="text-foreground font-bold text-lg">₦{(earning.amount / 1_000_000).toFixed(1)}M</p>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Due Date</span>
-                        <p className="text-foreground font-medium">
-                          {format(new Date(earning.dueDate), 'MMM d, yyyy')}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Type</span>
-                        <p className="text-foreground font-medium">
-                          {earning.bookingType === 'annual' ? 'Annual Lease' : 'Shortlet'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      variant="outline"
-                      className="rounded-xl border-border hover:border-primary/40 hover:text-primary"
-                      onClick={() => setSelectedEarning(earning)}
+            <TabsContent value="earnings" className="mt-6 space-y-6">
+              {/* Filter tabs */}
+              <div className="flex items-center gap-3 overflow-x-auto pb-2">
+                {(['all', 'received', 'upcoming', 'overdue'] as FilterState[]).map((tab) => {
+                  const active = filter === tab
+                  const count = tab === 'all' ? earningSnapshots.length : earningSnapshots.filter(e => e.status === tab).length
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setFilter(tab)}
+                      className={cn(
+                        'px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border whitespace-nowrap',
+                        active
+                          ? 'bg-primary text-primary-foreground border-primary shadow-lg scale-105'
+                          : 'border-border text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5'
+                      )}
                     >
-                      View Timeline
-                    </Button>
-                    <Button
-                      className="rounded-xl bg-primary text-primary-foreground shadow-lg hover:shadow-xl"
-                      onClick={() => toast.success(`Reminder sent to ${earning.tenantName}`)}
-                    >
-                      Send Reminder
-                    </Button>
+                      {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      <span className={cn(
+                        'ml-2 px-2 py-0.5 rounded-full text-xs',
+                        active ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'
+                      )}>
+                        {count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Earnings Transactions List */}
+              <div className="space-y-4">
+                {filteredSnapshots.map((earning) => (
+                  <article
+                    key={earning.id}
+                    className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg hover:shadow-2xl hover:-translate-y-0.5 transition-all group"
+                  >
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-primary/5 via-primary/5 to-transparent" />
+                    <div className="relative p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                      <div className="flex-1 space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+                          <h2 className="text-xl font-bold text-foreground">{earning.propertyName}</h2>
+                          <Badge className={cn('rounded-full border px-3 py-1 text-xs font-semibold shadow-sm w-fit', statusTone[earning.status])}>
+                            {earning.status.charAt(0).toUpperCase() + earning.status.slice(1)}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Tenant</span>
+                            <p className="text-foreground font-semibold">{earning.tenantName}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Amount</span>
+                            <p className="text-foreground font-bold text-lg">₦{(earning.amount / 1_000_000).toFixed(1)}M</p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Due Date</span>
+                            <p className="text-foreground font-medium">
+                              {format(new Date(earning.dueDate), 'MMM d, yyyy')}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Type</span>
+                            <p className="text-foreground font-medium">
+                              {earning.bookingType === 'annual' ? 'Annual Lease' : 'Shortlet'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Button
+                          variant="outline"
+                          className="rounded-xl border-border hover:border-primary/40 hover:text-primary"
+                          onClick={() => setSelectedEarning(earning)}
+                        >
+                          View Timeline
+                        </Button>
+                        <Button
+                          className="rounded-xl bg-primary text-primary-foreground shadow-lg hover:shadow-xl"
+                          onClick={() => toast.success(`Reminder sent to ${earning.tenantName}`)}
+                        >
+                          Send Reminder
+                        </Button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="financials" className="mt-6 space-y-6">
+              {/* Property Filter */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h3 className="text-xl font-bold text-foreground">Financial Overview</h3>
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <select 
+                    value={propertyFilter}
+                    onChange={(e) => setPropertyFilter(e.target.value)}
+                    className="bg-surface border border-border/60 rounded-xl px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="all">All Properties</option>
+                    {financialSummary.map(p => (
+                      <option key={p.propertyId} value={p.propertyId}>{p.propertyName}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Portfolio Financial Summary */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg">
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                        Total Income
+                      </span>
+                      <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                        <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-3xl font-black text-foreground">
+                        ₦{(totalPortfolioStats.totalIncome / 1_000_000).toFixed(1)}M
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
+                      <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                      <span className="text-xs font-semibold text-emerald-600">From rent payments</span>
+                    </div>
                   </div>
                 </div>
-              </article>
-            ))}
-          </div>
+
+                <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg">
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                        Total Expenses
+                      </span>
+                      <div className="p-3 rounded-2xl bg-destructive/10 border border-destructive/20">
+                        <ArrowDownRight className="h-4 w-4 text-destructive" />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-3xl font-black text-foreground">
+                        ₦{(totalPortfolioStats.totalExpenses / 1_000_000).toFixed(1)}M
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
+                      <Activity className="h-3.5 w-3.5 text-destructive" />
+                      <span className="text-xs font-semibold text-destructive">Operating costs</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg">
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                        Net Profit
+                      </span>
+                      <div className={cn(
+                        "p-3 rounded-2xl border",
+                        totalPortfolioStats.netProfit >= 0 
+                          ? "bg-primary/10 border-primary/20" 
+                          : "bg-destructive/10 border-destructive/20"
+                      )}>
+                        <DollarSign className={cn(
+                          "h-4 w-4",
+                          totalPortfolioStats.netProfit >= 0 ? "text-primary" : "text-destructive"
+                        )} />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className={cn(
+                        "text-3xl font-black",
+                        totalPortfolioStats.netProfit >= 0 ? "text-foreground" : "text-destructive"
+                      )}>
+                        ₦{Math.abs(totalPortfolioStats.netProfit / 1_000_000).toFixed(1)}M
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
+                      <BarChart3 className={cn(
+                        "h-3.5 w-3.5",
+                        totalPortfolioStats.netProfit >= 0 ? "text-primary" : "text-destructive"
+                      )} />
+                      <span className={cn(
+                        "text-xs font-semibold",
+                        totalPortfolioStats.netProfit >= 0 ? "text-primary" : "text-destructive"
+                      )}>
+                        {totalPortfolioStats.profitMargin.toFixed(1)}% margin
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg">
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                        Property Performance
+                      </span>
+                      <div className="p-3 rounded-2xl bg-accent/10 border border-accent/20">
+                        <Building2 className="h-4 w-4 text-accent" />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-3xl font-black text-foreground">
+                        {totalPortfolioStats.profitableProperties}/{financialSummary.length}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
+                      <TrendingUp className="h-3.5 w-3.5 text-accent" />
+                      <span className="text-xs font-semibold text-accent">Properties profitable</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Property-by-Property Financial Breakdown */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-foreground">Property Financial Breakdown</h3>
+                <div className="space-y-4">
+                  {filteredFinancialSummary.map((property) => (
+                    <article
+                      key={property.propertyId}
+                      className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg"
+                    >
+                      <div className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-bold text-foreground">{property.propertyName}</h4>
+                          <Badge className={cn(
+                            'rounded-full border px-3 py-1 text-xs font-semibold shadow-sm',
+                            property.netProfit >= 0
+                              ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                              : 'bg-destructive/10 text-destructive border-destructive/20'
+                          )}>
+                            {property.netProfit >= 0 ? 'Profitable' : 'Loss'}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Total Income</span>
+                            <p className="text-foreground font-bold text-lg">₦{(property.totalIncome / 1_000_000).toFixed(1)}M</p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Total Expenses</span>
+                            <p className="text-foreground font-bold text-lg">₦{(property.totalExpenses / 1_000_000).toFixed(1)}M</p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Net Profit</span>
+                            <p className={cn(
+                              "font-bold text-lg",
+                              property.netProfit >= 0 ? "text-emerald-600" : "text-destructive"
+                            )}>
+                              {property.netProfit >= 0 ? '+' : ''}₦{(property.netProfit / 1_000_000).toFixed(1)}M
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground/80">Profit Margin</span>
+                            <p className={cn(
+                              "font-bold text-lg",
+                              property.profitMargin >= 0 ? "text-emerald-600" : "text-destructive"
+                            )}>
+                              {property.profitMargin.toFixed(1)}%
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Profit Margin Bar */}
+                        <div className="mt-4 space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground font-medium">Profit Margin</span>
+                            <span className="font-bold text-foreground">{property.profitMargin.toFixed(1)}%</span>
+                          </div>
+                          <div className="h-2.5 rounded-full bg-muted/60 overflow-hidden">
+                            <div
+                              className={cn(
+                                'h-full rounded-full transition-all duration-500',
+                                property.profitMargin >= 50
+                                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
+                                  : property.profitMargin >= 0
+                                    ? 'bg-gradient-to-r from-amber-500 to-amber-400'
+                                    : 'bg-gradient-to-r from-destructive to-destructive/80'
+                              )}
+                              style={{ width: `${Math.min(100, Math.abs(property.profitMargin))}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              {/* Income & Expenditure Table */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-foreground">Income & Expenditure Table</h3>
+                  <Button variant="ghost" size="sm" className="text-primary text-xs font-bold uppercase tracking-widest">
+                    Export CSV
+                  </Button>
+                </div>
+                <div className="overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-border/60 bg-muted/30">
+                          <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Date</th>
+                          <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Description</th>
+                          <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Property</th>
+                          <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Category</th>
+                          <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-muted-foreground text-right">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40">
+                        {filteredTransactions.map((transaction) => (
+                          <tr key={transaction.id} className="hover:bg-muted/20 transition-colors">
+                            <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
+                              {format(new Date(transaction.date), 'MMM d, yyyy')}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className={cn(
+                                  "p-1.5 rounded-lg",
+                                  transaction.type === 'income' 
+                                    ? "bg-emerald-500/10 text-emerald-600" 
+                                    : "bg-destructive/10 text-destructive"
+                                )}>
+                                  {transaction.type === 'income' ? (
+                                    <ArrowUpRight className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <ArrowDownRight className="h-3.5 w-3.5" />
+                                  )}
+                                </div>
+                                <span className="text-sm font-semibold text-foreground">{transaction.description}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
+                              {transaction.propertyName}
+                            </td>
+                            <td className="px-6 py-4">
+                              <Badge variant="outline" className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-muted/50">
+                                {transaction.category || 'General'}
+                              </Badge>
+                            </td>
+                            <td className={cn(
+                              "px-6 py-4 text-sm font-bold text-right whitespace-nowrap",
+                              transaction.type === 'income' ? "text-emerald-600" : "text-destructive"
+                            )}>
+                              {transaction.type === 'income' ? '+' : '-'}₦{transaction.amount.toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredTransactions.length === 0 && (
+                          <tr>
+                            <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                              No transactions found for the selected filter.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </section>
       </main>
 

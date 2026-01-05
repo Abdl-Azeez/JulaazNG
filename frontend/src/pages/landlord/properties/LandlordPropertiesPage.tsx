@@ -1,17 +1,19 @@
-import { useMemo } from 'react'
-import { Plus, MoreVertical, Clock, Sparkles, TrendingUp, Building2, FileText, ShieldCheck, MapPin, Eye, Users, BarChart3 } from 'lucide-react'
+import { useMemo, useState, useEffect } from 'react'
+import { Plus, MoreVertical, Clock, Sparkles, TrendingUp, Building2, FileText, ShieldCheck, MapPin, Eye, Users, BarChart3, Receipt, Upload } from 'lucide-react'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { Footer } from '@/widgets/footer'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { useAuthStore } from '@/shared/store/auth.store'
-import { useState } from 'react'
 import { LandlordNav } from '@/widgets/landlord-nav'
-import { landlordProperties } from '@/__mocks__/data/landlord.mock'
-import type { LandlordProperty } from '@/shared/types/landlord.types'
+import { landlordProperties, mockPropertyExpenses } from '@/__mocks__/data/landlord.mock'
+import type { LandlordProperty, PropertyExpense, ExpenseCategory } from '@/shared/types/landlord.types'
 import { Button } from '@/shared/ui/button'
 import { Badge } from '@/shared/ui/badge'
 import { Card } from '@/shared/ui/card'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
+import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
@@ -21,6 +23,46 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/shared/ui/dialog'
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/shared/ui/sheet'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/select'
+import toast from 'react-hot-toast'
+import { format } from 'date-fns'
+
+// Custom hook for media query
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    if (media.matches !== matches) {
+      setMatches(media.matches)
+    }
+    const listener = () => setMatches(media.matches)
+    media.addEventListener('change', listener)
+    return () => media.removeEventListener('change', listener)
+  }, [matches, query])
+
+  return matches
+}
 
 const statusConfig: Record<LandlordProperty['status'], { label: string; tone: string; glow: string }> = {
   active: {
@@ -48,8 +90,204 @@ const statusConfig: Record<LandlordProperty['status'], { label: string; tone: st
 export function LandlordPropertiesPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuthStore()
+  const isDesktop = useMediaQuery('(min-width: 768px)')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false)
+  const [selectedProperty, setSelectedProperty] = useState<LandlordProperty | null>(null)
+  const [expenses, setExpenses] = useState<PropertyExpense[]>(mockPropertyExpenses)
+  const [expenseForm, setExpenseForm] = useState({
+    category: '' as ExpenseCategory | '',
+    description: '',
+    amount: '',
+    date: format(new Date(), 'yyyy-MM-dd'),
+    vendor: '',
+    notes: '',
+    receiptFile: null as File | null,
+  })
+
+  const expenseCategories: { value: ExpenseCategory; label: string }[] = [
+    { value: 'renovation', label: 'Renovation' },
+    { value: 'maintenance', label: 'Maintenance' },
+    { value: 'repair', label: 'Repair' },
+    { value: 'facility_addition', label: 'Facility Addition' },
+    { value: 'furniture', label: 'Furniture' },
+    { value: 'appliances', label: 'Appliances' },
+    { value: 'utilities', label: 'Utilities' },
+    { value: 'insurance', label: 'Insurance' },
+    { value: 'taxes', label: 'Taxes' },
+    { value: 'cleaning', label: 'Cleaning' },
+    { value: 'landscaping', label: 'Landscaping' },
+    { value: 'security', label: 'Security' },
+    { value: 'other', label: 'Other' },
+  ]
+
+  const handleExpenseSubmit = () => {
+    if (!selectedProperty || !expenseForm.category || !expenseForm.description || !expenseForm.amount) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    const newExpense: PropertyExpense = {
+      id: `expense_${Date.now()}`,
+      propertyId: selectedProperty.id,
+      propertyName: selectedProperty.name,
+      category: expenseForm.category as ExpenseCategory,
+      description: expenseForm.description,
+      amount: parseFloat(expenseForm.amount),
+      date: expenseForm.date,
+      vendor: expenseForm.vendor,
+      notes: expenseForm.notes,
+      receiptName: expenseForm.receiptFile?.name,
+      receiptUrl: expenseForm.receiptFile ? URL.createObjectURL(expenseForm.receiptFile) : undefined,
+      createdAt: new Date().toISOString(),
+    }
+
+    setExpenses(prev => [newExpense, ...prev])
+    setExpenseForm({
+      category: '',
+      description: '',
+      amount: '',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      vendor: '',
+      notes: '',
+      receiptFile: null,
+    })
+    setIsExpenseSheetOpen(false)
+    toast.success(`Expense logged for ${selectedProperty.name}`)
+  }
+
+  const ExpenseFormContent = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="expense-category">Category *</Label>
+          <Select
+            value={expenseForm.category}
+            onValueChange={(value) => setExpenseForm(prev => ({ ...prev, category: value as ExpenseCategory }))}
+          >
+            <SelectTrigger className="rounded-xl">
+              <SelectValue placeholder="Select expense category" />
+            </SelectTrigger>
+            <SelectContent>
+              {expenseCategories.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="expense-amount">Amount (₦) *</Label>
+          <Input
+            id="expense-amount"
+            type="number"
+            placeholder="0.00"
+            value={expenseForm.amount}
+            onChange={(e) => setExpenseForm(prev => ({ ...prev, amount: e.target.value }))}
+            className="rounded-xl"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="expense-description">Description *</Label>
+        <Input
+          id="expense-description"
+          placeholder="Brief description of the expense"
+          value={expenseForm.description}
+          onChange={(e) => setExpenseForm(prev => ({ ...prev, description: e.target.value }))}
+          className="rounded-xl"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="expense-date">Date</Label>
+          <Input
+            id="expense-date"
+            type="date"
+            value={expenseForm.date}
+            onChange={(e) => setExpenseForm(prev => ({ ...prev, date: e.target.value }))}
+            className="rounded-xl"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="expense-vendor">Vendor/Supplier</Label>
+          <Input
+            id="expense-vendor"
+            placeholder="Name of vendor or supplier"
+            value={expenseForm.vendor}
+            onChange={(e) => setExpenseForm(prev => ({ ...prev, vendor: e.target.value }))}
+            className="rounded-xl"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="expense-receipt">Receipt Upload</Label>
+        <div className="relative">
+          <Input
+            id="expense-receipt"
+            type="file"
+            accept="image/*,.pdf"
+            onChange={(e) => setExpenseForm(prev => ({ ...prev, receiptFile: e.target.files?.[0] || null }))}
+            className="rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+          />
+          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+            <Upload className="h-3.5 w-3.5" />
+            <span>Accepted formats: JPG, PNG, PDF (Max 5MB)</span>
+          </div>
+          {expenseForm.receiptFile && (
+            <p className="text-sm text-primary mt-1">
+              Selected: {expenseForm.receiptFile.name}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="expense-notes">Additional Notes</Label>
+        <Textarea
+          id="expense-notes"
+          placeholder="Any additional details about this expense..."
+          value={expenseForm.notes}
+          onChange={(e) => setExpenseForm(prev => ({ ...prev, notes: e.target.value }))}
+          className="rounded-xl min-h-[80px]"
+        />
+      </div>
+
+      {/* Recent Expenses for this Property */}
+      {selectedProperty && (
+        <div className="space-y-4 pt-4 border-t border-border/60">
+          <h4 className="text-sm font-semibold text-foreground">Recent Expenses</h4>
+          <div className="space-y-2 max-h-32 overflow-y-auto">
+            {expenses
+              .filter(expense => expense.propertyId === selectedProperty.id)
+              .slice(0, 3)
+              .map((expense) => (
+                <div key={expense.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{expense.description}</p>
+                    <p className="text-xs text-muted-foreground">{format(new Date(expense.date), 'MMM d, yyyy')} • {expense.category}</p>
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">₦{expense.amount.toLocaleString()}</p>
+                </div>
+              ))}
+            {expenses.filter(expense => expense.propertyId === selectedProperty.id).length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">No expenses recorded yet</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  const openExpenseSheet = (property: LandlordProperty) => {
+    setSelectedProperty(property)
+    setIsExpenseSheetOpen(true)
+  }
 
   const heroMetrics = useMemo(
     () => {
@@ -305,6 +543,16 @@ export function LandlordPropertiesPage() {
                                 <Building2 className="h-4 w-4" />
                                 Manage listing
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="gap-2"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  openExpenseSheet(property)
+                                }}
+                              >
+                                <Receipt className="h-4 w-4" />
+                                Log expense
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -358,6 +606,76 @@ export function LandlordPropertiesPage() {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
       <Footer />
+
+      {/* Expense Logging - Responsive (Dialog for Desktop, Sheet for Mobile) */}
+      {isDesktop ? (
+        <Dialog open={isExpenseSheetOpen} onOpenChange={setIsExpenseSheetOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-[32px] p-0 border-none bg-surface/95 backdrop-blur-xl shadow-2xl">
+            <DialogHeader className="px-8 pt-8 pb-4 border-b border-border/60">
+              <DialogTitle className="text-2xl font-bold">Log Property Expense</DialogTitle>
+              {selectedProperty && (
+                <p className="text-sm text-muted-foreground">
+                  Adding expense for <span className="font-semibold text-foreground">{selectedProperty.name}</span>
+                </p>
+              )}
+            </DialogHeader>
+            <div className="px-8 py-6">
+              <ExpenseFormContent />
+            </div>
+            <DialogFooter className="px-8 pb-8 pt-4 border-t border-border/60 flex sm:justify-between gap-4">
+              <Button
+                variant="outline"
+                className="rounded-2xl flex-1 h-12 font-semibold"
+                onClick={() => setIsExpenseSheetOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="rounded-2xl flex-1 h-12 font-semibold bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                onClick={handleExpenseSubmit}
+              >
+                Log Expense
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <Sheet open={isExpenseSheetOpen} onOpenChange={setIsExpenseSheetOpen}>
+          <SheetContent 
+            side="bottom" 
+            className="w-full h-[85vh] max-h-[85vh] rounded-t-[32px] flex flex-col p-0 border-none bg-surface/95 backdrop-blur-xl"
+          >
+            <SheetHeader className="px-6 pt-6 pb-4 border-b border-border/60 flex-shrink-0">
+              <SheetTitle className="text-xl font-bold">Log Property Expense</SheetTitle>
+              {selectedProperty && (
+                <p className="text-sm text-muted-foreground">
+                  Adding expense for <span className="font-semibold text-foreground">{selectedProperty.name}</span>
+                </p>
+              )}
+            </SheetHeader>
+            <div className="flex-1 overflow-y-auto px-6 py-6">
+              <ExpenseFormContent />
+            </div>
+            <SheetFooter className="px-6 pb-8 pt-4 border-t border-border/60 flex-shrink-0">
+              <div className="flex gap-3 w-full">
+                <Button
+                  variant="outline"
+                  className="rounded-2xl flex-1 h-12 font-semibold"
+                  onClick={() => setIsExpenseSheetOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="rounded-2xl flex-1 h-12 font-semibold bg-primary text-primary-foreground"
+                  onClick={handleExpenseSubmit}
+                >
+                  Log Expense
+                </Button>
+              </div>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      )}
     </div>
   )
 }

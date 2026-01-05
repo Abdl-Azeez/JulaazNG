@@ -12,6 +12,15 @@ export interface LandlordProperty {
   occupancyRate: number
 }
 
+export type PropertyUse = 'rental' | 'shortlet' | 'hotel'
+export type ElectricityType = 'generator' | 'solar' | 'government'
+
+export interface NearbyAmenity {
+  name: string
+  distance?: string
+  note?: string
+}
+
 export interface LandlordPropertyDetail {
   id: string
   name: string
@@ -25,6 +34,14 @@ export interface LandlordPropertyDetail {
   bathrooms: number
   parking: number
   description: string
+  propertyUse?: PropertyUse
+  allowShortlet?: boolean
+  preferredPayment?: 'monthly' | 'quarterly' | 'six-monthly' | 'annually'
+  electricity?: {
+    availability: string
+    type?: ElectricityType
+  }
+  nearby?: NearbyAmenity[]
   applicationsCount: number
   latestApplicant: {
     name: string
@@ -79,5 +96,68 @@ export interface LandlordApplication {
   parking: number
   sqft: number
   messagePreview: string
+  // Enhanced tenant background check information
+  tenantDetails?: {
+    maritalStatus: 'single' | 'married' | 'divorced' | 'widowed'
+    numberOfChildren: number
+    age: number
+    occupation: string
+    gender: 'male' | 'female' | 'other'
+    monthlyIncome?: number
+    employerName?: string
+    yearsOfEmployment?: number
+  }
+}
+
+export type ExpenseCategory = 
+  | 'renovation'
+  | 'maintenance'
+  | 'repair'
+  | 'facility_addition'
+  | 'furniture'
+  | 'appliances'
+  | 'utilities'
+  | 'insurance'
+  | 'taxes'
+  | 'cleaning'
+  | 'landscaping'
+  | 'security'
+  | 'other'
+
+export interface PropertyExpense {
+  id: string
+  propertyId: string
+  propertyName: string
+  category: ExpenseCategory
+  description: string
+  amount: number
+  date: string
+  receiptUrl?: string
+  receiptName?: string
+  vendor?: string
+  notes?: string
+  createdAt: string
+}
+
+export interface IncomeExpenseEntry {
+  id: string
+  propertyId: string
+  propertyName: string
+  type: 'income' | 'expense'
+  amount: number
+  date: string
+  description: string
+  category?: string
+  receiptUrl?: string
+}
+
+export interface PropertyFinancialSummary {
+  propertyId: string
+  propertyName: string
+  totalIncome: number
+  totalExpenses: number
+  netProfit: number
+  profitMargin: number
+  period: string
 }
 

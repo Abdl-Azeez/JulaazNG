@@ -9,6 +9,9 @@ import type {
   LandlordApplication,
   EarningSnapshot,
   EarningsSummary,
+  PropertyExpense,
+  IncomeExpenseEntry,
+  PropertyFinancialSummary,
 } from '@/shared/types/landlord.types'
 import { mockUsers } from './auth.mock'
 
@@ -541,6 +544,16 @@ export const landlordApplications: LandlordApplication[] = [
     parking: 1,
     sqft: 600,
     messagePreview: 'I love the natural light in the living room. Hoping to schedule an in-person viewing this weekend.',
+    tenantDetails: {
+      maritalStatus: 'single',
+      numberOfChildren: 0,
+      age: 28,
+      occupation: 'Software Engineer',
+      gender: 'male',
+      monthlyIncome: 450000,
+      employerName: 'TechCorp Nigeria',
+      yearsOfEmployment: 3
+    }
   },
   {
     id: 'application-2',
@@ -557,6 +570,16 @@ export const landlordApplications: LandlordApplication[] = [
     parking: 2,
     sqft: 820,
     messagePreview: 'Documents attached. Ready to proceed with agreement once inspection feedback is confirmed.',
+    tenantDetails: {
+      maritalStatus: 'married',
+      numberOfChildren: 2,
+      age: 35,
+      occupation: 'Marketing Director',
+      gender: 'female',
+      monthlyIncome: 800000,
+      employerName: 'Global Brands Ltd',
+      yearsOfEmployment: 7
+    }
   },
   {
     id: 'application-3',
@@ -573,6 +596,16 @@ export const landlordApplications: LandlordApplication[] = [
     parking: 1,
     sqft: 540,
     messagePreview: 'Thanks for the consideration. Kindly keep me in the loop if another unit becomes available.',
+    tenantDetails: {
+      maritalStatus: 'married',
+      numberOfChildren: 1,
+      age: 32,
+      occupation: 'Civil Engineer',
+      gender: 'male',
+      monthlyIncome: 380000,
+      employerName: 'Construction Masters',
+      yearsOfEmployment: 5
+    }
   },
   {
     id: 'application-4',
@@ -589,6 +622,16 @@ export const landlordApplications: LandlordApplication[] = [
     parking: 1,
     sqft: 600,
     messagePreview: 'Relocating from Abuja, looking for something long term with a good neighborhood.',
+    tenantDetails: {
+      maritalStatus: 'divorced',
+      numberOfChildren: 2,
+      age: 41,
+      occupation: 'Financial Analyst',
+      gender: 'female',
+      monthlyIncome: 520000,
+      employerName: 'First Bank Nigeria',
+      yearsOfEmployment: 8
+    }
   },
 ]
 
@@ -662,6 +705,16 @@ export const landlordPropertyDetails: Record<string, LandlordPropertyDetail> = {
     bathrooms: 3,
     parking: 2,
     description: 'A contemporary serviced apartment with panoramic lagoon views, chef-ready kitchen, and concierge support.',
+    propertyUse: 'rental',
+    allowShortlet: true,
+    preferredPayment: 'annually',
+    electricity: { availability: 'Yes', type: 'generator' },
+    nearby: [
+      { name: 'Supermarket', distance: '1.2km' },
+      { name: 'School (basic or higher)', distance: '0.9km' },
+      { name: 'Restaurant', distance: '0.6km' },
+      { name: 'Mall', distance: '1.8km' },
+    ],
     applicationsCount: 3,
     latestApplicant: { name: 'John Doe', status: 'pending' },
     tenant: { name: 'Jane Smith', period: 'Jan - Dec 2025', contactMethod: 'Chat' },
@@ -684,6 +737,16 @@ export const landlordPropertyDetails: Record<string, LandlordPropertyDetail> = {
     bathrooms: 2,
     parking: 1,
     description: 'Stylish penthouse with skyline terrace, smart lighting, and weekly housekeeping for corporate tenants.',
+    propertyUse: 'shortlet',
+    allowShortlet: true,
+    preferredPayment: 'monthly',
+    electricity: { availability: 'Included in Rent', type: 'government' },
+    nearby: [
+      { name: 'Cinema', distance: '1.5km' },
+      { name: 'Restaurant', distance: '0.4km' },
+      { name: 'Mall', distance: '1.1km' },
+      { name: 'Hospital', distance: '1.9km' },
+    ],
     applicationsCount: 1,
     latestApplicant: { name: 'Ibukun Awosika', status: 'approved' },
     tenant: { name: 'Kingsley Ade', period: 'Apr 2024 - Mar 2025', contactMethod: 'Chat' },
@@ -706,6 +769,16 @@ export const landlordPropertyDetails: Record<string, LandlordPropertyDetail> = {
     bathrooms: 3,
     parking: 1,
     description: 'Townhouse in a gated estate with solar backup, dedicated workspace, and children play area.',
+    propertyUse: 'rental',
+    allowShortlet: false,
+    preferredPayment: 'quarterly',
+    electricity: { availability: 'Yes', type: 'solar' },
+    nearby: [
+      { name: 'Mosque', distance: '0.7km' },
+      { name: 'Open Market', distance: '1.3km' },
+      { name: 'Children Playground', distance: '0.4km' },
+      { name: 'Pharmacy', distance: '1.0km' },
+    ],
     applicationsCount: 0,
     latestApplicant: null,
     tenant: undefined,
@@ -725,6 +798,16 @@ export const landlordPropertyDetails: Record<string, LandlordPropertyDetail> = {
     bathrooms: 4,
     parking: 3,
     description: 'Family-friendly duplex with landscaped garden, smart gate access, and backup water treatment.',
+    propertyUse: 'hotel',
+    allowShortlet: false,
+    preferredPayment: 'six-monthly',
+    electricity: { availability: 'Included in Rent', type: 'generator' },
+    nearby: [
+      { name: 'Church', distance: '0.5km' },
+      { name: 'Restaurant', distance: '0.9km' },
+      { name: 'Hospital', distance: '1.6km' },
+      { name: 'Supermarket', distance: '1.1km' },
+    ],
     applicationsCount: 5,
     latestApplicant: { name: 'Gloria Nwachukwu', status: 'pending' },
     tenant: { name: 'Obinna Okoye', period: 'Jul 2024 - Jun 2025', contactMethod: 'Chat' },
@@ -735,3 +818,185 @@ export const landlordPropertyDetails: Record<string, LandlordPropertyDetail> = {
     ],
   },
 }
+
+// Property Expenses Mock Data
+export const mockPropertyExpenses: PropertyExpense[] = [
+  {
+    id: 'expense_001',
+    propertyId: 'prop-101',
+    propertyName: 'Viva Residency',
+    category: 'maintenance',
+    description: 'Air conditioning servicing and repair',
+    amount: 85000,
+    date: '2024-01-15',
+    receiptUrl: '/receipts/ac_service_receipt.pdf',
+    receiptName: 'AC Service Receipt.pdf',
+    vendor: 'CoolMax Services',
+    notes: 'Annual maintenance for all AC units',
+    createdAt: '2024-01-15T10:30:00Z'
+  },
+  {
+    id: 'expense_002',
+    propertyId: 'prop-102',
+    propertyName: 'Palmgrove Court',
+    category: 'renovation',
+    description: 'Kitchen cabinet upgrade and countertop installation',
+    amount: 450000,
+    date: '2024-02-01',
+    receiptUrl: '/receipts/kitchen_renovation_receipt.pdf',
+    receiptName: 'Kitchen Renovation Receipt.pdf',
+    vendor: 'Elite Interior Works',
+    notes: 'Premium granite countertop with modern cabinet design',
+    createdAt: '2024-02-01T14:20:00Z'
+  },
+  {
+    id: 'expense_003',
+    propertyId: 'prop-104',
+    propertyName: 'Ojodu Place',
+    category: 'facility_addition',
+    description: 'Security camera system installation',
+    amount: 120000,
+    date: '2024-02-10',
+    receiptUrl: '/receipts/security_camera_receipt.pdf',
+    receiptName: 'Security System Receipt.pdf',
+    vendor: 'SecureTech Nigeria',
+    notes: '8-camera CCTV system with night vision',
+    createdAt: '2024-02-10T09:15:00Z'
+  },
+  {
+    id: 'expense_004',
+    propertyId: 'prop-103',
+    propertyName: 'Lekki Haven',
+    category: 'landscaping',
+    description: 'Garden redesign and lawn maintenance',
+    amount: 75000,
+    date: '2024-02-05',
+    receiptUrl: '/receipts/landscaping_receipt.pdf',
+    receiptName: 'Garden Design Receipt.pdf',
+    vendor: 'Green Thumb Landscaping',
+    notes: 'New flower beds and irrigation system',
+    createdAt: '2024-02-05T16:45:00Z'
+  },
+  {
+    id: 'expense_005',
+    propertyId: 'prop-101',
+    propertyName: 'Viva Residency',
+    category: 'appliances',
+    description: 'Washing machine and dryer replacement',
+    amount: 280000,
+    date: '2024-01-20',
+    receiptUrl: '/receipts/appliance_receipt.pdf',
+    receiptName: 'Appliance Purchase Receipt.pdf',
+    vendor: 'LG Electronics',
+    notes: 'Energy-efficient models with 5-year warranty',
+    createdAt: '2024-01-20T11:30:00Z'
+  }
+]
+
+// Income & Expense Summary Mock Data
+export const mockIncomeExpenseEntries: IncomeExpenseEntry[] = [
+  {
+    id: 'entry_001',
+    propertyId: 'prop-101',
+    propertyName: 'Viva Residency',
+    type: 'income',
+    amount: 2400000,
+    date: '2024-01-01',
+    description: 'Annual rent payment from Grace Okonkwo',
+    category: 'rent'
+  },
+  {
+    id: 'entry_002',
+    propertyId: 'prop-101',
+    propertyName: 'Viva Residency',
+    type: 'expense',
+    amount: 85000,
+    date: '2024-01-15',
+    description: 'Air conditioning servicing and repair',
+    category: 'maintenance',
+    receiptUrl: '/receipts/ac_service_receipt.pdf'
+  },
+  {
+    id: 'entry_003',
+    propertyId: 'prop-101',
+    propertyName: 'Viva Residency',
+    type: 'expense',
+    amount: 280000,
+    date: '2024-01-20',
+    description: 'Washing machine and dryer replacement',
+    category: 'appliances',
+    receiptUrl: '/receipts/appliance_receipt.pdf'
+  },
+  {
+    id: 'entry_004',
+    propertyId: 'prop-102',
+    propertyName: 'Palmgrove Court',
+    type: 'expense',
+    amount: 450000,
+    date: '2024-02-01',
+    description: 'Kitchen cabinet upgrade and countertop installation',
+    category: 'renovation',
+    receiptUrl: '/receipts/kitchen_renovation_receipt.pdf'
+  },
+  {
+    id: 'entry_005',
+    propertyId: 'prop-104',
+    propertyName: 'Ojodu Place',
+    type: 'income',
+    amount: 1200000,
+    date: '2024-07-01',
+    description: 'Annual rent payment from Obinna Okoye',
+    category: 'rent'
+  },
+  {
+    id: 'entry_006',
+    propertyId: 'prop-104',
+    propertyName: 'Ojodu Place',
+    type: 'expense',
+    amount: 120000,
+    date: '2024-02-10',
+    description: 'Security camera system installation',
+    category: 'facility_addition',
+    receiptUrl: '/receipts/security_camera_receipt.pdf'
+  }
+]
+
+// Property Financial Summary Mock Data
+export const mockPropertyFinancialSummary: PropertyFinancialSummary[] = [
+  {
+    propertyId: 'prop-101',
+    propertyName: 'Viva Residency',
+    totalIncome: 2400000,
+    totalExpenses: 365000,
+    netProfit: 2035000,
+    profitMargin: 84.8,
+    period: '2024'
+  },
+  {
+    propertyId: 'prop-102',
+    propertyName: 'Palmgrove Court',
+    totalIncome: 0,
+    totalExpenses: 450000,
+    netProfit: -450000,
+    profitMargin: 0,
+    period: '2024'
+  },
+  {
+    propertyId: 'prop-103',
+    propertyName: 'Lekki Haven',
+    totalIncome: 0,
+    totalExpenses: 75000,
+    netProfit: -75000,
+    profitMargin: 0,
+    period: '2024'
+  },
+  {
+    propertyId: 'prop-104',
+    propertyName: 'Ojodu Place',
+    totalIncome: 1200000,
+    totalExpenses: 120000,
+    netProfit: 1080000,
+    profitMargin: 90,
+    period: '2024'
+  }
+]

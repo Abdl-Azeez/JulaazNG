@@ -141,6 +141,17 @@ export function LandlordPropertyDetailsPage() {
                   <span className="font-semibold text-foreground">Type:</span> {property.type}
                 </p>
                 <p>
+                  <span className="font-semibold text-foreground">Listing:</span> {property.propertyUse ? property.propertyUse.charAt(0).toUpperCase() + property.propertyUse.slice(1) : 'Rental'}
+                </p>
+                <p>
+                  <span className="font-semibold text-foreground">Preferred payment:</span>{' '}
+                  {property.preferredPayment ? property.preferredPayment.replace('six-monthly', 'Every 6 months') : 'Not specified'}
+                </p>
+                <p>
+                  <span className="font-semibold text-foreground">Electricity:</span>{' '}
+                  {property.electricity ? `${property.electricity.availability}${property.electricity.type ? ` (${property.electricity.type})` : ''}` : 'Not provided'}
+                </p>
+                <p>
                   <span className="font-semibold text-foreground">Description:</span> {property.description}
                 </p>
               </div>
@@ -215,6 +226,25 @@ export function LandlordPropertyDetailsPage() {
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">No payment records.</p>
+              )}
+            </section>
+
+            <section className="rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-lg p-5 space-y-3">
+              <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">What's nearby (within 2km)</h2>
+              {property.nearby && property.nearby.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {property.nearby.map((item) => (
+                    <span
+                      key={`${item.name}-${item.distance ?? ''}`}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-muted/40 border border-border/60 text-xs font-semibold text-foreground"
+                    >
+                      {item.name}
+                      {item.distance && <span className="text-muted-foreground">• {item.distance}</span>}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No nearby places listed.</p>
               )}
             </section>
 
