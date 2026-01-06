@@ -13,7 +13,7 @@ import { ROUTES } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore, type RoleType, type UserRole } from '@/shared/store/role.store'
 import { findSampleUser } from '@/__mocks__/data/users.mock'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 
 interface ModalState {
   backgroundLocation?: Location
@@ -54,6 +54,7 @@ export function PasswordModal() {
   const email = searchParams.get('email') || ''
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const { setRoles, setActiveRole, openRoleSwitcher } = useRoleStore()
 
   const validatePassword = () => {
@@ -190,22 +191,36 @@ export function PasswordModal() {
               <Label htmlFor="modal-password" className="text-sm font-semibold text-foreground">
                 Password
               </Label>
-              <Input
-                id="modal-password"
-                type="password"
-                placeholder="Enter Your Password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  if (error) setError('')
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleContinue()
-                  }
-                }}
-                className={`w-full ${error ? 'border-destructive' : ''}`}
-              />
+              <div className="relative">
+                <Input
+                  id="modal-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter Your Password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    if (error) setError('')
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleContinue()
+                    }
+                  }}
+                  className={`w-full pr-10 ${error ? 'border-destructive' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
               {error && <p className="text-xs text-destructive">{error}</p>}
             </div>
 

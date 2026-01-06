@@ -10,7 +10,7 @@ import { Card } from '@/shared/ui/card'
 import LogoSvg from '@/assets/images/logo.svg?react'
 import { useRoleStore, type UserRole, type RoleType } from '@/shared/store/role.store'
 import { findSampleUser } from '@/__mocks__/data/users.mock'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 
 export function PasswordPage() {
   const [isDesktop, setIsDesktop] = useState(false)
@@ -32,6 +32,7 @@ export function PasswordPage() {
   const email = searchParams.get('email') || ''
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const validatePassword = () => {
     if (!password.trim()) {
@@ -173,22 +174,36 @@ export function PasswordPage() {
               <Label htmlFor="password" className="text-sm font-semibold text-foreground">
                 Password
               </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter Your Password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  if (error) setError('')
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleContinue()
-                  }
-                }}
-                className={`w-full ${error ? 'border-destructive' : ''}`}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter Your Password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    if (error) setError('')
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleContinue()
+                    }
+                  }}
+                  className={`w-full pr-10 ${error ? 'border-destructive' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
               {error && (
                 <p className="text-xs text-destructive">{error}</p>
               )}
@@ -244,22 +259,36 @@ export function PasswordPage() {
             <Label htmlFor="password" className="text-sm font-semibold text-foreground">
               Password
             </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter Your Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value)
-                if (error) setError('')
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleContinue()
-                }
-              }}
-              className={`w-full ${error ? 'border-destructive' : ''}`}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter Your Password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  if (error) setError('')
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleContinue()
+                  }
+                }}
+                className={`w-full pr-10 ${error ? 'border-destructive' : ''}`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
             {error && (
               <p className="text-xs text-destructive">{error}</p>
             )}
