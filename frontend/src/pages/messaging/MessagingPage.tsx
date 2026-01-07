@@ -7,8 +7,7 @@ import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Badge } from '@/shared/ui/badge'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
+import { SharedLayout } from '@/widgets/shared-layout'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { LogoLoader } from '@/widgets/logo-loader'
 import { useAuthStore } from '@/shared/store/auth.store'
@@ -20,7 +19,7 @@ import type { Message } from '@/shared/types/activity.types'
 export function MessagingPage() {
   const navigate = useNavigate()
   const { conversationId } = useParams()
-  const { user, isAuthenticated } = useAuthStore()
+  const { user } = useAuthStore()
   const conversations = useMessagingStore((state) => state.conversations)
   const messagesByConversation = useMessagingStore((state) => state.messages)
   const appendMessage = useMessagingStore((state) => state.addMessage)
@@ -29,7 +28,6 @@ export function MessagingPage() {
   const [isDesktop, setIsDesktop] = useState(false)
   const [isSending, setIsSending] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const createMessageId = React.useCallback(
     (prefix: string) => {
@@ -95,18 +93,6 @@ export function MessagingPage() {
     }
   }
 
-  const handleMenuClick = () => {
-    setIsSidebarOpen(true)
-  }
-
-  const handleProfileClick = () => {
-    if (isAuthenticated) {
-      navigate(ROUTES.PROFILE)
-    } else {
-      setIsDrawerOpen(true)
-    }
-  }
-
   const formatTime = (date: Date) => {
     return formatDistanceToNow(date, { addSuffix: true })
   }
@@ -134,8 +120,8 @@ export function MessagingPage() {
   if (!conversationId && !isDesktop) {
     // Mobile: Conversation list only
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <Header onMenuClick={handleMenuClick} onProfileClick={handleProfileClick} />
+      <SharedLayout>
+        <div className="min-h-screen bg-background flex flex-col">
         
         <div className="flex-1 flex flex-col">
           {/* Messages Header */}
@@ -228,16 +214,16 @@ export function MessagingPage() {
         </main>
         </div>
         
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
-      </div>
+        </div>
+      </SharedLayout>
     )
   }
 
   // Desktop Split View or Mobile Chat View
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header onMenuClick={handleMenuClick} onProfileClick={handleProfileClick} />
+    <SharedLayout>
+      <div className="min-h-screen bg-background flex flex-col">
       
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Conversation List - Always visible on desktop, hidden on mobile when chat is open */}
@@ -498,9 +484,9 @@ export function MessagingPage() {
         )}
       </div>
       
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
-    </div>
+      </div>
+    </SharedLayout>
   )
 }
 

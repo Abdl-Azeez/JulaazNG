@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -172,7 +170,6 @@ const analyticsSnapshots: Record<TimeRange, AnalyticsSnapshot> = {
 
 export function AdminAnalyticsPage() {
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [timeRange, setTimeRange] = useState<TimeRange>('30d')
 
   const snapshot = analyticsSnapshots[timeRange]
@@ -210,13 +207,7 @@ export function AdminAnalyticsPage() {
   )
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
+    <AdminLayout>
       <main className="flex-1">
         {/* Header Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-primary/5 via-background to-accent/10">
@@ -508,10 +499,7 @@ export function AdminAnalyticsPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-    </div>
+    </AdminLayout>
   )
 }
 

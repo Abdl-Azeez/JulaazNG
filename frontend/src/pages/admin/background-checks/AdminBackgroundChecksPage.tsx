@@ -1,7 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -93,7 +91,6 @@ const ITEMS_PER_PAGE = 8
 
 export function AdminBackgroundChecksPage() {
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<BackgroundCheck['status'] | 'all'>('all')
   const [roleFilter, setRoleFilter] = useState<BackgroundCheck['userRole'] | 'all'>('all')
@@ -189,14 +186,9 @@ export function AdminBackgroundChecksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
-      <main className="flex-1">
+    <AdminLayout>
+      <div className="min-h-screen bg-background flex flex-col">
+        <main className="flex-1">
         {/* Header Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-blue-500/5 via-background to-background">
           <div className="container mx-auto max-w-7xl px-4 lg:px-6 xl:px-8 py-8 lg:py-10">
@@ -584,9 +576,7 @@ export function AdminBackgroundChecksPage() {
           )}
         </section>
       </main>
-
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      </div>
 
       {/* Document Viewer Dialog */}
       <Dialog open={!!viewingDocument} onOpenChange={(open) => !open && setViewingDocument(null)}>
@@ -726,7 +716,7 @@ export function AdminBackgroundChecksPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   )
 }
 

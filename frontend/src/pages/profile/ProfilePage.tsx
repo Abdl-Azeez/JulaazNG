@@ -13,8 +13,7 @@ import {
   SelectValue,
 } from '@/shared/ui/select'
 import { Badge } from '@/shared/ui/badge'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
+import { SharedLayout } from '@/widgets/shared-layout'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import { useAuthStore } from '@/shared/store/auth.store'
 import { useRoleStore } from '@/shared/store/role.store'
@@ -28,12 +27,11 @@ import { mockHandymanBadgeMetrics } from '@/__mocks__/data/handyman.mock'
 
 export function ProfilePage() {
   const navigate = useNavigate()
-  const { user, logout, isAuthenticated } = useAuthStore()
+  const { user, logout } = useAuthStore()
   const { activeRole } = useRoleStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   
   // Edit mode
   const [isEditing, setIsEditing] = useState(false)
@@ -145,18 +143,6 @@ export function ProfilePage() {
       navigate(ROUTES.HOME)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleMenuClick = () => {
-    setIsSidebarOpen(true)
-  }
-
-  const handleProfileClick = () => {
-    if (isAuthenticated) {
-      // Already on profile page
-    } else {
-      setIsDrawerOpen(true)
     }
   }
 
@@ -317,11 +303,10 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header onMenuClick={handleMenuClick} onProfileClick={handleProfileClick} />
-      
-      {/* Profile Header with Settings Button */}
-      <header className="sticky z-40 w-full border-b bg-surface/95 backdrop-blur-sm shadow-sm">
+    <SharedLayout>
+      <div className="min-h-screen bg-background">
+        {/* Profile Header with Settings Button */}
+        <header className="sticky z-40 w-full border-b bg-surface/95 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto px-4 lg:px-6 xl:px-8 h-16 lg:h-20 flex items-center justify-end max-w-7xl">
           <Button
             variant="ghost"
@@ -1083,8 +1068,8 @@ export function ProfilePage() {
         )}
       </div>
       
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
-    </div>
+        <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+      </div>
+    </SharedLayout>
   )
 }

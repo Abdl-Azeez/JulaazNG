@@ -5,8 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/shared/ui/button'
 import { Badge } from '@/shared/ui/badge'
 import { cn } from '@/shared/lib/utils/cn'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
+import { SharedLayout } from '@/widgets/shared-layout'
 import { AuthDialog } from '@/widgets/auth-dialog'
 import {
   DropdownMenu,
@@ -28,7 +27,6 @@ import {
 } from 'lucide-react'
 import { sampleNotifications } from '@/__mocks__/data/notifications.mock'
 import { Notification } from '@/shared/types/activity.types'
-import { useAuthStore } from '@/shared/store/auth.store'
 import { ROUTES } from '@/shared/constants/routes'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -90,11 +88,9 @@ const getNotificationColor = (type: Notification['type']) => {
 
 export function NotificationsPage() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
   const [notifications, setNotifications] = useState(sampleNotifications)
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const filteredNotifications = notifications.filter(notif => {
     if (filter === 'unread') return notif.status !== 'read'
@@ -143,18 +139,6 @@ export function NotificationsPage() {
     }
     setNotifications([])
     toast.success('All notifications deleted')
-  }
-
-  const handleMenuClick = () => {
-    setIsSidebarOpen(true)
-  }
-
-  const handleProfileClick = () => {
-    if (isAuthenticated) {
-      navigate(ROUTES.PROFILE)
-    } else {
-      setIsDrawerOpen(true)
-    }
   }
 
   const handleNotificationClick = (notification: Notification) => {
@@ -211,8 +195,8 @@ export function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header onMenuClick={handleMenuClick} onProfileClick={handleProfileClick} />
+    <SharedLayout>
+      <div className="min-h-screen bg-background flex flex-col">
       
       {/* Notifications Header */}
       <header className="sticky z-10 bg-surface/95 backdrop-blur-sm border-b border-border shadow-sm">
@@ -422,9 +406,9 @@ export function NotificationsPage() {
         </div>
       </main>
       
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
-    </div>
+      </div>
+    </SharedLayout>
   )
 }
 

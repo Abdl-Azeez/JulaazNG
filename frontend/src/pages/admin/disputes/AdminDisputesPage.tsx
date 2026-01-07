@@ -1,7 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -94,7 +92,6 @@ export function AdminDisputesPage() {
   const messagesByConversation = useMessagingStore((state) => state.messages)
   const addConversation = useMessagingStore((state) => state.addConversation)
   const addMessage = useMessagingStore((state) => state.addMessage)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Dispute['status'] | 'all'>('all')
   const [priorityFilter, setPriorityFilter] = useState<Dispute['priority'] | 'all'>('all')
@@ -394,13 +391,7 @@ export function AdminDisputesPage() {
   ).length
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
+    <AdminLayout>
       <main className="flex-1">
         {/* Header Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-red-500/5 via-background to-background">
@@ -751,9 +742,6 @@ export function AdminDisputesPage() {
         </section>
       </main>
 
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
       {/* View Case Dialog */}
       <Dialog open={isCaseDialogOpen} onOpenChange={setIsCaseDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -1003,6 +991,6 @@ export function AdminDisputesPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   )
 }

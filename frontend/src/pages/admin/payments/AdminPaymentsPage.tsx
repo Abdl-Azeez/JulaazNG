@@ -1,7 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -78,7 +76,6 @@ const ITEMS_PER_PAGE = 10
 
 export function AdminPaymentsPage() {
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Payment['status'] | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<Payment['type'] | 'all'>('all')
@@ -224,13 +221,7 @@ export function AdminPaymentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
+    <AdminLayout>
       <main className="flex-1">
         {/* Header Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-emerald-500/5 via-background to-background">
@@ -594,9 +585,6 @@ export function AdminPaymentsPage() {
         </section>
       </main>
 
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
       {/* Payment Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
         <DialogContent className="max-w-2xl">
@@ -756,6 +744,6 @@ export function AdminPaymentsPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   )
 }

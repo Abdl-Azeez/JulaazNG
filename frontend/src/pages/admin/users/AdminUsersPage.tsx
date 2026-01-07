@@ -1,7 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -133,7 +131,6 @@ export function AdminUsersPage() {
   const messagesByConversation = useMessagingStore((state) => state.messages)
   const addConversation = useMessagingStore((state) => state.addConversation)
   const addMessage = useMessagingStore((state) => state.addMessage)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<User['role'] | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<User['status'] | 'all'>('all')
@@ -611,14 +608,9 @@ export function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
-      <main className="flex-1">
+    <AdminLayout>
+      <div className="min-h-screen bg-background flex flex-col">
+        <main className="flex-1">
         {/* Header Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-purple-500/5 via-background to-background">
           <div className="container mx-auto max-w-7xl px-4 lg:px-6 xl:px-8 py-6 lg:py-8">
@@ -960,9 +952,7 @@ export function AdminUsersPage() {
           </Card>
         </section>
       </main>
-
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      </div>
 
       {/* User Details Dialog */}
       <Dialog open={isUserDetailsOpen} onOpenChange={setIsUserDetailsOpen}>
@@ -1892,6 +1882,6 @@ export function AdminUsersPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   )
 }

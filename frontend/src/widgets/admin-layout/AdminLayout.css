@@ -1,0 +1,77 @@
+/* Admin Layout Styles */
+
+:root {
+  --admin-sidebar-width: 280px;
+}
+
+.admin-layout {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  overflow-x: hidden;
+}
+
+.admin-layout__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Desktop: Content shifts to accommodate sidebar */
+@media (min-width: 1024px) {
+  .admin-layout__content {
+    margin-left: var(--admin-sidebar-width, 280px);
+  }
+}
+
+.admin-layout__main {
+  flex: 1;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Hide header on desktop for admin users */
+@media (min-width: 1024px) {
+  .admin-layout .admin-layout__content > header {
+    display: none;
+  }
+  
+  /* Adjust sticky headers that were positioned below the main header */
+  .admin-layout .admin-layout__main [class*="sticky"][class*="top-20"],
+  .admin-layout .admin-layout__main header.sticky {
+    top: 0 !important;
+  }
+}
+
+/* Mobile: Remove top spacing from sticky headers inside admin layout */
+@media (max-width: 1023px) {
+  .admin-layout .admin-layout__main header.sticky[class*="top-20"] {
+    top: 0 !important;
+  }
+}
+
+/* Hide "Back to Dashboard" navigation buttons on desktop (sidebar provides navigation) */
+@media (min-width: 1024px) {
+  /* Target buttons with ArrowLeft icon - more specific selectors */
+  .admin-layout .admin-layout__main button:has(.lucide-arrow-left) {
+    display: none;
+  }
+  
+  /* Hide profile settings header on desktop for admin (settings in sidebar) */
+  .admin-layout .admin-layout__main > div > header:has(button[aria-label="Settings"]) {
+    display: none;
+  }
+}
+
+/* Mobile: No margin shift, regular mobile layout */
+@media (max-width: 1023px) {
+  .admin-layout__content {
+    margin-left: 0;
+    width: 100%;
+  }
+}

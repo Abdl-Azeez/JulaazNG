@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -37,7 +35,6 @@ type FilterStatus = 'all' | 'pending' | 'under_review' | 'approved' | 'rejected'
 
 export function AdminApprovalsPage() {
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [approvals, setApprovals] = useState(samplePendingApprovals)
   const [filterType, setFilterType] = useState<FilterType>('all')
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
@@ -161,13 +158,7 @@ export function AdminApprovalsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
+    <AdminLayout>
       <main className="flex-1">
         {/* Header Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-amber-500/5 via-background to-background">
@@ -383,9 +374,6 @@ export function AdminApprovalsPage() {
         </section>
       </main>
 
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
       <Dialog open={Boolean(activePreview)} onOpenChange={(open) => !open && setActivePreview(null)}>
         <DialogContent className="max-w-2xl">
           {activePreview && (
@@ -437,7 +425,7 @@ export function AdminApprovalsPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   )
 }
 

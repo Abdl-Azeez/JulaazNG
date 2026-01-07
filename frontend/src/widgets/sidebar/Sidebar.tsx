@@ -49,8 +49,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     location.pathname.includes('/homerunner') ||
     location.pathname.includes('/admin')
 
-  // Admin and homerunner don't need Home, Properties, or Services pages
+  // Public menu items for Explore section
   const publicMenuItems: MenuItem[] = [
+    // Admin gets Dashboard instead of Home
+    ...(isAdmin ? [{ icon: Home, label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD }] : []),
     ...((isHomerunner || isAdmin) ? [] : [{ icon: Home, label: 'Home', path: ROUTES.HOME }]),
     ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }]),
     ...((isHandyman || isHomerunner || isAdmin) ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
@@ -169,13 +171,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const adminMenuItems: MenuItem[] = [
     {
-      icon: ShieldCheck,
-      label: 'Admin Dashboard',
-      path: ROUTES.ADMIN_DASHBOARD,
-      requiresAuth: true,
-      roles: ['admin'],
-    },
-    {
       icon: CheckCircle,
       label: 'Approvals',
       path: ROUTES.ADMIN_APPROVALS,
@@ -285,21 +280,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     onClose()
   }
 
-  const handleMessagesClick = () => {
-    if (isAuthenticated) {
-      handleNavigation(ROUTES.MESSAGING)
-      return
-    }
-
-    navigate(ROUTES.LOGIN, {
-      state: {
-        backgroundLocation: location,
-        modal: true,
-      },
-    })
-    onClose()
-  }
-
   const shouldShowItem = (item: MenuItem) => {
     if (item.requiresAuth && !isAuthenticated) return false
     if (item.roles && currentRole && !item.roles.includes(currentRole)) return false
@@ -363,14 +343,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </button>
               )
             })}
-            <button
-              onClick={handleMessagesClick}
-              className={cn('sidebar__item', isActive(ROUTES.MESSAGING) && 'sidebar__item--active')}
-            >
-              <MessageCircle className="sidebar__item-icon" />
-              <span className="sidebar__item-label">Messages</span>
-              <div className="sidebar__item-shine" />
-            </button>
           </div>
 
           {/* Quick Services Chips */}

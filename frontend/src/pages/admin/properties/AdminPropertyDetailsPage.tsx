@@ -21,9 +21,7 @@ import { Button } from '@/shared/ui/button'
 import { Badge } from '@/shared/ui/badge'
 import { Card } from '@/shared/ui/card'
 import { Avatar, AvatarFallback } from '@/shared/ui/avatar'
-import { Footer } from '@/widgets/footer'
-import { Sidebar } from '@/widgets/sidebar'
-import { Header } from '@/widgets/header'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { samplePropertyDetails } from '@/__mocks__/data/property-details.mock'
 import { cn } from '@/shared/lib/utils/cn'
 import type { PropertyDetail } from '@/entities/property/model/types'
@@ -39,7 +37,6 @@ const formatCurrency = (value: number) =>
 export function AdminPropertyDetailsPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [propertyStatus, setPropertyStatus] = useState<'active' | 'pending' | 'suspended' | 'rejected'>('pending')
 
   // Try to get property from samplePropertyDetails first, then fallback to admin properties
@@ -132,13 +129,9 @@ export function AdminPropertyDetailsPage() {
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <Header
-          className="hidden lg:block"
-          onMenuClick={() => setIsSidebarOpen(true)}
-          onProfileClick={() => navigate(ROUTES.PROFILE)}
-        />
-        <main className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-4">
+      <AdminLayout>
+        <div className="min-h-screen bg-background flex flex-col">
+          <main className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-4">
           <h1 className="text-2xl font-bold text-foreground">Property not found</h1>
           <p className="text-muted-foreground max-w-md">
             We couldn&apos;t locate this property. It may have been removed or the link is incorrect.
@@ -152,9 +145,8 @@ export function AdminPropertyDetailsPage() {
             </Button>
           </div>
         </main>
-        <Footer />
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      </div>
+        </div>
+      </AdminLayout>
     )
   }
 
@@ -181,13 +173,7 @@ export function AdminPropertyDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        className="hidden lg:block"
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-      />
-
+    <AdminLayout>
       {/* Hero / Gallery */}
       <section className="relative">
         <div className="relative aspect-[16/11] w-full overflow-hidden bg-muted lg:aspect-[16/7]">
@@ -761,10 +747,7 @@ export function AdminPropertyDetailsPage() {
           </section>
         </div>
       </main>
-
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-    </div>
+    </AdminLayout>
   )
 }
 

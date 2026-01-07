@@ -1,7 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -57,7 +55,6 @@ const ITEMS_PER_PAGE = 12
 
 export function AdminPropertiesPage() {
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<Property['status'] | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<Property['type'] | 'all'>('all')
@@ -153,13 +150,7 @@ export function AdminPropertiesPage() {
   }, [properties])
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
+    <AdminLayout>
       <main className="flex-1">
         {/* Header Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-blue-500/5 via-background to-background">
@@ -574,9 +565,6 @@ export function AdminPropertiesPage() {
           )}
         </section>
       </main>
-
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-    </div>
+    </AdminLayout>
   )
 }

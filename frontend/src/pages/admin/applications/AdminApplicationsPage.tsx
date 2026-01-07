@@ -1,8 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -48,7 +45,6 @@ import {
   User,
   MapPin
 } from 'lucide-react'
-import { ROUTES } from '@/shared/constants/routes'
 import { cn } from '@/shared/lib/utils/cn'
 
 // Mocks
@@ -57,8 +53,6 @@ import { mockUpcomingJobs } from '@/__mocks__/data/handyman.mock'
 import { mockInspections } from '@/__mocks__/data/homerunner.mock'
 
 export function AdminApplicationsPage() {
-  const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
 
@@ -131,13 +125,7 @@ export function AdminApplicationsPage() {
   )
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
+    <AdminLayout>
       <main className="flex-1">
         <section className="border-b border-border/60 bg-gradient-to-br from-violet-500/10 via-background to-background relative overflow-hidden">
           {/* Decorative background elements */}
@@ -648,9 +636,6 @@ export function AdminApplicationsPage() {
           </Tabs>
         </section>
       </main>
-
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-    </div>
+    </AdminLayout>
   )
 }

@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
-import { Footer } from '@/widgets/footer'
+import { AdminLayout } from '@/widgets/admin-layout'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -59,7 +57,6 @@ function NairaIcon({ className }: { className?: string }) {
 
 export function AdminDashboardPage() {
   const navigate = useNavigate()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [approvals, setApprovals] = useState(samplePendingApprovals)
   const [reviewApproval, setReviewApproval] = useState<PendingApproval | null>(null)
   const loyaltySnapshot = useMemo(
@@ -186,14 +183,9 @@ export function AdminDashboardPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
-        onMenuClick={() => setIsSidebarOpen(true)}
-        onProfileClick={() => navigate(ROUTES.PROFILE)}
-        className="lg:shadow-sm"
-      />
-
-      <main className="flex-1">
+    <AdminLayout>
+      <div className="min-h-screen bg-background flex flex-col">
+        <main className="flex-1">
         {/* Hero Section */}
         <section className="border-b border-border/60 bg-gradient-to-br from-violet-500/10 via-background to-background">
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
@@ -565,9 +557,7 @@ export function AdminDashboardPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      </div>
 
       <Dialog open={Boolean(reviewApproval)} onOpenChange={(open) => !open && setReviewApproval(null)}>
         <DialogContent className="max-w-2xl">
@@ -620,7 +610,7 @@ export function AdminDashboardPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   )
 }
 

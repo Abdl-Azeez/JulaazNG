@@ -11,23 +11,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select'
-import { Header } from '@/widgets/header'
-import { Sidebar } from '@/widgets/sidebar'
+import { SharedLayout } from '@/widgets/shared-layout'
 import { AuthDialog } from '@/widgets/auth-dialog'
-import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/store/auth.store'
 import { useThemeStore, themes } from '@/shared/store/theme.store'
-import { ROUTES } from '@/shared/constants/routes'
 import { LogoLoader } from '@/widgets/logo-loader'
 import toast from 'react-hot-toast'
 
 export function SettingsPage() {
-  const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
   const { theme, setTheme: setThemeStore } = useThemeStore()
   const [isLoading, setIsLoading] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   
   // Language settings
   const [language, setLanguage] = useState('en')
@@ -118,21 +111,9 @@ export function SettingsPage() {
     }
   }
 
-  const handleMenuClick = () => {
-    setIsSidebarOpen(true)
-  }
-
-  const handleProfileClick = () => {
-    if (isAuthenticated) {
-      navigate(ROUTES.PROFILE)
-    } else {
-      setIsDrawerOpen(true)
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header onMenuClick={handleMenuClick} onProfileClick={handleProfileClick} />
+    <SharedLayout>
+      <div className="min-h-screen bg-background">
       
       {/* Settings Header */}
       {/* <header className="sticky top-20 z-40 w-full border-b bg-surface/95 backdrop-blur-sm shadow-sm">
@@ -413,9 +394,9 @@ export function SettingsPage() {
         </Button>
       </div>
       
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
-    </div>
+      </div>
+    </SharedLayout>
   )
 }
 
