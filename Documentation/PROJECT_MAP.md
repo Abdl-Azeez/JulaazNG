@@ -31,19 +31,19 @@ New to the project? Follow this path:
 - **Design guidelines**: [Documentation/Designer_Summary.md](Documentation/Designer_Summary.md)
 
 ### I want to set up my environment
-- **Setup guide**: [GETTING_STARTED.md](GETTING_STARTED.md)
+- **Setup guide**: [Documentation/GETTING_STARTED.md](Documentation/GETTING_STARTED.md)
 - **Frontend environment**: [frontend/ENV_TEMPLATE.md](frontend/ENV_TEMPLATE.md)
 - **Backend environment**: [backend/ENV_TEMPLATE.md](backend/ENV_TEMPLATE.md)
 
 ### I want to understand the architecture
-- **Complete folder structure**: [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md)
+- **Complete folder structure**: [Documentation/FOLDER_STRUCTURE.md](Documentation/FOLDER_STRUCTURE.md)
 - **Frontend architecture**: [frontend/README.md](frontend/README.md)
 - **Backend architecture**: [backend/README.md](backend/README.md)
 
 ### I want to start coding
 - **Frontend README**: [frontend/README.md](frontend/README.md) - See "Development Guidelines"
 - **Backend README**: [backend/README.md](backend/README.md) - See "Development Guidelines"
-- **Setup summary**: [PROJECT_SETUP_SUMMARY.md](PROJECT_SETUP_SUMMARY.md)
+- **Getting Started**: [Documentation/GETTING_STARTED.md](Documentation/GETTING_STARTED.md)
 
 ---
 
@@ -53,14 +53,14 @@ New to the project? Follow this path:
 
 ```
 JulaazNG/
-├── 📄 README.md                        # Project overview & quick start
-├── 📄 GETTING_STARTED.md               # Detailed setup guide
-├── 📄 FOLDER_STRUCTURE.md              # Complete folder tree
-├── 📄 PROJECT_SETUP_SUMMARY.md         # Setup completion summary
-├── 📄 PROJECT_MAP.md                   # This file - Navigation guide
+├── 📄 readme.md                        # Project overview & quick start
 ├── 📁 frontend/                        # React application
 ├── 📁 backend/                         # NestJS API
 ├── 📁 Documentation/                   # Project documentation
+│   ├── 📄 GETTING_STARTED.md           # Detailed setup guide
+│   ├── 📄 FOLDER_STRUCTURE.md          # Complete folder tree
+│   ├── 📄 PROJECT_MAP.md               # This file - Navigation guide
+│   └── ...                             # Other documentation
 ├── 🎨 logo.svg                         # Company logo
 └── 🎨 icon.svg                         # App icon
 ```
@@ -230,18 +230,18 @@ npm run test:cov         # With coverage
 ## 📚 Documentation Index
 
 ### Getting Started
-- [Main README](README.md) - Project overview
+- [Main README](../readme.md) - Project overview
 - [Getting Started Guide](GETTING_STARTED.md) - Setup instructions
-- [Project Setup Summary](PROJECT_SETUP_SUMMARY.md) - What's been created
+- [Folder Structure](FOLDER_STRUCTURE.md) - Complete architecture guide
 
 ### Architecture
 - [Folder Structure](FOLDER_STRUCTURE.md) - Complete folder tree
-- [Frontend Architecture](frontend/README.md) - FSD architecture
-- [Backend Architecture](backend/README.md) - DDD architecture
+- [Frontend Architecture](../frontend/README.md) - FSD architecture
+- [Backend Architecture](../backend/README.md) - DDD architecture
 
 ### Configuration
-- [Frontend Environment](frontend/ENV_TEMPLATE.md) - FE environment variables
-- [Backend Environment](backend/ENV_TEMPLATE.md) - BE environment variables
+- [Frontend Environment](../frontend/ENV_TEMPLATE.md) - FE environment variables
+- [Backend Environment](../backend/ENV_TEMPLATE.md) - BE environment variables
 
 ### Business
 - [PRD](Documentation/PRD.md) - Product requirements
@@ -298,13 +298,13 @@ npm run test:cov         # With coverage
 ### Issue: Setup problems
 1. Check [GETTING_STARTED.md](GETTING_STARTED.md)
 2. Verify environment variables (ENV_TEMPLATE files)
-3. Check "Common Issues" section in Getting Started guide
+3. Check "Troubleshooting" section in Getting Started guide
 4. Ensure PostgreSQL and Redis are running
 
 ### Issue: Architecture questions
 1. Read [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md)
-2. Check relevant README ([frontend](frontend/README.md) or [backend](backend/README.md))
-3. Look at "Architecture Comparison" section
+2. Check relevant README ([frontend](../frontend/README.md) or [backend](../backend/README.md))
+3. Look at "Architecture Overview" section
 
 ---
 
@@ -343,17 +343,19 @@ npm run test          # Run tests
 - Database schema: `backend/prisma/schema.prisma`
 - Environment files: `.env.local` (FE), `.env` (BE)
 - Documentation: `Documentation/`
+- Setup guide: `Documentation/GETTING_STARTED.md`
+- Folder structure: `Documentation/FOLDER_STRUCTURE.md`
 
 ---
 
 ## 🎯 Your Next Steps
 
 1. **First time here?**
-   - Read [README.md](README.md)
+   - Read [README.md](../readme.md)
    - Follow [GETTING_STARTED.md](GETTING_STARTED.md)
 
 2. **Ready to code?**
-   - Check [frontend/README.md](frontend/README.md) or [backend/README.md](backend/README.md)
+   - Check [frontend/README.md](../frontend/README.md) or [backend/README.md](../backend/README.md)
    - Review [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md)
 
 3. **Need help?**

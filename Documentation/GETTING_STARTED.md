@@ -1,789 +1,663 @@
 # 🚀 Getting Started with JulaazNG
 
-This comprehensive guide will help you set up and run the JulaazNG platform locally on your machine.
+**Complete Setup Guide for Development Environment**
+
+**Date:** January 2026  
+**Status:** ✅ Complete  
+**Project:** JulaazNG - Nigeria's Property & Services Marketplace
+
+---
 
 ## 📋 Table of Contents
 
 1. [Prerequisites](#prerequisites)
-2. [Installation](#installation)
-3. [Environment Setup](#environment-setup)
-4. [Database Setup](#database-setup)
-5. [Running the Application](#running-the-application)
+2. [Quick Setup (3 Steps)](#quick-setup-3-steps)
+3. [Detailed Setup](#detailed-setup)
+4. [Project Structure](#project-structure)
+5. [Architecture Overview](#architecture-overview)
 6. [Development Workflow](#development-workflow)
-7. [Common Issues](#common-issues)
-8. [Next Steps](#next-steps)
+7. [Useful Commands](#useful-commands)
+8. [Troubleshooting](#troubleshooting)
+9. [Next Steps](#next-steps)
 
 ---
 
-## 🛠️ Prerequisites
+## Prerequisites
 
-Before you begin, ensure you have the following installed on your machine:
+Before you begin, ensure you have the following installed:
 
 ### Required Software
 
-| Software | Version | Download |
-|----------|---------|----------|
-| **Node.js** | 20.x or higher | [nodejs.org](https://nodejs.org/) |
-| **pnpm** | 9.x (recommended) | `npm install -g pnpm` |
-| **PostgreSQL** | 16.x | [postgresql.org](https://www.postgresql.org/download/) |
-| **Redis** | 7.x | [redis.io](https://redis.io/download) |
-| **Git** | Latest | [git-scm.com](https://git-scm.com/) |
+- **Node.js** 20.x or higher ([Download](https://nodejs.org/))
+- **pnpm** 8.x or higher (`npm install -g pnpm`)
+- **Docker Desktop** ([Download](https://www.docker.com/products/docker-desktop))
+- **Git** ([Download](https://git-scm.com/))
+- **PostgreSQL** 16.x (optional, if not using Docker)
+- **Redis** 7.x (optional, if not using Docker)
 
-### Optional (but Recommended)
+### Recommended Tools
 
-| Software | Purpose | Download |
-|----------|---------|----------|
-| **Docker** | Run PostgreSQL & Redis in containers | [docker.com](https://www.docker.com/) |
-| **Docker Compose** | Manage multiple containers | Included with Docker Desktop |
-| **VS Code** | Code editor | [code.visualstudio.com](https://code.visualstudio.com/) |
-| **Postman** | API testing | [postman.com](https://www.postman.com/) |
+- **VS Code** with extensions:
+  - ESLint
+  - Prettier
+  - Prisma
+  - Tailwind CSS IntelliSense
+- **Postman** or **Insomnia** (for API testing)
+- **DBeaver** or **pgAdmin** (for database management)
 
-### Verify Installation
+---
 
+## Quick Setup (3 Steps)
+
+### Step 1: Install Dependencies
+
+**Frontend:**
 ```bash
-# Check Node.js version
-node --version
-# Should output: v20.x.x or higher
+cd frontend
+pnpm install
+# or: npm install
+```
 
-# Check pnpm version
-pnpm --version
-# Should output: 9.x.x or higher
+**Backend:**
+```bash
+cd backend
+npm install
+```
 
-# Check PostgreSQL version
-psql --version
-# Should output: psql (PostgreSQL) 16.x
+### Step 2: Set Up Environment
 
-# Check Redis version (if installed manually)
-redis-cli --version
-# Should output: redis-cli 7.x.x
+**Frontend** - Create `.env.local`:
+```bash
+cd frontend
+touch .env.local
+```
 
-# Check Docker version (if using Docker)
-docker --version
-docker-compose --version
+Add minimal config:
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_APP_URL=http://localhost:5173
+```
+
+**Backend** - Create `.env`:
+```bash
+cd backend
+touch .env
+```
+
+Add minimal config:
+```env
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://julaazng:password123@localhost:5432/julaazng_dev
+FRONTEND_URL=http://localhost:5173
+JWT_SECRET=your-secret-key-min-32-characters-long
+JWT_REFRESH_SECRET=your-refresh-secret-key-min-32-chars
+```
+
+> **Note:** For complete environment variable lists, see:
+> - [Frontend ENV Template](../frontend/ENV_TEMPLATE.md)
+> - [Backend ENV Template](../backend/ENV_TEMPLATE.md)
+
+### Step 3: Start Services
+
+**Terminal 1 - Database (Docker):**
+```bash
+cd backend
+docker-compose up -d postgres redis
+```
+
+**Terminal 2 - Backend:**
+```bash
+cd backend
+npm run prisma:generate
+npm run prisma:migrate
+npm run start:dev
+```
+
+**Terminal 3 - Frontend:**
+```bash
+cd frontend
+pnpm dev
 ```
 
 ---
 
-## 📦 Installation
+## Detailed Setup
 
-### Step 1: Clone the Repository
+### 1. Clone Repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/JulaazNG.git
-
-# Navigate to project directory
+git clone <repository-url>
 cd JulaazNG
 ```
 
-### Step 2: Install Frontend Dependencies
+### 2. Install Dependencies
 
+**Frontend:**
 ```bash
-# Navigate to frontend directory
 cd frontend
-
-# Install dependencies using pnpm (recommended)
 pnpm install
+```
 
-# OR using npm
+**Backend:**
+```bash
+cd backend
 npm install
-
-# OR using yarn
-yarn install
 ```
 
-### Step 3: Install Backend Dependencies
+### 3. Environment Configuration
 
-```bash
-# Navigate to backend directory (from project root)
-cd ../backend
+#### Frontend Environment
 
-# Install dependencies using npm
-npm install
+Create `frontend/.env.local`:
 
-# OR using pnpm
-pnpm install
-
-# OR using yarn
-yarn install
-```
-
----
-
-## ⚙️ Environment Setup
-
-### Frontend Environment Variables
-
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Copy environment template
-cp ENV_TEMPLATE.md .env.local
-
-# Open .env.local in your editor
-# For VS Code users:
-code .env.local
-
-# OR use any text editor:
-nano .env.local
-```
-
-**Minimal .env.local for development:**
-
-```bash
-# Application
-VITE_APP_URL=http://localhost:5173
-VITE_APP_ENV=development
-
+```env
 # API Configuration
 VITE_API_URL=http://localhost:3000/api
-VITE_SOCKET_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:5173
 
-# Feature Flags (Enable basic features)
+# Feature Flags
 VITE_FEATURE_ARTISAN_MARKETPLACE=true
 VITE_FEATURE_PROPERTY_MANAGEMENT=true
 VITE_FEATURE_SHORT_LET=true
+
+# Internationalization
+VITE_I18N_DEFAULT_LOCALE=en-NG
+VITE_I18N_AVAILABLE_LOCALES=en-NG,yo,ha,ig
+
+# Theme
+VITE_DEFAULT_THEME=naija-fresh
 ```
 
-> **Note:** You'll need to add payment gateway keys, Cloudinary credentials, and other service keys later for full functionality.
+See [frontend/ENV_TEMPLATE.md](../frontend/ENV_TEMPLATE.md) for complete list.
 
-### Backend Environment Variables
+#### Backend Environment
 
-```bash
-# Navigate to backend directory
-cd ../backend
+Create `backend/.env`:
 
-# Copy environment template
-cp ENV_TEMPLATE.md .env
-
-# Open .env in your editor
-code .env
-# OR
-nano .env
-```
-
-**Minimal .env for development:**
-
-```bash
+```env
 # Application
 NODE_ENV=development
 PORT=3000
-BACKEND_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:5173
 
 # Database
 DATABASE_URL=postgresql://julaazng:password123@localhost:5432/julaazng_dev
 
-# Redis
-REDIS_URL=redis://localhost:6379
-
-# JWT (Generate secure keys for production!)
-JWT_SECRET=your-development-jwt-secret-min-32-chars
-JWT_REFRESH_SECRET=your-development-refresh-secret-min-32-chars
+# Authentication
+JWT_SECRET=your-secret-key-min-32-characters-long
+JWT_REFRESH_SECRET=your-refresh-secret-key-min-32-chars
 JWT_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 
-# CORS
-CORS_ORIGIN=http://localhost:5173,http://localhost:3000
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Payment (Get from providers)
+PAYSTACK_SECRET_KEY=sk_test_...
+FLUTTERWAVE_SECRET_KEY=FLWSECK_TEST-...
 ```
 
-> **Important:** The JWT secrets above are for development only. Generate secure keys for production!
+See [backend/ENV_TEMPLATE.md](../backend/ENV_TEMPLATE.md) for complete list.
 
-#### Generate Secure JWT Keys
+### 4. Database Setup
 
-```bash
-# Generate JWT secret (copy output to JWT_SECRET)
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-
-# Generate refresh secret (copy output to JWT_REFRESH_SECRET)
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
----
-
-## 🗄️ Database Setup
-
-You have two options: **Docker** (recommended) or **Manual Installation**.
-
-### Option 1: Using Docker (Recommended)
-
-This is the easiest way to get started. Docker Compose will set up both PostgreSQL and Redis for you.
+#### Option A: Using Docker (Recommended)
 
 ```bash
-# Navigate to backend directory
 cd backend
-
-# Start PostgreSQL and Redis containers
 docker-compose up -d postgres redis
-
-# Verify containers are running
-docker-compose ps
-
-# Expected output:
-# NAME                COMMAND                  STATUS              PORTS
-# backend-postgres-1  "docker-entrypoint.s…"   Up About a minute   0.0.0.0:5432->5432/tcp
-# backend-redis-1     "docker-entrypoint.s…"   Up About a minute   0.0.0.0:6379->6379/tcp
 ```
 
-**Useful Docker Commands:**
+This starts:
+- PostgreSQL 16 on port 5432
+- Redis 7 on port 6379
 
-```bash
-# View logs
-docker-compose logs -f postgres
-docker-compose logs -f redis
+#### Option B: Manual Installation
 
-# Stop containers
-docker-compose down
-
-# Stop and remove all data (⚠️ deletes database!)
-docker-compose down -v
-
-# Restart containers
-docker-compose restart postgres redis
-```
-
-### Option 2: Manual Installation
-
-#### PostgreSQL Setup
-
-```bash
-# macOS (using Homebrew)
-brew install postgresql@16
-brew services start postgresql@16
-
-# Ubuntu/Debian
-sudo apt update
-sudo apt install postgresql-16 postgresql-contrib-16
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-
-# Windows
-# Download installer from postgresql.org and follow the wizard
-```
-
-**Create Database and User:**
-
-```bash
-# Connect to PostgreSQL
-psql postgres
-
-# In psql prompt, run:
+1. Install PostgreSQL 16
+2. Create database:
+```sql
 CREATE DATABASE julaazng_dev;
 CREATE USER julaazng WITH PASSWORD 'password123';
 GRANT ALL PRIVILEGES ON DATABASE julaazng_dev TO julaazng;
-\q
 ```
 
-#### Redis Setup
+3. Install Redis 7
+4. Start Redis service
+
+### 5. Run Migrations
 
 ```bash
-# macOS (using Homebrew)
-brew install redis
-brew services start redis
-
-# Ubuntu/Debian
-sudo apt update
-sudo apt install redis-server
-sudo systemctl start redis-server
-sudo systemctl enable redis-server
-
-# Windows
-# Download from https://redis.io/download or use WSL
-```
-
-**Test Redis Connection:**
-
-```bash
-redis-cli ping
-# Should output: PONG
-```
-
-### Run Database Migrations
-
-Once PostgreSQL is running:
-
-```bash
-# Navigate to backend directory
 cd backend
-
-# Generate Prisma client
 npm run prisma:generate
-
-# Run migrations (creates database tables)
 npm run prisma:migrate
-
-# Seed database with initial data (optional)
-npm run prisma:seed
-
-# Open Prisma Studio (Database GUI) to verify
-npm run prisma:studio
-# Opens at http://localhost:5555
+npm run prisma:seed  # Optional: Seed sample data
 ```
 
----
-
-## 🏃 Running the Application
-
-### Start Backend Server
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Development mode (with hot reload)
-npm run start:dev
-
-# Expected output:
-# [Nest] 12345 - LOG [NestFactory] Starting Nest application...
-# [Nest] 12345 - LOG [InstanceLoader] AppModule dependencies initialized
-# ...
-# [Nest] 12345 - LOG [NestApplication] Nest application successfully started
-# [Nest] 12345 - LOG Application is running on: http://localhost:3000
-```
-
-**Backend is now running at:**
-- API: http://localhost:3000
-- API Documentation (Swagger): http://localhost:3000/api/docs
-- Health Check: http://localhost:3000/health
-
-### Start Frontend Development Server
-
-Open a **new terminal window/tab**:
-
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Development mode (with hot reload)
-pnpm dev
-
-# Expected output:
-# VITE v5.x.x  ready in xxx ms
-# 
-# ➜  Local:   http://localhost:5173/
-# ➜  Network: use --host to expose
-# ➜  press h + enter to show help
-```
-
-**Frontend is now running at:**
-- Application: http://localhost:5173
-
----
-
-## 🎯 Verify Everything is Working
-
-### 1. Check Backend Health
-
-```bash
-curl http://localhost:3000/health
-
-# Expected response:
-# {"status":"ok","info":{"database":{"status":"up"},"redis":{"status":"up"}}}
-```
-
-### 2. Check API Documentation
-
-Open your browser and navigate to:
-- http://localhost:3000/api/docs
-
-You should see the Swagger UI with all API endpoints.
-
-### 3. Check Frontend
-
-Open your browser and navigate to:
-- http://localhost:5173
-
-You should see the JulaazNG landing page.
-
-### 4. Test API from Frontend
-
-Try registering a new user or logging in through the frontend interface.
-
----
-
-## 💻 Development Workflow
-
-### Terminal Setup (Recommended)
-
-Use 3 terminal windows/tabs for efficient development:
-
-**Terminal 1: Backend**
-```bash
-cd backend
-npm run start:dev
-```
-
-**Terminal 2: Frontend**
-```bash
-cd frontend
-pnpm dev
-```
-
-**Terminal 3: Commands** (for running migrations, tests, etc.)
-```bash
-# Available for ad-hoc commands
-```
-
-### Using VS Code
-
-**Recommended Extensions:**
-
-1. **ESLint** - Code linting
-2. **Prettier** - Code formatting
-3. **Prisma** - Database schema syntax highlighting
-4. **Tailwind CSS IntelliSense** - Tailwind autocomplete
-5. **Auto Rename Tag** - Rename HTML tags automatically
-6. **GitLens** - Enhanced Git integration
-
-**Install all at once:**
-
-```bash
-# Run this in VS Code terminal
-code --install-extension dbaeumer.vscode-eslint
-code --install-extension esbenp.prettier-vscode
-code --install-extension Prisma.prisma
-code --install-extension bradlc.vscode-tailwindcss
-code --install-extension formulahendry.auto-rename-tag
-code --install-extension eamodio.gitlens
-```
-
-### Code Formatting
-
-```bash
-# Frontend
-cd frontend
-pnpm format        # Format all files
-pnpm lint          # Check for linting errors
-pnpm lint:fix      # Fix linting errors
-
-# Backend
-cd backend
-npm run format     # Format all files
-npm run lint       # Check for linting errors
-npm run lint:fix   # Fix linting errors
-```
-
-### Running Tests
-
-```bash
-# Frontend
-cd frontend
-pnpm test          # Run unit tests
-pnpm test:watch    # Run tests in watch mode
-
-# Backend
-cd backend
-npm run test       # Run unit tests
-npm run test:watch # Run tests in watch mode
-npm run test:e2e   # Run end-to-end tests
-npm run test:cov   # Run tests with coverage
-```
-
-### Database Operations
-
-```bash
-cd backend
-
-# Create a new migration
-npm run prisma:migrate -- --name add_new_feature
-
-# Reset database (⚠️ deletes all data!)
-npm run prisma:reset
-
-# Open Prisma Studio (Database GUI)
-npm run prisma:studio
-
-# Seed database
-npm run prisma:seed
-```
-
----
-
-## 🔧 Common Issues & Solutions
-
-### Issue 1: Port Already in Use
-
-**Error:**
-```
-Port 3000 is already in use
-```
-
-**Solution:**
-```bash
-# Find process using port 3000
-lsof -i :3000
-
-# Kill the process
-kill -9 <PID>
-
-# OR change the port in backend/.env
-PORT=3001
-```
-
-### Issue 2: Database Connection Failed
-
-**Error:**
-```
-Error: P1001: Can't reach database server at localhost:5432
-```
-
-**Solution:**
-```bash
-# Check if PostgreSQL is running
-# macOS/Linux
-ps aux | grep postgres
-
-# Windows
-tasklist | findstr postgres
-
-# Start PostgreSQL
-# macOS (Homebrew)
-brew services start postgresql@16
-
-# Ubuntu
-sudo systemctl start postgresql
-
-# Docker
-docker-compose up -d postgres
-```
-
-### Issue 3: Redis Connection Failed
-
-**Error:**
-```
-Error: connect ECONNREFUSED 127.0.0.1:6379
-```
-
-**Solution:**
-```bash
-# Check if Redis is running
-redis-cli ping
-
-# Start Redis
-# macOS (Homebrew)
-brew services start redis
-
-# Ubuntu
-sudo systemctl start redis-server
-
-# Docker
-docker-compose up -d redis
-```
-
-### Issue 4: Prisma Client Not Generated
-
-**Error:**
-```
-Cannot find module '@prisma/client'
-```
-
-**Solution:**
-```bash
-cd backend
-npm run prisma:generate
-```
-
-### Issue 5: Module Not Found (Frontend)
-
-**Error:**
-```
-Failed to resolve import "..." from "..."
-```
-
-**Solution:**
-```bash
-cd frontend
-
-# Clear node_modules and reinstall
-rm -rf node_modules
-rm pnpm-lock.yaml  # or package-lock.json
-pnpm install
-
-# Restart dev server
-pnpm dev
-```
-
-### Issue 6: TypeScript Errors After Fresh Install
-
-**Solution:**
-```bash
-# Frontend
-cd frontend
-pnpm exec tsc --noEmit
-
-# Backend
-cd backend
-npm run build
-```
-
-### Issue 7: Docker Compose Issues
-
-**Error:**
-```
-ERROR: Couldn't connect to Docker daemon
-```
-
-**Solution:**
-```bash
-# Make sure Docker Desktop is running
-
-# macOS
-open -a Docker
-
-# Restart Docker service
-# Linux
-sudo systemctl restart docker
-
-# Verify Docker is running
-docker ps
-```
-
----
-
-## 📚 Next Steps
-
-### 1. Explore the Codebase
-
-**Frontend:**
-- Check out `frontend/src/pages/home/` for the landing page
-- Look at `frontend/src/features/auth/` for authentication logic
-- Explore `frontend/src/shared/ui/` for reusable UI components
+### 6. Start Development Servers
 
 **Backend:**
-- Check `backend/src/modules/auth/` for authentication endpoints
-- Look at `backend/src/modules/properties/` for property management
-- Explore `backend/prisma/schema.prisma` for database schema
-
-### 2. Create Your First Feature
-
-Follow this guide to add a new feature:
-- [Creating a New Frontend Feature](frontend/README.md#creating-features)
-- [Creating a New Backend Module](backend/README.md#creating-modules)
-
-### 3. Set Up Third-Party Services
-
-For full functionality, you'll need to set up:
-
-**Payment Gateways:**
-- [Paystack](https://paystack.com) - Nigerian payment processor
-- [Flutterwave](https://flutterwave.com) - Alternative payment processor
-
-**File Storage:**
-- [Cloudinary](https://cloudinary.com) - Image/video hosting (free tier available)
-
-**Email Service:**
-- [SendGrid](https://sendgrid.com) - Email delivery (free tier: 100 emails/day)
-- [Resend](https://resend.com) - Modern email API
-
-**SMS Service:**
-- [Termii](https://termii.com) - Nigerian SMS provider
-
-**Maps:**
-- [Google Maps API](https://developers.google.com/maps) - Maps and geocoding
-- [Mapbox](https://www.mapbox.com) - Alternative maps provider
-
-**Push Notifications:**
-- [Firebase Cloud Messaging](https://firebase.google.com/products/cloud-messaging) - Free push notifications
-
-### 4. Read the Documentation
-
-- **[Project README](README.md)** - Project overview
-- **[Folder Structure](FOLDER_STRUCTURE.md)** - Complete folder structure
-- **[Frontend README](frontend/README.md)** - Frontend architecture
-- **[Backend README](backend/README.md)** - Backend architecture
-- **[PRD](Documentation/PRD.md)** - Product requirements
-- **[Development Plan](Documentation/JulaazNG_development_plan.md)** - Development timeline
-
-### 5. Join the Development
-
-Ready to contribute?
-1. Create a new branch: `git checkout -b feature/your-feature-name`
-2. Make your changes
-3. Run tests: `pnpm test` (frontend) or `npm test` (backend)
-4. Commit: `git commit -m "feat: add your feature"`
-5. Push: `git push origin feature/your-feature-name`
-6. Open a Pull Request
-
----
-
-## 🎓 Learning Resources
-
-### General
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Git Basics](https://git-scm.com/book/en/v2/Getting-Started-Git-Basics)
-
-### Frontend
-- [React Documentation](https://react.dev/)
-- [Vite Guide](https://vitejs.dev/guide/)
-- [TanStack Query](https://tanstack.com/query/latest)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Zustand](https://github.com/pmndrs/zustand)
-
-### Backend
-- [NestJS Documentation](https://docs.nestjs.com/)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [PostgreSQL Tutorial](https://www.postgresqltutorial.com/)
-- [Redis Documentation](https://redis.io/documentation)
-
----
-
-## 💬 Getting Help
-
-### Quick Help Commands
-
 ```bash
-# Frontend help
-cd frontend
-pnpm --help
-pnpm run   # List all available scripts
-
-# Backend help
 cd backend
-npm run    # List all available scripts
+npm run start:dev
 ```
 
-### Community Support
-
-- **GitHub Issues**: Report bugs and request features
-- **Email**: support@julaazng.com
-- **Documentation**: Check the `/Documentation` folder
+**Frontend:**
+```bash
+cd frontend
+pnpm dev
+```
 
 ---
 
-## ✅ Development Checklist
+## Access Points
 
-Use this checklist to verify your setup:
+Once running:
 
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:3000
+- **API Docs (Swagger):** http://localhost:3000/api/docs
+- **Prisma Studio:** `npm run prisma:studio` (http://localhost:5555)
+- **Health Check:** http://localhost:3000/health
+
+---
+
+## Project Structure
+
+```
+JulaazNG/
+├── frontend/                    # React 18 + TypeScript + Vite
+│   ├── src/
+│   │   ├── app/                 # Application layer
+│   │   ├── pages/               # Route components
+│   │   ├── features/            # Business logic
+│   │   ├── entities/            # Data models
+│   │   ├── widgets/             # Complex UI
+│   │   ├── shared/              # Reusable utilities
+│   │   ├── assets/              # Static files
+│   │   └── styles/              # Global styles
+│   ├── README.md                # Frontend documentation
+│   └── ENV_TEMPLATE.md          # Environment variables guide
+│
+├── backend/                     # NestJS + TypeScript + Prisma
+│   ├── src/
+│   │   ├── config/              # Configuration
+│   │   ├── common/              # Shared utilities
+│   │   ├── infrastructure/      # External services
+│   │   ├── modules/             # Domain modules
+│   │   └── health/              # Health checks
+│   ├── prisma/                  # Database schema
+│   ├── README.md                # Backend documentation
+│   └── ENV_TEMPLATE.md          # Environment variables guide
+│
+└── Documentation/               # Project documentation
+    ├── PRD.md                   # Product Requirements
+    ├── FOLDER_STRUCTURE.md      # Complete folder tree
+    ├── GETTING_STARTED.md       # This file
+    └── ...                      # Other docs
+```
+
+> **For complete folder structure, see [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md)**
+
+---
+
+## Architecture Overview
+
+### Frontend: Feature-Sliced Design (FSD)
+
+**Architecture Layers:**
+1. **app/** - Application initialization (Providers, Router, Stores)
+2. **pages/** - Route entry points (Login, Home, Dashboard)
+3. **features/** - Business logic (Auth, Properties, Services, Artisans)
+4. **entities/** - Data models (User, Property, Booking types)
+5. **widgets/** - Complex UI (Header, Cards, Chat)
+6. **shared/** - Reusable utilities (UI components, Hooks, Utils)
+
+**Key Features:**
+- 🎨 6 Nigerian-themed color schemes
+- 🌍 Multi-language support (English, Yoruba, Hausa, Igbo)
+- 📱 Progressive Web App (PWA)
+- 🔄 Real-time messaging (Socket.IO)
+- 💳 Payment integration (Paystack, Flutterwave)
+- 🎯 Type-safe with TypeScript
+
+### Backend: Domain-Driven Design (DDD)
+
+**Architecture Layers:**
+1. **config/** - Application configuration
+2. **common/** - Shared utilities (Guards, Decorators, Pipes)
+3. **infrastructure/** - External services (Database, Cache, Email, Payment)
+4. **modules/** - Domain logic (Auth, Properties, Artisans, Bookings)
+5. **health/** - Health check endpoints
+
+**Key Features:**
+- 🔐 JWT authentication with refresh tokens
+- 🗄️ PostgreSQL + Prisma ORM
+- ⚡ Redis caching
+- 📧 Multi-channel notifications (Email, SMS, Push)
+- 💰 Payment gateway integration
+- 🤖 AI-powered features (OpenAI)
+- 🔄 Real-time WebSocket (Socket.IO)
+
+> **For detailed architecture, see:**
+> - [Frontend README](../frontend/README.md)
+> - [Backend README](../backend/README.md)
+> - [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md)
+
+---
+
+## Development Workflow
+
+### 1. Create Feature Branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+### 2. Development
+
+**Frontend:**
+- Add pages in `src/pages/`
+- Add business logic in `src/features/`
+- Add UI components in `src/shared/ui/`
+- Add types in `src/entities/*/model/`
+
+**Backend:**
+- Add modules in `src/modules/`
+- Update database schema in `prisma/schema.prisma`
+- Run migrations: `npm run prisma:migrate`
+
+### 3. Testing
+
+**Frontend:**
+```bash
+cd frontend
+pnpm test
+pnpm test:coverage
+```
+
+**Backend:**
+```bash
+cd backend
+npm run test
+npm run test:e2e
+npm run test:cov
+```
+
+### 4. Code Quality
+
+**Linting:**
+```bash
+# Frontend
+cd frontend && pnpm lint
+
+# Backend
+cd backend && npm run lint
+```
+
+**Formatting:**
+```bash
+# Frontend
+cd frontend && pnpm format
+
+# Backend
+cd backend && npm run format
+```
+
+### 5. Commit & Push
+
+```bash
+git add .
+git commit -m "feat: add your feature"
+git push origin feature/your-feature-name
+```
+
+---
+
+## Useful Commands
+
+### Frontend Commands
+
+```bash
+pnpm dev              # Start dev server
+pnpm build            # Build for production
+pnpm preview          # Preview production build
+pnpm lint             # Check code
+pnpm lint:fix         # Fix linting issues
+pnpm format           # Format code
+pnpm type-check       # TypeScript type checking
+pnpm test             # Run tests
+pnpm test:watch       # Run tests in watch mode
+pnpm test:coverage    # Run tests with coverage
+```
+
+### Backend Commands
+
+```bash
+npm run start:dev     # Start with hot reload
+npm run start:prod    # Start production server
+npm run build         # Build for production
+npm run lint          # Check code
+npm run lint:fix      # Fix linting issues
+npm run format        # Format code
+npm run test          # Run unit tests
+npm run test:e2e      # Run E2E tests
+npm run test:cov      # Run tests with coverage
+
+# Database
+npm run prisma:generate    # Generate Prisma Client
+npm run prisma:migrate     # Run migrations
+npm run prisma:studio      # Open Prisma Studio
+npm run prisma:seed        # Seed database
+npm run prisma:reset      # Reset database
+```
+
+### Docker Commands
+
+```bash
+docker-compose up -d              # Start services
+docker-compose down               # Stop services
+docker-compose logs -f postgres   # View PostgreSQL logs
+docker-compose logs -f redis      # View Redis logs
+docker-compose restart            # Restart services
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Port Already in Use
+
+**Error:** `EADDRINUSE: address already in use :::3000`
+
+**Solution:**
+```bash
+# Find process using port
+lsof -i :3000  # macOS/Linux
+netstat -ano | findstr :3000  # Windows
+
+# Kill process or change PORT in .env
+```
+
+#### 2. Database Connection Error
+
+**Error:** `Can't reach database server`
+
+**Solutions:**
+- Check Docker is running: `docker ps`
+- Verify DATABASE_URL in `.env`
+- Restart Docker: `docker-compose restart postgres`
+- Check PostgreSQL logs: `docker-compose logs postgres`
+
+#### 3. Prisma Client Not Generated
+
+**Error:** `@prisma/client did not initialize yet`
+
+**Solution:**
+```bash
+cd backend
+npm run prisma:generate
+```
+
+#### 4. Module Not Found
+
+**Error:** `Cannot find module`
+
+**Solutions:**
+- Reinstall dependencies: `pnpm install` or `npm install`
+- Clear cache: `rm -rf node_modules .next` (if applicable)
+- Check import paths (use `@/` prefix for absolute imports)
+
+#### 5. Environment Variables Not Loading
+
+**Solutions:**
+- Ensure `.env.local` (frontend) or `.env` (backend) exists
+- Restart dev server after adding new variables
+- Check variable names match exactly (case-sensitive)
+
+#### 6. CORS Errors
+
+**Error:** `Access to fetch has been blocked by CORS policy`
+
+**Solution:**
+- Verify `FRONTEND_URL` in backend `.env` matches frontend URL
+- Check CORS configuration in backend
+
+---
+
+## Next Steps
+
+### 1. Review Documentation
+
+- [README.md](../readme.md) - Project overview
+- [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md) - Complete folder tree
+- [PRD.md](PRD.md) - Product requirements
+- [Frontend README](../frontend/README.md) - Frontend architecture
+- [Backend README](../backend/README.md) - Backend architecture
+
+### 2. Explore the Codebase
+
+- Check out existing pages in `frontend/src/pages/`
+- Review API structure in `backend/src/modules/`
+- Explore UI components in `frontend/src/shared/ui/`
+
+### 3. Start Building
+
+- Pick a feature from the [PRD.md](PRD.md)
+- Create a feature branch
+- Follow the development workflow
+- Write tests
+- Submit a PR
+
+### 4. Development Phases
+
+**Phase 1: MVP (Months 1-3)**
+- User authentication & profiles
+- Property listing & search
+- Basic booking system
+- Payment integration (Paystack)
+- Admin dashboard
+
+**Phase 2: Enhanced Features (Months 4-6)**
+- Service marketplace
+- Artisan network
+- Advanced search & filters
+- Review & rating system
+- Verification system
+
+**Phase 3: Advanced Features (Months 7-12)**
+- Premium property management
+- Security monitoring (cameras)
+- AI-powered recommendations
+- Advanced analytics
+- Market expansion
+
+---
+
+## ✅ Setup Checklist
+
+Use this checklist to verify everything is set up:
+
+### Prerequisites
 - [ ] Node.js 20.x installed
-- [ ] pnpm/npm installed
-- [ ] PostgreSQL 16.x running
-- [ ] Redis 7.x running (optional but recommended)
-- [ ] Git repository cloned
-- [ ] Frontend dependencies installed
-- [ ] Backend dependencies installed
-- [ ] Frontend `.env.local` configured
-- [ ] Backend `.env` configured
-- [ ] Database created
-- [ ] Migrations run successfully
-- [ ] Backend server starts without errors
-- [ ] Frontend dev server starts without errors
-- [ ] API documentation accessible (http://localhost:3000/api/docs)
-- [ ] Frontend loads successfully (http://localhost:5173)
-- [ ] Health check passes (http://localhost:3000/health)
+- [ ] pnpm installed
+- [ ] Docker Desktop installed and running
+- [ ] Git installed
+
+### Installation
+- [ ] Repository cloned
+- [ ] Frontend dependencies installed (`pnpm install`)
+- [ ] Backend dependencies installed (`npm install`)
+
+### Configuration
+- [ ] Frontend `.env.local` created
+- [ ] Backend `.env` created
+- [ ] Environment variables configured
+
+### Database
+- [ ] Docker services running (`docker-compose up -d`)
+- [ ] Prisma Client generated (`npm run prisma:generate`)
+- [ ] Migrations run (`npm run prisma:migrate`)
+- [ ] Database seeded (optional: `npm run prisma:seed`)
+
+### Development
+- [ ] Backend server running (`npm run start:dev`)
+- [ ] Frontend server running (`pnpm dev`)
+- [ ] Can access frontend at http://localhost:5173
+- [ ] Can access API at http://localhost:3000
+- [ ] Can access API docs at http://localhost:3000/api/docs
 
 ---
 
-## 🎉 You're All Set!
+## 🎨 Design System
 
-Congratulations! You now have JulaazNG running locally. Happy coding! 🚀
+### Themes
 
-For questions or issues, please refer to:
-- [Project README](README.md)
-- [Frontend README](frontend/README.md)
-- [Backend README](backend/README.md)
-- [GitHub Issues](https://github.com/yourusername/JulaazNG/issues)
+Six Nigerian-themed color schemes:
 
-**Next**: Start exploring the codebase and building amazing features! 💪
+1. **🌿 Naija Fresh** (Default) - Green/Nature
+2. **🌃 Eko Luxe** - Lagos Premium, Dark Gold
+3. **🏜️ Arewa Calm** - Northern Nigeria, Earth Tones
+4. **🏠 Ụlọ Oma** - Igbo Heritage, Red/Traditional
+5. **🌧️ Rainy 9ja** - Lagos Rainy Season, Blue/Cool
+6. **🎨 Ajébo Blend** - Modern Nigerian, Purple/Tech
 
+### Design Principles
+
+- Mobile-first approach
+- WCAG 2.1 AA accessibility
+- Core Web Vitals optimization
+- Responsive across all devices
+- Intuitive navigation
+
+---
+
+## 📞 Support & Resources
+
+### Documentation
+- **Main README:** [README.md](../readme.md)
+- **Folder Structure:** [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md)
+- **Frontend Guide:** [frontend/README.md](../frontend/README.md)
+- **Backend Guide:** [backend/README.md](../backend/README.md)
+- **PRD:** [PRD.md](PRD.md)
+
+### External Resources
+- **React:** https://react.dev
+- **NestJS:** https://docs.nestjs.com
+- **Prisma:** https://www.prisma.io/docs
+- **Tailwind CSS:** https://tailwindcss.com
+- **shadcn/ui:** https://ui.shadcn.com
+
+### Contact
+- **Email:** support@julaazng.com
+- **GitHub:** Create an issue for bugs/features
+
+---
+
+**Built with ❤️ for the Nigerian property market**
+
+*Last Updated: January 2026*

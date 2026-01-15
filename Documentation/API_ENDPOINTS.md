@@ -1,5 +1,7 @@
-# 📋 JulaazNG Complete API Reference
-## Comprehensive API Endpoint Documentation for All Roles & Modules
+# 📋 JulaazNG API Endpoints Reference
+## Quick Reference Guide for All API Endpoints
+
+> **For comprehensive backend development guide (architecture, database schema, implementation details), see [BACKEND_API_SPEC.md](BACKEND_API_SPEC.md)**
 
 ---
 
@@ -210,16 +212,6 @@
 | 9 | POST | `/conversations/:id/typing` | Send typing indicator | Yes | All |
 | 10 | GET | `/unread-count` | Get total unread messages | Yes | All |
 
-### WebSocket Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `authenticate` | Client → Server | Authenticate socket connection |
-| `message:new` | Server → Client | New chat message |
-| `message:read` | Server → Client | Message read receipt |
-| `conversation:typing` | Bidirectional | Typing indicator |
-| `user:online` | Server → Client | User came online |
-| `user:offline` | Server → Client | User went offline |
-
 ---
 
 ## 🔔 8. Notifications APIs (`/api/v1/notifications`)
@@ -236,12 +228,6 @@
 | 8 | GET | `/settings` | Get notification preferences | Yes | All |
 | 9 | PUT | `/settings` | Update notification preferences | Yes | All |
 | 10 | POST | `/subscribe` | Subscribe to push notifications | Yes | All |
-
-### WebSocket Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `notification:new` | Server → Client | New notification |
-| `notification:read` | Server → Client | Notification read |
 
 ---
 
@@ -571,59 +557,6 @@
 
 ---
 
-## 🔌 WebSocket Events Summary
-
-### Connection Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `connect` | Client → Server | Establish connection |
-| `authenticate` | Client → Server | Authenticate with JWT |
-| `disconnect` | Bidirectional | Connection closed |
-
-### Messaging Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `message:new` | Server → Client | New chat message |
-| `message:read` | Server → Client | Message read receipt |
-| `message:delivered` | Server → Client | Message delivered |
-| `conversation:typing` | Bidirectional | Typing indicator |
-
-### Notification Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `notification:new` | Server → Client | New notification |
-| `notification:read` | Client → Server | Mark notification read |
-
-### Booking Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `booking:status_changed` | Server → Client | Booking status update |
-| `application:approved` | Server → Client | Application approved |
-| `application:rejected` | Server → Client | Application rejected |
-| `viewing:scheduled` | Server → Client | Viewing scheduled |
-
-### Payment Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `payment:received` | Server → Client | Payment confirmation |
-| `payment:failed` | Server → Client | Payment failed |
-| `payment:due` | Server → Client | Payment reminder |
-
-### Job Events (Handyman/Homerunner)
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `job:assigned` | Server → Client | New job assigned |
-| `job:updated` | Server → Client | Job status updated |
-| `job:completed` | Server → Client | Job completed |
-
-### User Events
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `user:online` | Server → Client | User came online |
-| `user:offline` | Server → Client | User went offline |
-
----
-
 ## 📊 Total API Count by Role
 
 | Role | Accessible Endpoints |
@@ -655,6 +588,6 @@
 ---
 
 **Document Version:** 1.0  
-**Last Updated:** December 2025  
+**Last Updated:** January 2026  
 **Total Endpoints:** ~289  
-**Prepared By:** JulaazNG Development Team
+**For detailed backend development guide, see [BACKEND_API_SPEC.md](BACKEND_API_SPEC.md)**
