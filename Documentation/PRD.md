@@ -2449,6 +2449,59 @@ Chatbot: OpenAI Assistants API LangChain (custom logic)
 
 ---
 
+## 15. Key Selling Points & Value Propositions
+
+> **📄 For detailed selling points by user role, see [KEY_SELLING_POINTS.md](KEY_SELLING_POINTS.md)**
+
+### 15.1 Quick Reference
+
+**For Tenants:**
+- Request to Rent feature (proactive property matching)
+- Flexible lease terms (monthly, quarterly, six-month, annual)
+- Background check verification (one-time, reusable)
+- My Bookings dashboard (14-stage tracking)
+- Agreements & Payments workspace (integrated signing & payment)
+- Loyalty points system (earn & redeem on services)
+- Dual rental options (long-term + short-let)
+
+**For Landlords:**
+- Earnings Management Dashboard (real-time financial tracking)
+- Property Management Suite (occupancy, applications, analytics)
+- Premium Property Management (8-12% standard, 15-20% with security)
+- Application Management (streamlined approval workflows)
+- Flexible Rent Terms (attract more tenants)
+- Dual Revenue Streams (long-term + short-let)
+- Lower Commission Rates (5-8% vs 10-15% traditional)
+
+**For Service Providers & Artisans:**
+- Artisan Marketplace (diagnostic fees, AI matching)
+- Service Booking Management (complete lifecycle tracking)
+- Professional Credibility (verification, ratings, badges)
+
+**Platform-Wide:**
+- Trust & Security Framework (comprehensive verification)
+- One-Stop Platform (rentals + services + management)
+- Real-Time Communication (integrated messaging)
+- Mobile-First PWA (offline-capable, fast loading)
+- Transparent Pricing (no hidden fees)
+- Multi-Language Support (English, Yoruba, Hausa, Igbo)
+- Admin Oversight (comprehensive moderation)
+
+### 15.2 Nigerian Market-Specific Features
+
+> **📄 For detailed Nigerian market feature recommendations, see [NIGERIAN_MARKET_FEATURES.md](NIGERIAN_MARKET_FEATURES.md)**
+
+**Priority Features:**
+- USSD Payment Integration (reach unbanked users)
+- NIN Integration (mandatory, trusted ID)
+- WhatsApp Integration (primary communication tool)
+- Agent Network Integration (leverage existing network)
+- Bank Transfer Auto-Verification (most trusted method)
+- Generator/Power Backup Information (critical decision factor)
+- Referral Program (word-of-mouth growth)
+
+---
+
 ## 16. Conclusion
 
 JulaazNG represents a significant opportunity to transform Nigeria's property rental market through technology. By focusing on trust, convenience, and comprehensive service offerings, the platform can capture significant market share while building sustainable revenue streams.
