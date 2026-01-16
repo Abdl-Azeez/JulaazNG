@@ -55,6 +55,13 @@ export function RealtorEarningsPage() {
                       </span>
                       <span className="text-muted-foreground">gross commissions</span>
                     </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-destructive/10 border border-destructive/20">
+                      <Activity className="h-4 w-4 text-destructive" />
+                      <span className="font-semibold text-destructive">
+                        ₦{(expensesThisMonth / 1_000_000).toFixed(2)}M
+                      </span>
+                      <span className="text-muted-foreground">expenses</span>
+                    </div>
                   </div>
                 </div>
 
