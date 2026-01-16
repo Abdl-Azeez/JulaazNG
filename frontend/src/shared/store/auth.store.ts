@@ -7,7 +7,7 @@ export interface User {
   name?: string
   email?: string
   phone?: string
-  role?: 'tenant' | 'landlord' | 'service_provider' | 'artisan' | 'property_manager' | 'admin' | 'handyman' | 'homerunner'
+  role?: 'tenant' | 'landlord' | 'realtor' | 'service_provider' | 'artisan' | 'property_manager' | 'admin' | 'handyman' | 'homerunner'
   isVerified?: boolean
   roles?: RoleType[]
   averageRating?: number

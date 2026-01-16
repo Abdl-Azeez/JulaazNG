@@ -46,4 +46,13 @@ export const demoUsers = [
     roles: [UserRole.ADMIN],
     preferredRole: UserRole.ADMIN,
   },
+  {
+    email: 'realtor@julaaz.com',
+    phone: '08010000008',
+    password: 'realtor123',
+    firstName: 'Amaka',
+    lastName: 'Okafor',
+    roles: [UserRole.REALTOR],
+    preferredRole: UserRole.REALTOR,
+  },
 ]

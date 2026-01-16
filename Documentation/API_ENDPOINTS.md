@@ -38,6 +38,7 @@
 |------|-------------|-----------------|
 | **Tenant** | Property seekers & renters | Search, book, pay rent, review |
 | **Landlord** | Property owners | List properties, manage applications, track earnings |
+| **Realtor** | Licensed agents & letting consultants | Manage landlord portfolios, onboard tenants, track commission-based earnings |
 | **Service Provider** | Cleaning, moving, maintenance services | Offer services, manage bookings |
 | **Artisan** | Skilled tradespeople | Electrical, plumbing, carpentry services |
 | **Property Manager** | Manages properties for landlords | Tenant management, maintenance, rent collection |
@@ -45,6 +46,19 @@
 | **Homerunner** | Field agents for viewings & inspections | Conduct inspections, manage viewings |
 | **Admin** | Platform administrators | User management, approvals, analytics |
 | **Super Admin** | Full platform control | All admin permissions + system config |
+
+---
+
+## 🧭 Realtor Dashboard APIs (`/api/v1/realtor`)
+
+High-level endpoints for the new **Realtor** role (rentals & shortlets only):
+
+| # | Method | Endpoint | Description | Auth / Role |
+|---|--------|----------|-------------|-------------|
+| 1 | GET | `/dashboard` | Get portfolio + pipeline overview (properties, tenants, GMV, commission rate) | Auth (Realtor) |
+| 2 | GET | `/earnings` | Get earnings snapshot (gross commission, expenses, net) | Auth (Realtor) |
+| 3 | GET | `/properties` | List managed properties (rentals + shortlets only) | Auth (Realtor) |
+| 4 | GET | `/clients` | List landlords, corporate clients, and tenants managed by the realtor | Auth (Realtor) |
 
 ---
 

@@ -104,6 +104,11 @@ JulaazNG is a mobile-first web application that serves as Nigeria's premier prop
 - **Pain Points:** Customer acquisition, trust issues, delayed payments, lack of proper tools for customer interaction
 - **Needs:** Consistent job flow, secure payment processing, professional credibility, diagnostic fee structure
 
+#### 2.4.5 Realtors & Letting Agents
+- **Demographics:** Licensed estate agents, independent letting consultants, small real-estate shops
+- **Pain Points:** Fragmented landlord portfolios across spreadsheets/WhatsApp, manual tracking of commissions and expenses, lack of unified dashboard for long-term rentals and shortlets
+- **Needs:** Ability to onboard existing landlords and tenants, manage rental & shortlet portfolios in one place, track income vs expenditure, and get a professional dashboard they can show to clients
+
 ---
 
 ## 3. Product Vision & Strategy

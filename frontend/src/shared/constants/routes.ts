@@ -57,6 +57,7 @@ export const ROUTES = {
   // Dashboard routes
   DASHBOARD_TENANT: '/dashboard/tenant',
   DASHBOARD_LANDLORD: '/dashboard/landlord',
+  DASHBOARD_REALTOR: '/dashboard/realtor',
   DASHBOARD_SERVICE_PROVIDER: '/dashboard/service-provider',
   DASHBOARD_ARTISAN: '/dashboard/artisan',
   DASHBOARD_PROPERTY_MANAGER: '/dashboard/property-manager',
@@ -104,6 +105,12 @@ export const ROUTES = {
   LANDLORD_PROPERTY_DETAILS: (id: string) => `/landlord/properties/${id}`,
   LANDLORD_PROPERTY_INSIGHTS: (id: string) => `/landlord/properties/${id}/insights`,
   LANDLORD_PROPERTY_MANAGE: (id: string) => `/landlord/properties/${id}/manage`,
+
+  // Realtor routes
+  REALTOR_DASHBOARD: '/realtor/dashboard',
+  REALTOR_PROPERTIES: '/realtor/properties',
+  REALTOR_EARNINGS: '/realtor/earnings',
+  REALTOR_TENANTS: '/realtor/clients',
  
   // Info routes
   ABOUT: '/about',

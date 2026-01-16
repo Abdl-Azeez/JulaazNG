@@ -30,6 +30,12 @@ const roleCatalog: Record<RoleType, RoleMeta> = {
     icon: Building2,
     to: ROUTES.LANDLORD_PROPERTIES,
   },
+  realtor: {
+    label: 'Realtor',
+    description: 'Curate rental & shortlet portfolios for your clients',
+    icon: Building2,
+    to: ROUTES.REALTOR_DASHBOARD,
+  },
   property_manager: {
     label: 'Property Manager',
     description: 'Manage properties on behalf of landlords',

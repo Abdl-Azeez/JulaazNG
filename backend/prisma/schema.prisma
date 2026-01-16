@@ -14,6 +14,7 @@ datasource db {
 enum UserRole {
   TENANT
   LANDLORD
+  REALTOR
   SERVICE_PROVIDER
   ARTISAN
   PROPERTY_MANAGER

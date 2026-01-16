@@ -7,6 +7,7 @@
 export type UserRole =
   | 'tenant'
   | 'landlord'
+  | 'realtor'
   | 'admin'
   | 'service_provider'
   | 'artisan'

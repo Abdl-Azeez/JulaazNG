@@ -1,0 +1,2 @@
+export { RealtorPropertiesPage } from './RealtorPropertiesPage'
+
