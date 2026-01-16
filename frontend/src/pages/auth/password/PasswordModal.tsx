@@ -133,16 +133,17 @@ export function PasswordModal() {
       const roleToRoute: Record<RoleType, string> = {
         tenant: ROUTES.HOME,
         landlord: ROUTES.LANDLORD_PROPERTIES,
+        realtor: ROUTES.REALTOR_DASHBOARD,
         service_provider: ROUTES.MY_SERVICES,
         artisan: ROUTES.MY_SERVICES,
         property_manager: ROUTES.HOME,
         admin: ROUTES.ADMIN_DASHBOARD,
         handyman: ROUTES.HANDYMAN_DASHBOARD,
         homerunner: ROUTES.HOMERUNNER_DASHBOARD,
-    }
+      }
       
-      // For admin, homerunner, and handyman, always go to their dashboard
-      const forceDashboardRoles: RoleType[] = ['admin', 'homerunner', 'handyman']
+      // For admin, realtor, homerunner, and handyman, always go to their dashboard
+      const forceDashboardRoles: RoleType[] = ['admin', 'realtor', 'homerunner', 'handyman']
       if (forceDashboardRoles.includes(active)) {
         navigate(roleToRoute[active] ?? ROUTES.HOME, { replace: true })
       } else if (finalIntendedDestination && active === 'tenant') {

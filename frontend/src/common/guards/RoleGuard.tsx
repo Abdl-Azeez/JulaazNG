@@ -15,6 +15,7 @@ interface RoleGuardProps {
 const roleToDashboard: Record<RoleType, string> = {
   tenant: ROUTES.HOME,
   landlord: ROUTES.LANDLORD_PROPERTIES,
+  realtor: ROUTES.REALTOR_DASHBOARD,
   service_provider: ROUTES.HANDYMAN_DASHBOARD,
   artisan: ROUTES.HANDYMAN_DASHBOARD,
   property_manager: ROUTES.HOME,

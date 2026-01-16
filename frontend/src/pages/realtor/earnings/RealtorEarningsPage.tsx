@@ -7,9 +7,10 @@ import { Wallet, TrendingUp, Activity, ArrowUpRight, PiggyBank } from 'lucide-re
 import { realtorEarningsTrend } from '@/__mocks__/data/realtor.mock'
 
 export function RealtorEarningsPage() {
-  const grossThisMonth = realtorEarningsTrend[realtorEarningsTrend.length - 1]?.grossCommission ?? 0
-  const expensesThisMonth = realtorEarningsTrend[realtorEarningsTrend.length - 1]?.expenses ?? 0
-  const netThisMonth = realtorEarningsTrend[realtorEarningsTrend.length - 1]?.net ?? 0
+  const lastMonth = realtorEarningsTrend[realtorEarningsTrend.length - 1]
+  const grossThisMonth = lastMonth?.grossCommission ?? 0
+  const expensesThisMonth = lastMonth?.expenses ?? 0
+  const netThisMonth = lastMonth?.net ?? 0
 
   return (
     <RealtorLayout>
