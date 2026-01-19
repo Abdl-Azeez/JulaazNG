@@ -22,14 +22,12 @@ import {
 import {
   ArrowLeft,
   Search,
-  Filter,
   Download,
   Building2,
   User,
   DollarSign,
   TrendingUp,
   TrendingDown,
-  FileText,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'

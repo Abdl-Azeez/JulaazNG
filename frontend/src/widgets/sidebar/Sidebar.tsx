@@ -40,7 +40,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const isHomerunner = currentRole === 'homerunner'
   const isAdmin = currentRole === 'admin'
   const isRealtor = currentRole === 'realtor'
-
   const isHotelManager = currentRole === 'hotel_manager'
   const hideTenantFeatures =
     currentRole === 'landlord' ||
@@ -59,7 +58,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const publicMenuItems: MenuItem[] = [
     // Admin gets Dashboard instead of Home
     ...(isAdmin ? [{ icon: Home, label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD }] : []),
-    ...((isHomerunner || isAdmin || isRealtor) ? [] : [{ icon: Home, label: 'Home', path: ROUTES.HOME }]),
+    // Hotel manager: Home should go to hotel manager dashboard
+    ...(isHotelManager
+      ? [{ icon: Home, label: 'Dashboard', path: ROUTES.HOTEL_MANAGER_DASHBOARD }]
+      : (isHomerunner || isAdmin || isRealtor)
+        ? []
+        : [{ icon: Home, label: 'Home', path: ROUTES.HOME }]),
     ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }]),
     ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Hotels', path: ROUTES.HOTELS }]),
     ...((isHandyman || isHomerunner || isAdmin || isRealtor) ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
@@ -426,8 +430,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           )}
 
-          {/* Quick Services Chips */}
-          {!isRealtor && !isHandyman && !isHomerunner && !isAdmin && (
+          {/* Quick Services Chips (not shown for back-office roles including hotel manager) */}
+          {!isRealtor && !isHandyman && !isHomerunner && !isAdmin && !isHotelManager && (
           <div className="sidebar__section">
             <h3 className="sidebar__section-title">Quick Services</h3>
             <div className="grid grid-cols-2 gap-2 px-2">
@@ -567,6 +571,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="sidebar__section">
                   <h3 className="sidebar__section-title">Homerunner</h3>
                   {homerunnerMenuItems.filter(shouldShowItem).map((item) => {
+                    const active = isActive(item.path)
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigation(item.path)}
+                        className={cn('sidebar__item', active && 'sidebar__item--active')}
+                      >
+                        <item.icon className="sidebar__item-icon" />
+                        <span className="sidebar__item-label">{item.label}</span>
+                        <div className="sidebar__item-shine" />
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {isHotelManager && hotelManagerMenuItems.some(shouldShowItem) && (
+                <div className="sidebar__section">
+                  <h3 className="sidebar__section-title">Hotel Manager</h3>
+                  {hotelManagerMenuItems.filter(shouldShowItem).map((item) => {
                     const active = isActive(item.path)
                     return (
                       <button

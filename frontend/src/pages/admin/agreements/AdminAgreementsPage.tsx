@@ -24,7 +24,6 @@ import {
 import {
   ArrowLeft,
   Search,
-  Filter,
   FileText,
   Upload,
   Download,
@@ -35,7 +34,6 @@ import {
   Building2,
   User,
   Edit,
-  Trash2,
   AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
@@ -319,7 +317,7 @@ export function AdminAgreementsPage() {
                   <p className="text-sm text-muted-foreground">
                     Manage standard Julaaz tenancy agreement templates used by landlords
                   </p>
-                  <Button onClick={() => toast.info('New template creation coming soon')}>
+                  <Button onClick={() => toast('New template creation coming soon')}>
                     <Upload className="h-4 w-4 mr-2" />
                     New Template
                   </Button>

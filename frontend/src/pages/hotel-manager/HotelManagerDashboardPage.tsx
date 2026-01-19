@@ -11,8 +11,6 @@ import {
   ArrowRight,
   Hotel,
   Key,
-  CheckCircle,
-  XCircle,
   BarChart3,
   Activity,
 } from 'lucide-react'
@@ -114,7 +112,7 @@ export function HotelManagerDashboardPage() {
   // Revenue trend (last 6 months - simulated)
   const revenueTrend = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-    return months.map((month, index) => {
+    return months.map((month) => {
       // Simulate revenue data
       const baseRevenue = stats.monthlyRevenue
       const variation = (Math.random() * 0.3 - 0.15) * baseRevenue // ±15% variation

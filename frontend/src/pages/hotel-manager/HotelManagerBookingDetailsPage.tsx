@@ -6,7 +6,6 @@ import {
   User,
   Mail,
   Phone,
-  MapPin,
   Building2,
   Bed,
   Users,
@@ -53,7 +52,7 @@ export function HotelManagerBookingDetailsPage() {
   const booking = useMemo(() => {
     return mockHotelBookings.find((b) => b.id === id)
   }, [id])
-
+//TODO: make use of these functions
   const hotel = useMemo(() => {
     if (!booking) return null
     return mockHotels.find((h) => h.id === booking.hotelId)
@@ -64,6 +63,8 @@ export function HotelManagerBookingDetailsPage() {
     const hotelRooms = mockHotelRooms[booking.hotelId] || []
     return hotelRooms.find((r) => r.id === booking.roomId)
   }, [booking])
+
+  console.log(hotel, room)
 
   const handleProfileClick = () => {
     navigate(ROUTES.PROFILE)

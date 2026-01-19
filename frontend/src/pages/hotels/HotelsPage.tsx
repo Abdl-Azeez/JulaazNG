@@ -21,21 +21,18 @@ import { Checkbox } from '@/shared/ui/checkbox'
 import { mockHotels } from '@/__mocks__/data/hotels.mock'
 import { ROUTES } from '@/shared/constants/routes'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/store/auth.store'
 import { cn } from '@/shared/lib/utils/cn'
-import type { Hotel, HotelSearchFilters } from '@/shared/types/hotel.types'
+import type { HotelSearchFilters } from '@/shared/types/hotel.types'
 
 type LayoutType = 'grid' | 'row'
 
 export function HotelsPage() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [layout, setLayout] = useState<LayoutType>('grid')
   const [showFilters, setShowFilters] = useState(false)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const [locationError, setLocationError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState<HotelSearchFilters>({
     city: '',
@@ -55,11 +52,10 @@ export function HotelsPage() {
         },
         (error) => {
           console.error('Error getting location:', error)
-          setLocationError('Unable to get your location')
         }
       )
     } else {
-      setLocationError('Geolocation is not supported by your browser')
+      console.error('Geolocation is not supported by your browser')
     }
   }, [])
 
@@ -151,9 +147,13 @@ export function HotelsPage() {
     navigate(ROUTES.HOTEL_DETAILS(hotelId))
   }
 
+  const handleProfileClick = () => {
+    navigate(ROUTES.PROFILE)
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header onMenuClick={() => setIsSidebarOpen(true)} />
+      <Header onMenuClick={() => setIsSidebarOpen(true)} onProfileClick={handleProfileClick} />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1">
@@ -173,10 +173,8 @@ export function HotelsPage() {
               {/* Search Bar */}
               <div className="max-w-3xl mx-auto">
                 <SearchBar
-                  placeholder="Search hotels by name, location, or city..."
                   onSearch={handleSearch}
-                  value={searchQuery}
-                  onChange={setSearchQuery}
+                  className="w-full"
                 />
               </div>
 
