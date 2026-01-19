@@ -83,7 +83,7 @@ pnpm dev
 - **Backend API:** http://localhost:3000
 - **API Docs:** http://localhost:3000/api/docs
 
-**📖 For detailed setup instructions, see [SETUP.md](SETUP.md)**
+**📖 For detailed setup instructions, see [Documentation/GETTING_STARTED.md](Documentation/GETTING_STARTED.md)**
 
 ---
 
@@ -113,8 +113,9 @@ JulaazNG/
 │
 └── Documentation/         # Complete documentation
     ├── PRD.md                      # Product Requirements
-    ├── GETTING_STARTED.md          # Detailed setup guide
+    ├── GETTING_STARTED.md          # Complete setup guide
     ├── FOLDER_STRUCTURE.md         # Complete folder tree
+    ├── PROJECT_MAP.md              # Navigation guide
     └── UI/                         # Design mockups
 ```
 
@@ -238,10 +239,10 @@ JulaazNG/
 ## 📚 Documentation
 
 ### Quick Links
-- **[SETUP.md](SETUP.md)** - Quick setup guide
-- **[Documentation/GETTING_STARTED.md](Documentation/GETTING_STARTED.md)** - Detailed setup
+- **[Documentation/GETTING_STARTED.md](Documentation/GETTING_STARTED.md)** - Complete setup guide
 - **[Documentation/FOLDER_STRUCTURE.md](Documentation/FOLDER_STRUCTURE.md)** - Complete structure
 - **[Documentation/PRD.md](Documentation/PRD.md)** - Product requirements
+- **[Documentation/PROJECT_MAP.md](Documentation/PROJECT_MAP.md)** - Navigation guide
 - **[frontend/README.md](frontend/README.md)** - Frontend guide
 - **[backend/README.md](backend/README.md)** - Backend guide
 

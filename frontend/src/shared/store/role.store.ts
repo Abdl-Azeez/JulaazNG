@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 export type RoleType =
   | 'tenant'
   | 'landlord'
+  | 'realtor'
   | 'service_provider'
   | 'artisan'
   | 'property_manager'

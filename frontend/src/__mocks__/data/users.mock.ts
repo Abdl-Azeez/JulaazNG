@@ -159,6 +159,21 @@ export const sampleUsers: SampleUser[] = [
     ],
     preferredRole: 'admin',
   },
+  {
+    id: 'realtor-001',
+    name: 'Amaka Okafor',
+    email: 'realtor@julaaz.com',
+    phone: '08010000009',
+    password: 'realtor123',
+    roles: [
+      {
+        type: 'realtor',
+        priority: 'primary',
+        lastUsed: true,
+      },
+    ],
+    preferredRole: 'realtor',
+  },
 ]
 
 // ============================================================

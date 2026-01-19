@@ -17,6 +17,10 @@ import {
   UpcomingRotaPage,
   ViewAllAssignmentsPage,
 } from '@/pages/handyman'
+import { RealtorDashboardPage } from '@/pages/realtor/RealtorDashboardPage'
+import { RealtorPropertiesPage } from '@/pages/realtor/properties'
+import { RealtorEarningsPage } from '@/pages/realtor/earnings'
+import { RealtorTenantsPage } from '@/pages/realtor/tenants'
 import {
   HomerunnerDashboardPage,
   HomerunnerInspectionsPage,
@@ -92,6 +96,8 @@ type ModalLocationState = {
   modal?: boolean
 }
 
+import { useRoleStore } from '@/shared/store/role.store'
+
 interface AppRoutesProps {
   showSplash: boolean
   isMobile: boolean
@@ -103,15 +109,19 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
   const state = location.state as ModalLocationState | undefined
   const showModalOverlay = Boolean(!isMobile && state?.modal && state.backgroundLocation)
   const routesLocation = showModalOverlay && state?.backgroundLocation ? state.backgroundLocation : location
+  const { activeRole } = useRoleStore()
 
   if (showSplash && isMobile) {
     return <SplashScreen onComplete={onSplashComplete} />
   }
 
+  const homeElement =
+    activeRole === 'realtor' ? <Navigate to={ROUTES.REALTOR_DASHBOARD} replace /> : <HomePage />
+
   return (
     <>
       <Routes location={routesLocation}>
-        <Route path={ROUTES.HOME} element={<HomePage />} />
+        <Route path={ROUTES.HOME} element={homeElement} />
         <Route
           path={ROUTES.PROPERTIES}
           element={
@@ -242,6 +252,40 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
           element={
             <RoleGuard allowedRoles={['homerunner']} redirectTo={ROUTES.HOMERUNNER_DASHBOARD}>
               <HomerunnerDashboardPage />
+            </RoleGuard>
+          }
+        />
+        {/* Realtor Routes */}
+        <Route
+          path={ROUTES.REALTOR_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['realtor']} redirectTo={ROUTES.HOME}>
+              <RealtorDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.REALTOR_PROPERTIES}
+          element={
+            <RoleGuard allowedRoles={['realtor']} redirectTo={ROUTES.REALTOR_DASHBOARD}>
+              <RealtorPropertiesPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.REALTOR_EARNINGS}
+          element=
+          {
+            <RoleGuard allowedRoles={['realtor']} redirectTo={ROUTES.REALTOR_DASHBOARD}>
+              <RealtorEarningsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.REALTOR_TENANTS}
+          element={
+            <RoleGuard allowedRoles={['realtor']} redirectTo={ROUTES.REALTOR_DASHBOARD}>
+              <RealtorTenantsPage />
             </RoleGuard>
           }
         />

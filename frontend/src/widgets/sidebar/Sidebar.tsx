@@ -39,13 +39,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const isHandyman = currentRole === 'handyman'
   const isHomerunner = currentRole === 'homerunner'
   const isAdmin = currentRole === 'admin'
+  const isRealtor = currentRole === 'realtor'
 
   const hideTenantFeatures =
     currentRole === 'landlord' ||
+    isRealtor ||
     isHandyman ||
     isHomerunner ||
     isAdmin ||
     location.pathname.includes('/landlord') ||
+    location.pathname.includes('/realtor') ||
     location.pathname.includes('/homerunner') ||
     location.pathname.includes('/admin')
 
@@ -53,9 +56,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const publicMenuItems: MenuItem[] = [
     // Admin gets Dashboard instead of Home
     ...(isAdmin ? [{ icon: Home, label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD }] : []),
-    ...((isHomerunner || isAdmin) ? [] : [{ icon: Home, label: 'Home', path: ROUTES.HOME }]),
+    ...((isHomerunner || isAdmin || isRealtor) ? [] : [{ icon: Home, label: 'Home', path: ROUTES.HOME }]),
     ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }]),
-    ...((isHandyman || isHomerunner || isAdmin) ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
+    ...((isHandyman || isHomerunner || isAdmin || isRealtor) ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
   ]
 
   const authenticatedMenuItems: MenuItem[] = [
@@ -74,8 +77,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           // Only keep Messages and Notifications for admin/homerunner
           if (item.path !== ROUTES.MESSAGING && item.path !== ROUTES.NOTIFICATIONS) return false
         }
+        // Back-office roles (landlord, realtor, etc.) don't use tenant-facing bookings/services here
         if (item.path === ROUTES.MY_BOOKINGS) return false
-        if ((currentRole === 'landlord' || isHandyman || isHomerunner || isAdmin) && item.path === ROUTES.MY_SERVICES) return false
+        if (
+          (currentRole === 'landlord' || currentRole === 'realtor' || isHandyman || isHomerunner || isAdmin) &&
+          item.path === ROUTES.MY_SERVICES
+        )
+          return false
         return true
       })
     : authenticatedMenuItems
@@ -118,6 +126,37 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: ROUTES.LANDLORD_EARNINGS,
       requiresAuth: true,
       roles: ['landlord'],
+    },
+  ]
+
+  const realtorMenuItems: MenuItem[] = [
+    {
+      icon: Home,
+      label: 'Realtor Hub',
+      path: ROUTES.REALTOR_DASHBOARD,
+      requiresAuth: true,
+      roles: ['realtor'],
+    },
+    {
+      icon: Building2,
+      label: 'Portfolios',
+      path: ROUTES.REALTOR_PROPERTIES,
+      requiresAuth: true,
+      roles: ['realtor'],
+    },
+    {
+      icon: FileText,
+      label: 'Clients & Tenants',
+      path: ROUTES.REALTOR_TENANTS,
+      requiresAuth: true,
+      roles: ['realtor'],
+    },
+    {
+      icon: Wallet,
+      label: 'Commissions',
+      path: ROUTES.REALTOR_EARNINGS,
+      requiresAuth: true,
+      roles: ['realtor'],
     },
   ]
 
@@ -259,7 +298,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   ]
 
   const handleNavigation = (path: string) => {
-    navigate(path)
+    // For Realtors, any "home-style" navigation should land on the Realtor dashboard
+    if (currentRole === 'realtor' && path === ROUTES.HOME) {
+      navigate(ROUTES.REALTOR_DASHBOARD)
+    } else {
+      navigate(path)
+    }
     onClose()
   }
 
@@ -326,27 +370,29 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Navigation */}
         <nav className="sidebar__nav">
-          {/* Public Menu Items */}
-          <div className="sidebar__section">
-            <h3 className="sidebar__section-title">Explore</h3>
-            {publicMenuItems.map((item) => {
-              const active = isActive(item.path)
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => handleNavigation(item.path)}
-                  className={cn('sidebar__item', active && 'sidebar__item--active')}
-                >
-                  <item.icon className="sidebar__item-icon" />
-                  <span className="sidebar__item-label">{item.label}</span>
-                  <div className="sidebar__item-shine" />
-                </button>
-              )
-            })}
-          </div>
+          {/* Public Menu Items (hide for dedicated back-office roles like Realtor) */}
+          {!isRealtor && (
+            <div className="sidebar__section">
+              <h3 className="sidebar__section-title">Explore</h3>
+              {publicMenuItems.map((item) => {
+                const active = isActive(item.path)
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => handleNavigation(item.path)}
+                    className={cn('sidebar__item', active && 'sidebar__item--active')}
+                  >
+                    <item.icon className="sidebar__item-icon" />
+                    <span className="sidebar__item-label">{item.label}</span>
+                    <div className="sidebar__item-shine" />
+                  </button>
+                )
+              })}
+            </div>
+          )}
 
           {/* Quick Services Chips */}
-          {!isHandyman && !isHomerunner && !isAdmin && (
+          {!isRealtor && !isHandyman && !isHomerunner && !isAdmin && (
           <div className="sidebar__section">
             <h3 className="sidebar__section-title">Quick Services</h3>
             <div className="grid grid-cols-2 gap-2 px-2">
@@ -446,6 +492,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="sidebar__section">
                   <h3 className="sidebar__section-title">Landlord</h3>
                   {landlordMenuItems.filter(shouldShowItem).map((item) => {
+                    const active = isActive(item.path)
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigation(item.path)}
+                        className={cn('sidebar__item', active && 'sidebar__item--active')}
+                      >
+                        <item.icon className="sidebar__item-icon" />
+                        <span className="sidebar__item-label">{item.label}</span>
+                        <div className="sidebar__item-shine" />
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {currentRole === 'realtor' && realtorMenuItems.some(shouldShowItem) && (
+                <div className="sidebar__section">
+                  <h3 className="sidebar__section-title">Realtor</h3>
+                  {realtorMenuItems.filter(shouldShowItem).map((item) => {
                     const active = isActive(item.path)
                     return (
                       <button

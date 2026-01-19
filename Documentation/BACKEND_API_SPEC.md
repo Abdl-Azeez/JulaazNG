@@ -43,8 +43,8 @@
   password: string (hashed)
   dateOfBirth: Date
   gender: enum ['male', 'female', 'other']
-  roles: enum[] ['tenant', 'landlord', 'admin', 'service_provider', 'artisan', 'property_manager', 'handyman', 'homerunner']
-  preferredRole: enum ['tenant', 'landlord', 'admin', 'service_provider', 'artisan', 'property_manager', 'handyman', 'homerunner']
+  roles: enum[] ['tenant', 'landlord', 'realtor', 'admin', 'service_provider', 'artisan', 'property_manager', 'handyman', 'homerunner']
+  preferredRole: enum ['tenant', 'landlord', 'realtor', 'admin', 'service_provider', 'artisan', 'property_manager', 'handyman', 'homerunner']
   profilePicture: string (URL)
   isEmailVerified: boolean (default: false)
   isPhoneVerified: boolean (default: false)
