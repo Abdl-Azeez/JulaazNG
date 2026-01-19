@@ -12,6 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/shared/ui/dialog'
 import { Badge } from '@/shared/ui/badge'
 import { SharedLayout } from '@/widgets/shared-layout'
 import { AuthDialog } from '@/widgets/auth-dialog'
@@ -35,6 +42,18 @@ export function ProfilePage() {
   
   // Edit mode
   const [isEditing, setIsEditing] = useState(false)
+  
+  // OTP Verification for email/phone updates
+  const [showOtpDialog, setShowOtpDialog] = useState(false)
+  const [otpEmail, setOtpEmail] = useState('')
+  const [otpPhone, setOtpPhone] = useState('')
+  const [verificationType, setVerificationType] = useState<'email' | 'phone' | null>(null)
+  const [otp, setOtp] = useState(['', '', '', '', '', ''])
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [otpError, setOtpError] = useState('')
+  const [otpTimer, setOtpTimer] = useState(60)
+  const [canResendOtp, setCanResendOtp] = useState(false)
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([])
   
   // Profile data
   const [profileData, setProfileData] = useState({
@@ -91,6 +110,31 @@ export function ProfilePage() {
   })
   const [documentFiles, setDocumentFiles] = useState<File[]>([])
   const [isSubmittingBackground, setIsSubmittingBackground] = useState(false)
+  
+  // Mock rejected documents - in real app, this would come from API
+  const [rejectedDocuments, setRejectedDocuments] = useState<Array<{
+    id: string
+    name: string
+    type: string
+    rejectionReason: string
+    rejectedAt: string
+  }>>([
+    // Example rejected document
+    // {
+    //   id: 'doc-1',
+    //   name: 'National ID Card',
+    //   type: 'identity',
+    //   rejectionReason: 'Document is unclear. Please upload a clearer image.',
+    //   rejectedAt: '2025-01-10',
+    // }
+  ])
+  
+  const handleReuploadDocument = (docId: string, _file: File) => {
+    // Simulate re-upload
+    toast.success(`Document re-uploaded. It will be reviewed again.`)
+    // Remove from rejected list
+    setRejectedDocuments(prev => prev.filter(doc => doc.id !== docId))
+  }
 
   const averageRating = user?.averageRating ?? 5
   const ratingCount = user?.ratingCount ?? 0
@@ -158,6 +202,29 @@ export function ProfilePage() {
   }
 
   const handleSave = async () => {
+    // Check if email or phone changed
+    const emailChanged = editData.email !== profileData.email && editData.email !== user?.email
+    const phoneChanged = editData.phone !== profileData.phone && editData.phone !== user?.phone
+    
+    if (emailChanged || phoneChanged) {
+      // Trigger OTP verification
+      if (emailChanged) {
+        setOtpEmail(editData.email)
+        setVerificationType('email')
+        setShowOtpDialog(true)
+        setOtpTimer(60)
+        setCanResendOtp(false)
+      } else if (phoneChanged) {
+        setOtpPhone(editData.phone)
+        setVerificationType('phone')
+        setShowOtpDialog(true)
+        setOtpTimer(60)
+        setCanResendOtp(false)
+      }
+      return
+    }
+    
+    // No email/phone change, proceed with normal save
     setIsLoading(true)
     try {
       // Simulate API call
@@ -172,6 +239,104 @@ export function ProfilePage() {
     } finally {
       setIsLoading(false)
     }
+  }
+  
+  // OTP Verification handlers
+  useEffect(() => {
+    if (showOtpDialog) {
+      otpInputRefs.current[0]?.focus()
+    }
+  }, [showOtpDialog])
+  
+  useEffect(() => {
+    if (otpTimer > 0 && !canResendOtp && showOtpDialog) {
+      const interval = setInterval(() => {
+        setOtpTimer((prev) => {
+          if (prev <= 1) {
+            setCanResendOtp(true)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+      return () => clearInterval(interval)
+    }
+  }, [otpTimer, canResendOtp, showOtpDialog])
+  
+  const handleOtpChange = (index: number, value: string) => {
+    if (value && !/^[0-9]$/.test(value)) return
+    
+    const newOtp = [...otp]
+    newOtp[index] = value
+    setOtp(newOtp)
+    setOtpError('')
+    
+    if (value && index < 5) {
+      otpInputRefs.current[index + 1]?.focus()
+    }
+  }
+  
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus()
+    }
+  }
+  
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault()
+    const pastedData = e.clipboardData.getData('text').trim().slice(0, 6)
+    if (/^\d{6}$/.test(pastedData)) {
+      const newOtp = pastedData.split('')
+      setOtp(newOtp)
+      otpInputRefs.current[5]?.focus()
+      setOtpError('')
+    }
+  }
+  
+  const handleResendOtp = async () => {
+    setOtpTimer(60)
+    setCanResendOtp(false)
+    setOtpError('')
+    // Simulate sending OTP
+    toast.success(`Verification code sent to ${verificationType === 'email' ? otpEmail : otpPhone}`)
+    otpInputRefs.current[0]?.focus()
+  }
+  
+  const handleVerifyOtp = async () => {
+    const otpCode = otp.join('')
+    if (otpCode.length !== 6) {
+      setOtpError('Please enter a valid 6-digit code')
+      return
+    }
+    
+    setIsVerifying(true)
+    setOtpError('')
+    
+    try {
+      // Simulate API verification
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // Verify OTP success - update profile
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Update profile data
+      setProfileData({ ...editData })
+      setIsEditing(false)
+      setShowOtpDialog(false)
+      setOtp(['', '', '', '', '', ''])
+      toast.success('Profile updated successfully! Your email/phone has been verified.')
+    } catch {
+      setOtpError('Invalid verification code. Please try again.')
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+  
+  const handleCancelOtp = () => {
+    setShowOtpDialog(false)
+    setOtp(['', '', '', '', '', ''])
+    setOtpError('')
+    setEditData({ ...profileData })
   }
 
   const handleCancel = () => {
@@ -647,6 +812,60 @@ export function ProfilePage() {
               </div>
             </div>
 
+            {/* Rejected Documents Section */}
+            {rejectedDocuments.length > 0 && (
+              <Card className="p-6 lg:p-8 bg-surface border border-red-500/30 rounded-2xl space-y-4 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Documents Requiring Re-upload</h3>
+                </div>
+                <div className="space-y-4">
+                  {rejectedDocuments.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="p-4 rounded-xl border border-red-500/30 bg-red-500/5 space-y-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FileText className="h-4 w-4 text-red-600" />
+                            <p className="font-semibold text-foreground">{doc.name}</p>
+                            <Badge className="bg-red-500/10 text-red-600 border-red-500/20 text-xs">
+                              {doc.type}
+                            </Badge>
+                          </div>
+                          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 mb-3">
+                            <p className="text-xs font-semibold text-red-600 mb-1">Rejection Reason:</p>
+                            <p className="text-sm text-red-600/90">{doc.rejectionReason}</p>
+                            <p className="text-xs text-red-600/70 mt-2">Rejected on {new Date(doc.rejectedAt).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <label className="flex flex-col items-center justify-center gap-2 h-24 rounded-lg border-2 border-dashed border-red-500/40 bg-background/60 cursor-pointer hover:border-red-500/60 transition-colors">
+                        <Upload className="h-5 w-5 text-red-600" />
+                        <span className="text-sm text-foreground font-medium">Re-upload Document</span>
+                        <input
+                          type="file"
+                          accept="application/pdf,image/png,image/jpeg"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              if (file.size > 10 * 1024 * 1024) {
+                                toast.error('File size must be less than 10MB')
+                                return
+                              }
+                              handleReuploadDocument(doc.id, file)
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
             {/* Background Check Workflow */}
             <Card className="p-6 lg:p-8 bg-surface border border-border/60 rounded-2xl space-y-6">
               {backgroundStatus === 'verified' ? (
@@ -663,23 +882,39 @@ export function ProfilePage() {
                     </div>
                     <h3 className="text-lg lg:text-xl font-semibold text-foreground">Background check completed</h3>
                     <p className="text-sm text-muted-foreground">
-                      Your profile is now verified. Landlords will see your trusted status when reviewing applications.
+                      {effectiveRole === 'tenant' || !effectiveRole
+                        ? 'Your profile is now verified. Landlords will see your trusted status when reviewing applications.'
+                        : effectiveRole === 'landlord'
+                          ? 'Your profile is now verified. Tenants will see your trusted status when viewing your properties.'
+                          : effectiveRole === 'handyman' || effectiveRole === 'service_provider' || effectiveRole === 'artisan'
+                            ? 'Your profile is now verified. Clients will see your trusted status when booking your services.'
+                            : effectiveRole === 'realtor'
+                              ? 'Your profile is now verified. Clients will see your trusted status when working with you.'
+                              : 'Your profile is now verified.'}
                     </p>
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
                         <FileText className="mt-0.5 h-4 w-4 text-primary" />
                         <span>
-                          {isHandyman
+                          {effectiveRole === 'handyman' || effectiveRole === 'service_provider' || effectiveRole === 'artisan'
                             ? 'Identity and workshop details securely stored.'
-                            : 'Identity and employment documents securely stored.'}
+                            : effectiveRole === 'landlord'
+                              ? 'Identity and property verification documents securely stored.'
+                              : effectiveRole === 'realtor'
+                                ? 'Identity and license documents securely stored.'
+                                : 'Identity and employment documents securely stored.'}
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="mt-0.5 h-4 w-4 text-primary" />
                         <span>
-                          {isHandyman
+                          {effectiveRole === 'handyman' || effectiveRole === 'service_provider' || effectiveRole === 'artisan'
                             ? 'Trade competency evidence reviewed by the Julaaz service quality team.'
-                            : 'Financial information reviewed by Julaaz compliance team.'}
+                            : effectiveRole === 'landlord'
+                              ? 'Property verification and compliance reviewed by Julaaz team.'
+                              : effectiveRole === 'realtor'
+                                ? 'License and credentials reviewed by Julaaz compliance team.'
+                                : 'Financial information reviewed by Julaaz compliance team.'}
                         </span>
                       </li>
                     </ul>
@@ -1068,8 +1303,83 @@ export function ProfilePage() {
         )}
       </div>
       
-        <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
-      </div>
+      <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+      
+      {/* OTP Verification Dialog */}
+      <Dialog open={showOtpDialog} onOpenChange={(open) => !open && handleCancelOtp()}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-foreground">
+              Verify Your {verificationType === 'email' ? 'Email' : 'Phone'}
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              We've sent a 6-digit verification code to{' '}
+              <span className="font-semibold text-foreground">
+                {verificationType === 'email' ? otpEmail : otpPhone}
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 mt-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-foreground text-center block">
+                Enter Verification Code
+              </Label>
+              <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
+                {otp.map((digit, index) => (
+                  <Input
+                    key={index}
+                    ref={(el) => (otpInputRefs.current[index] = el)}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    className="w-12 h-14 text-center text-xl font-semibold"
+                  />
+                ))}
+              </div>
+              {otpError && <p className="text-xs text-destructive text-center">{otpError}</p>}
+            </div>
+            
+            <div className="text-center space-y-2">
+              {!canResendOtp ? (
+                <p className="text-sm text-muted-foreground">
+                  Resend code in {otpTimer}s
+                </p>
+              ) : (
+                <Button
+                  variant="link"
+                  className="text-primary"
+                  onClick={handleResendOtp}
+                >
+                  Resend Code
+                </Button>
+              )}
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 rounded-xl"
+                onClick={handleCancelOtp}
+                disabled={isVerifying}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={handleVerifyOtp}
+                disabled={isVerifying || otp.join('').length !== 6}
+              >
+                {isVerifying ? 'Verifying...' : 'Verify & Update'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
     </SharedLayout>
   )
 }

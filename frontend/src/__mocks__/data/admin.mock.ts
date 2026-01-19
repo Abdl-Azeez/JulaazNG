@@ -990,6 +990,15 @@ export interface AdminBackgroundCheckDocument {
   uploadedAt: string
   fileUrl?: string
   notes?: string
+  rejectionReason?: string
+  uploadedBy?: 'user' | 'admin'
+  uploadSource?: 'user_upload' | 'email' | 'walk_in'
+  uploadedByAdmin?: {
+    adminId: string
+    adminName: string
+    uploadedAt: string
+    source: 'email' | 'walk_in'
+  }
 }
 
 export interface AdminBackgroundCheck {

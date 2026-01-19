@@ -19,7 +19,8 @@ import {
   Bell,
   MessageCircle,
   LogOut,
-  User
+  User,
+  DollarSign,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { ROUTES } from '@/shared/constants/routes'
@@ -171,6 +172,18 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           icon: CreditCard,
           label: 'Payments',
           path: ROUTES.ADMIN_PAYMENTS,
+          group: 'operations',
+        },
+        {
+          icon: DollarSign,
+          label: 'Financials',
+          path: ROUTES.ADMIN_FINANCIALS,
+          group: 'operations',
+        },
+        {
+          icon: FileText,
+          label: 'Agreements',
+          path: ROUTES.ADMIN_AGREEMENTS,
           group: 'operations',
         },
       ],

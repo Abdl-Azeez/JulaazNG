@@ -118,10 +118,11 @@ export function PasswordPage() {
         admin: ROUTES.ADMIN_DASHBOARD,
         handyman: ROUTES.HANDYMAN_DASHBOARD,
         homerunner: ROUTES.HOMERUNNER_DASHBOARD,
+        hotel_manager: ROUTES.HOTEL_MANAGER_DASHBOARD,
       }
       
-      // For admin, realtor, homerunner, and handyman, always go to their dashboard
-      const forceDashboardRoles: RoleType[] = ['admin', 'realtor', 'homerunner', 'handyman']
+      // For admin, realtor, homerunner, handyman, and hotel_manager, always go to their dashboard
+      const forceDashboardRoles: RoleType[] = ['admin', 'realtor', 'homerunner', 'handyman', 'hotel_manager']
       if (forceDashboardRoles.includes(active)) {
         navigate(roleToRoute[active] ?? ROUTES.HOME, { replace: true })
       } else if (intendedDestination && active === 'tenant') {

@@ -4,6 +4,8 @@ import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import { Input } from '@/shared/ui/input'
+import { Textarea } from '@/shared/ui/textarea'
+import { Label } from '@/shared/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -31,6 +33,8 @@ import {
   FileCheck,
   ChevronLeft,
   ChevronRight,
+  Upload,
+  AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils/cn'
 import { useNavigate } from 'react-router-dom'
@@ -43,6 +47,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/shared/ui/dropdown-menu'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/select'
 import {
   adminBackgroundChecks,
   type AdminBackgroundCheck as BackgroundCheck,
@@ -100,6 +111,15 @@ export function AdminBackgroundChecksPage() {
     check: BackgroundCheck
     document: BackgroundCheckDocument
   } | null>(null)
+  const [rejectingDocument, setRejectingDocument] = useState<{
+    checkId: string
+    docId: string
+  } | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
+  const [uploadingForUser, setUploadingForUser] = useState<BackgroundCheck | null>(null)
+  const [uploadSource, setUploadSource] = useState<'email' | 'walk_in'>('email')
+  const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [uploadDocType, setUploadDocType] = useState<BackgroundCheckDocument['type']>('identity')
 
   const filteredChecks = useMemo(() => {
     return backgroundChecks.filter((check) => {
@@ -148,18 +168,75 @@ export function AdminBackgroundChecksPage() {
   }
 
   const handleDocumentReject = (checkId: string, docId: string) => {
+    setRejectingDocument({ checkId, docId })
+    setRejectionReason('')
+  }
+  
+  const handleConfirmReject = () => {
+    if (!rejectingDocument || !rejectionReason.trim()) {
+      toast.error('Please provide a rejection reason')
+      return
+    }
+    
     setBackgroundChecks((prev) =>
       prev.map((check) => {
-        if (check.id === checkId) {
+        if (check.id === rejectingDocument.checkId) {
           const updatedDocs = check.documents.map((doc) =>
-            doc.id === docId ? { ...doc, status: 'rejected' as const } : doc
+            doc.id === rejectingDocument.docId
+              ? { ...doc, status: 'rejected' as const, rejectionReason: rejectionReason.trim() }
+              : doc
           )
           return { ...check, documents: updatedDocs }
         }
         return check
       })
     )
-    toast.success('Document rejected')
+    toast.success('Document rejected. User will be notified to re-upload.')
+    setRejectingDocument(null)
+    setRejectionReason('')
+  }
+  
+  const handleUploadForUser = (check: BackgroundCheck) => {
+    setUploadingForUser(check)
+    setUploadFile(null)
+    setUploadSource('email')
+    setUploadDocType('identity')
+  }
+  
+  const handleConfirmUpload = async () => {
+    if (!uploadingForUser || !uploadFile) {
+      toast.error('Please select a file to upload')
+      return
+    }
+    
+    // Simulate upload
+    const newDoc: BackgroundCheckDocument = {
+      id: `doc-${Date.now()}`,
+      name: uploadFile.name,
+      type: uploadDocType,
+      status: 'pending',
+      uploadedAt: new Date().toISOString(),
+      uploadedBy: 'admin',
+      uploadSource: uploadSource === 'email' ? 'email' : 'walk_in',
+      uploadedByAdmin: {
+        adminId: 'admin-1',
+        adminName: 'Admin User',
+        uploadedAt: new Date().toISOString(),
+        source: uploadSource,
+      },
+    }
+    
+    setBackgroundChecks((prev) =>
+      prev.map((check) =>
+        check.id === uploadingForUser.id
+          ? { ...check, documents: [...check.documents, newDoc] }
+          : check
+      )
+    )
+    
+    toast.success(`Document uploaded on behalf of user (Source: ${uploadSource === 'email' ? 'Email' : 'Walk-in'})`)
+    setUploadingForUser(null)
+    setUploadFile(null)
   }
 
   const handleCheckApprove = (checkId: string) => {
@@ -390,11 +467,23 @@ export function AdminBackgroundChecksPage() {
                             <div className={cn('h-8 w-8 rounded-lg flex items-center justify-center shrink-0', documentTypeColors[doc.type])}>
                               {documentTypeIcons[doc.type]}
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-foreground break-words">{doc.name}</p>
                               <Badge className={cn('rounded-full text-[10px] mt-1 whitespace-nowrap', docStatusColors[doc.status])}>
                                 {doc.status}
                               </Badge>
+                              {doc.status === 'rejected' && doc.rejectionReason && (
+                                <div className="mt-1 p-2 rounded bg-red-500/10 border border-red-500/20">
+                                  <p className="text-xs text-red-600 font-medium">Rejection Reason:</p>
+                                  <p className="text-xs text-red-600/80 mt-0.5">{doc.rejectionReason}</p>
+                                </div>
+                              )}
+                              {doc.uploadedByAdmin && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  <span className="font-medium">Uploaded by admin</span>
+                                  <span className="ml-1">({doc.uploadedByAdmin.source === 'email' ? 'Email' : 'Walk-in'})</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-1.5 shrink-0">
@@ -484,31 +573,41 @@ export function AdminBackgroundChecksPage() {
                     </Card>
 
                     {/* Actions */}
-                    {check.status !== 'approved' && check.status !== 'rejected' && (
-                      <div className="space-y-2">
-                        <Button
-                          className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-700"
-                          onClick={() => handleCheckApprove(check.id)}
-                          disabled={check.progress < 100}
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve Check
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full rounded-lg text-red-600 border-red-600/30 hover:bg-red-50"
-                          onClick={() => handleCheckReject(check.id)}
-                        >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Reject Check
-                        </Button>
-                        {check.progress < 100 && (
-                          <p className="text-xs text-amber-600 text-center">
-                            All documents must be approved before final approval
-                          </p>
-                        )}
-                      </div>
-                    )}
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-lg border-primary/30 text-primary hover:bg-primary/10"
+                        onClick={() => handleUploadForUser(check)}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Document on Behalf
+                      </Button>
+                      {check.status !== 'approved' && check.status !== 'rejected' && (
+                        <>
+                          <Button
+                            className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                            onClick={() => handleCheckApprove(check.id)}
+                            disabled={check.progress < 100}
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Approve Check
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full rounded-lg text-red-600 border-red-600/30 hover:bg-red-50"
+                            onClick={() => handleCheckReject(check.id)}
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Reject Check
+                          </Button>
+                          {check.progress < 100 && (
+                            <p className="text-xs text-amber-600 text-center">
+                              All documents must be approved before final approval
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -714,6 +813,125 @@ export function AdminBackgroundChecksPage() {
               </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Rejection Reason Dialog */}
+      <Dialog open={!!rejectingDocument} onOpenChange={(open) => !open && setRejectingDocument(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reject Document</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for rejecting this document. The user will be notified and can re-upload.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection-reason">Rejection Reason *</Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="e.g., Document is unclear, expired, or doesn't match requirements..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                className="min-h-[100px]"
+                required
+              />
+            </div>
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                The user will receive a notification about this rejection and will be able to re-upload the document.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectingDocument(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmReject}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={!rejectionReason.trim()}
+            >
+              Reject Document
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Upload Document Dialog */}
+      <Dialog open={!!uploadingForUser} onOpenChange={(open) => !open && setUploadingForUser(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload Document on Behalf of User</DialogTitle>
+            <DialogDescription>
+              Upload a document for {uploadingForUser?.userName}. Please specify where the document came from.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="doc-type">Document Type *</Label>
+              <Select value={uploadDocType} onValueChange={(val) => setUploadDocType(val as BackgroundCheckDocument['type'])}>
+                <SelectTrigger id="doc-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="identity">Identity</SelectItem>
+                  <SelectItem value="employment">Employment</SelectItem>
+                  <SelectItem value="financial">Financial</SelectItem>
+                  <SelectItem value="competency">Competency</SelectItem>
+                  <SelectItem value="workshop">Workshop</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="upload-source">Document Source *</Label>
+              <Select value={uploadSource} onValueChange={(val) => setUploadSource(val as 'email' | 'walk_in')}>
+                <SelectTrigger id="upload-source">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="email">Email (User sent via email)</SelectItem>
+                  <SelectItem value="walk_in">Walk-in (User submitted in person)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="upload-file">Document File *</Label>
+              <label
+                htmlFor="upload-file"
+                className="flex flex-col items-center justify-center gap-3 h-32 rounded-xl border-2 border-dashed border-border/60 bg-muted/40 text-sm text-muted-foreground hover:border-primary/40 cursor-pointer transition-colors"
+              >
+                <Upload className="h-6 w-6" />
+                <span>{uploadFile ? uploadFile.name : 'Click to select file'}</span>
+                <input
+                  id="upload-file"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      if (file.size > 10 * 1024 * 1024) {
+                        toast.error('File size must be less than 10MB')
+                        return
+                      }
+                      setUploadFile(file)
+                    }
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUploadingForUser(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmUpload} disabled={!uploadFile}>
+              Upload Document
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </AdminLayout>

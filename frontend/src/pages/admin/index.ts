@@ -8,4 +8,6 @@ export { AdminPaymentsPage } from './payments'
 export { AdminDisputesPage } from './disputes'
 export { AdminServicesPage } from './services'
 export { AdminBackgroundChecksPage } from './background-checks'
+export { AdminFinancialsPage } from './financials/AdminFinancialsPage'
+export { AdminAgreementsPage } from './agreements/AdminAgreementsPage'
 

@@ -14,6 +14,7 @@ export type UserRole =
   | 'property_manager'
   | 'handyman'
   | 'homerunner'
+  | 'hotel_manager'
 
 export type UserStatus = 'active' | 'suspended' | 'inactive' | 'pending_verification'
 

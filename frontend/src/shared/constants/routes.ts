@@ -22,6 +22,12 @@ export const ROUTES = {
   PROPERTY_BOOKING: (id: string) => `/properties/${id}/booking`,
   MY_BOOKINGS: '/my-bookings',
   
+  // Hotel routes
+  HOTELS: '/hotels',
+  HOTEL_SEARCH: '/hotels/search',
+  HOTEL_DETAILS: (id: string) => `/hotels/${id}`,
+  HOTEL_BOOKING: (id: string) => `/hotels/${id}/booking`,
+  
   // Service routes
   SERVICES: '/services',
   SERVICE_PROVIDERS: (id: string) => `/services/providers/${id}`,
@@ -75,6 +81,8 @@ export const ROUTES = {
   ADMIN_PAYMENTS: '/admin/payments',
   ADMIN_DISPUTES: '/admin/disputes',
   ADMIN_BACKGROUND_CHECKS: '/admin/background-checks',
+  ADMIN_FINANCIALS: '/admin/financials',
+  ADMIN_AGREEMENTS: '/admin/agreements',
   ADMIN_SETTINGS: '/admin/settings',
   
   // Homerunner routes
@@ -111,6 +119,13 @@ export const ROUTES = {
   REALTOR_PROPERTIES: '/realtor/properties',
   REALTOR_EARNINGS: '/realtor/earnings',
   REALTOR_TENANTS: '/realtor/clients',
+  
+  // Hotel Manager routes
+  HOTEL_MANAGER_DASHBOARD: '/hotel-manager/dashboard',
+  HOTEL_MANAGER_HOTELS: '/hotel-manager/hotels',
+  HOTEL_MANAGER_HOTEL_CREATE: '/hotel-manager/hotels/create',
+  HOTEL_MANAGER_BOOKINGS: '/hotel-manager/bookings',
+  HOTEL_MANAGER_HOTEL_DETAILS: (id: string) => `/hotel-manager/hotels/${id}`,
  
   // Info routes
   ABOUT: '/about',

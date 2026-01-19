@@ -6,11 +6,16 @@
 // API Spec: rentalPreference: enum ['annual_lease', 'shortlet']
 export type BookingType = 'annual_lease' | 'shortlet'
 
-// API Spec: status: enum ['pending', 'viewing_scheduled', 'viewing_completed', 'application_submitted', 'approved', 'rejected', 'agreement_sent', 'agreement_signed', 'payment_pending', 'payment_completed', 'active', 'completed', 'cancelled']
+// API Spec: status: enum ['pending', 'viewing_scheduled', 'viewing_completed', 'inspection_completed', 'inspection_declined', 'sign_off_fee_pending', 'sign_off_fee_completed', 'rental_payment_pending', 'application_submitted', 'approved', 'rejected', 'agreement_sent', 'agreement_signed', 'payment_pending', 'payment_completed', 'active', 'completed', 'cancelled']
 export type BookingStatus =
   | 'pending'
   | 'viewing_scheduled'
   | 'viewing_completed'
+  | 'inspection_completed'
+  | 'inspection_declined'
+  | 'sign_off_fee_pending'
+  | 'sign_off_fee_completed'
+  | 'rental_payment_pending'
   | 'application_submitted'
   | 'approved'
   | 'rejected'
@@ -111,6 +116,22 @@ export interface PropertyBooking {
     status: 'pending' | 'processing' | 'completed' | 'failed'
     dueDate: Date
     paidAt?: Date
+  }
+  
+  // Sign-off Fee (separate from rental payment)
+  signOffFee?: {
+    id: string
+    amount: number
+    status: 'pending' | 'processing' | 'completed' | 'failed'
+    dueDate: Date
+    paidAt?: Date
+  }
+  
+  // Inspection decision
+  inspectionDecision?: {
+    completedAt: Date
+    proceed: boolean
+    reason?: string
   }
 
   // Timeline (optional for mock data flexibility)

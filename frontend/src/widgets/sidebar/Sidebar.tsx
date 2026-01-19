@@ -58,6 +58,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     ...(isAdmin ? [{ icon: Home, label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD }] : []),
     ...((isHomerunner || isAdmin || isRealtor) ? [] : [{ icon: Home, label: 'Home', path: ROUTES.HOME }]),
     ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES }]),
+    ...(hideTenantFeatures ? [] : [{ icon: Building2, label: 'Hotels', path: ROUTES.HOTELS }]),
     ...((isHandyman || isHomerunner || isAdmin || isRealtor) ? [] : [{ icon: Wrench, label: 'Services', path: ROUTES.SERVICES }]),
   ]
 

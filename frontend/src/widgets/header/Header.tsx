@@ -153,10 +153,19 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
       ]
     }
 
+    if (role === 'hotel_manager') {
+      return [
+        { icon: Home, label: 'Dashboard', path: ROUTES.HOTEL_MANAGER_DASHBOARD },
+        { icon: Building2, label: 'My Hotels', path: ROUTES.HOTEL_MANAGER_HOTELS },
+        { icon: Calendar, label: 'Bookings', path: ROUTES.HOTEL_MANAGER_BOOKINGS },
+      ]
+    }
+
     if (role === 'tenant') {
       return [
         { icon: Home, label: 'Home', path: ROUTES.HOME },
         { icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES },
+        { icon: Building2, label: 'Hotels', path: ROUTES.HOTELS },
         { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
       ]
     }
@@ -164,6 +173,7 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
     return [
       { icon: Home, label: 'Home', path: ROUTES.HOME },
       { icon: Building2, label: 'Properties', path: ROUTES.PROPERTIES },
+      { icon: Building2, label: 'Hotels', path: ROUTES.HOTELS },
     { icon: Wrench, label: 'Services', path: ROUTES.SERVICES },
   ]
   }

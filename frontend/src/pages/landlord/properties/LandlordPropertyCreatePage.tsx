@@ -35,12 +35,13 @@ import {
   Image as ImageIcon,
   Info,
   CalendarRange,
+  FileText,
 } from 'lucide-react'
 
 type StepKey = 'address' | 'details' | 'pricing' | 'media' | 'summary'
 
 interface FormState {
-  propertyUse: 'rental' | 'shortlet' | 'hotel'
+  propertyUse: 'rental' | 'shortlet'
   unitNumber: string
   propertyName: string
   address: string
@@ -69,6 +70,8 @@ interface FormState {
   description: string
   images: Array<{ id: string; url: string; file?: File }>
   video?: { id: string; url: string; file?: File }
+  agreementType: 'julaaz' | 'custom'
+  customAgreement?: File
 }
 
 const essentialAmenities = ['Electricity', 'Water', 'Internet', 'Security']
@@ -101,7 +104,6 @@ const stepMeta: Record<StepKey, { title: string; subtitle: string }> = {
 const propertyUseOptions: Array<{ value: FormState['propertyUse']; label: string; helper: string }> = [
   { value: 'rental', label: 'Rental', helper: 'Annual or multi-month stays, can also allow shortlet' },
   { value: 'shortlet', label: 'Shortlet', helper: 'Nightly/weekly bookings, must have essential utilities' },
-  { value: 'hotel', label: 'Hotel', helper: 'Hotel-style operations with full amenities' },
 ]
 const propertyTypes = ['Apartment', 'Highrise', 'Townhouse', 'Duplex', 'Bungalow', 'Studio']
 const carparks = ['0', '1', '2', '3', '4+']
@@ -168,6 +170,7 @@ const defaultState: FormState = {
   preferredPayment: 'annually',
   description: '',
   images: [],
+  agreementType: 'julaaz',
 }
 
 export function LandlordPropertyCreatePage() {
@@ -735,11 +738,9 @@ export function LandlordPropertyCreatePage() {
                     <p>
                       {form.propertyUse === 'shortlet'
                         ? 'Shortlet selected: ensure power, water, internet, and security are available.'
-                        : form.propertyUse === 'hotel'
-                          ? 'Hotel selected: guests expect always-on utilities and services.'
-                          : hasEssentialAmenities
-                            ? 'This rental qualifies for shortlet if you opt-in.'
-                            : 'Enable essential utilities (power, water, internet, security) to qualify for shortlet bookings.'}
+                        : hasEssentialAmenities
+                          ? 'This rental qualifies for shortlet if you opt-in.'
+                          : 'Enable essential utilities (power, water, internet, security) to qualify for shortlet bookings.'}
                     </p>
                   </div>
                   {form.propertyUse === 'rental' && (
@@ -826,6 +827,95 @@ export function LandlordPropertyCreatePage() {
                   <p className="text-xs text-muted-foreground">
                     Landlord can indicate minimum shortlet nights or monthly leases in advanced settings later.
                   </p>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-border/60">
+                  <div className="space-y-2">
+                    <Label className="text-xs uppercase text-muted-foreground">Tenancy Agreement</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Choose whether to use Julaaz standard agreement or upload your own custom agreement from your lawyer.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setField('agreementType', 'julaaz')}
+                      className={cn(
+                        'w-full rounded-2xl border px-4 py-4 text-left transition-all',
+                        form.agreementType === 'julaaz'
+                          ? 'border-primary bg-primary/10 text-primary shadow-lg'
+                          : 'border-border text-foreground hover:border-primary/40'
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <ShieldCheck className="h-5 w-5 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold">Use Julaaz Agreement</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Standard legal agreement template used by Julaaz
+                          </p>
+                        </div>
+                        {form.agreementType === 'julaaz' && (
+                          <CheckCircle2 className="h-5 w-5 text-primary" />
+                        )}
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setField('agreementType', 'custom')}
+                      className={cn(
+                        'w-full rounded-2xl border px-4 py-4 text-left transition-all',
+                        form.agreementType === 'custom'
+                          ? 'border-primary bg-primary/10 text-primary shadow-lg'
+                          : 'border-border text-foreground hover:border-primary/40'
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <FileText className="h-5 w-5 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold">Upload Custom Agreement</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Upload your own agreement from your lawyer (requires admin approval)
+                          </p>
+                        </div>
+                        {form.agreementType === 'custom' && (
+                          <CheckCircle2 className="h-5 w-5 text-primary" />
+                        )}
+                      </div>
+                    </button>
+                  </div>
+                  {form.agreementType === 'custom' && (
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-muted-foreground">Upload Agreement PDF</Label>
+                      <label className="flex flex-col items-center justify-center gap-3 h-32 rounded-2xl border-2 border-dashed border-border/60 bg-muted/40 text-sm text-muted-foreground hover:border-primary/40 cursor-pointer transition-colors">
+                        <Upload className="h-5 w-5" />
+                        <span>
+                          {form.customAgreement 
+                            ? form.customAgreement.name 
+                            : 'Tap to upload agreement PDF'}
+                        </span>
+                        <input 
+                          type="file" 
+                          accept="application/pdf" 
+                          className="hidden" 
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              if (file.size > 10 * 1024 * 1024) {
+                                toast.error('File size must be less than 10MB')
+                                return
+                              }
+                              setForm(prev => ({ ...prev, customAgreement: file }))
+                              toast.success('Agreement uploaded. It will be reviewed by admin before approval.')
+                            }
+                          }} 
+                        />
+                      </label>
+                      <p className="text-xs text-muted-foreground">
+                        Your custom agreement will be reviewed by Julaaz admin team before it can be used.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

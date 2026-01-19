@@ -36,7 +36,7 @@ export function SignupPage() {
   const navigate = useNavigate()
   const role = searchParams.get('role') || 'tenant'
 
-  const availableUserTypes = ['tenant', 'landlord', 'handyman'] as const
+  const availableUserTypes = ['tenant', 'landlord', 'handyman', 'hotel_manager'] as const
   type UserType = (typeof availableUserTypes)[number]
 
   const defaultRole: UserType | '' = availableUserTypes.includes(role as UserType)
@@ -245,6 +245,12 @@ export function SignupPage() {
                 <RadioGroupItem value="handyman" id="signup-handyman" />
                 <Label htmlFor="signup-handyman" className="font-normal cursor-pointer">
                   Handyman / Service Pro
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 flex-1">
+                <RadioGroupItem value="hotel_manager" id="signup-hotel-manager" />
+                <Label htmlFor="signup-hotel-manager" className="font-normal cursor-pointer">
+                  Hotel Manager
                 </Label>
               </div>
             </RadioGroup>

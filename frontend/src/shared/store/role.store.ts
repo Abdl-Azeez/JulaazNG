@@ -11,6 +11,7 @@ export type RoleType =
   | 'admin'
   | 'handyman'
   | 'homerunner'
+  | 'hotel_manager'
 
 export interface UserRole {
   type: RoleType

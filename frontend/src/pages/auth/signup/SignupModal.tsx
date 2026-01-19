@@ -48,7 +48,7 @@ export function SignupModal() {
 
   const role = searchParams.get('role') || 'tenant'
 
-  const availableUserTypes = ['tenant', 'landlord', 'handyman'] as const
+  const availableUserTypes = ['tenant', 'landlord', 'handyman', 'hotel_manager'] as const
   type UserType = (typeof availableUserTypes)[number]
 
   const defaultRole: UserType = availableUserTypes.includes(role as UserType)
@@ -270,6 +270,12 @@ export function SignupModal() {
                   <RadioGroupItem value="handyman" id="modal-signup-handyman" />
                   <Label htmlFor="modal-signup-handyman" className="font-normal cursor-pointer">
                     Handyman / Service Pro
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 flex-1">
+                  <RadioGroupItem value="hotel_manager" id="modal-signup-hotel-manager" />
+                  <Label htmlFor="modal-signup-hotel-manager" className="font-normal cursor-pointer">
+                    Hotel Manager
                   </Label>
                 </div>
               </RadioGroup>

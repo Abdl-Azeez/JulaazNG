@@ -15,6 +15,9 @@ import {
   ChevronRight,
   Filter,
   Eye,
+  Download,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Header } from '@/widgets/header'
@@ -59,7 +62,37 @@ const getStatusConfig = (status: BookingStatus) => {
       label: 'Viewing Done',
       icon: CheckCircle2,
       className: 'bg-primary/10 text-primary border-primary/20',
-      description: 'Viewing completed',
+      description: 'Viewing completed - decide to proceed or decline',
+    },
+    inspection_completed: {
+      label: 'Inspection Completed',
+      icon: CheckCircle2,
+      className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+      description: 'Inspection completed - proceeding with application',
+    },
+    inspection_declined: {
+      label: 'Inspection Declined',
+      icon: XCircle,
+      className: 'bg-muted text-muted-foreground border-border',
+      description: 'You declined to proceed after inspection',
+    },
+    sign_off_fee_pending: {
+      label: 'Sign-off Fee Due',
+      icon: CreditCard,
+      className: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      description: 'Pay sign-off fee to proceed',
+    },
+    sign_off_fee_completed: {
+      label: 'Sign-off Fee Paid',
+      icon: CheckCircle2,
+      className: 'bg-primary/10 text-primary border-primary/20',
+      description: 'Sign-off fee paid - proceed with rental payment',
+    },
+    rental_payment_pending: {
+      label: 'Rental Payment Due',
+      icon: CreditCard,
+      className: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      description: 'Pay rental amount to proceed',
     },
     application_submitted: {
       label: 'Application Sent',
@@ -154,6 +187,11 @@ export function MyBookingsPage() {
         (b) =>
           b.status === 'pending' ||
           b.status === 'viewing_scheduled' ||
+          b.status === 'viewing_completed' ||
+          b.status === 'inspection_completed' ||
+          b.status === 'sign_off_fee_pending' ||
+          b.status === 'sign_off_fee_completed' ||
+          b.status === 'rental_payment_pending' ||
           b.status === 'application_submitted' ||
           b.status === 'approved' ||
           b.status === 'agreement_sent' ||
@@ -162,7 +200,7 @@ export function MyBookingsPage() {
       )
     } else if (filter === 'completed') {
       filtered = filtered.filter(
-        (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
+        (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected' || b.status === 'inspection_declined'
       )
     }
 
@@ -177,6 +215,11 @@ export function MyBookingsPage() {
       (b) =>
         b.status === 'pending' ||
         b.status === 'viewing_scheduled' ||
+        b.status === 'viewing_completed' ||
+        b.status === 'inspection_completed' ||
+        b.status === 'sign_off_fee_pending' ||
+        b.status === 'sign_off_fee_completed' ||
+        b.status === 'rental_payment_pending' ||
         b.status === 'application_submitted' ||
         b.status === 'approved' ||
         b.status === 'agreement_sent' ||
@@ -184,7 +227,7 @@ export function MyBookingsPage() {
         b.status === 'payment_pending'
     ).length
     const completed = samplePropertyBookings.filter(
-      (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
+      (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected' || b.status === 'inspection_declined'
     ).length
 
     return { total: samplePropertyBookings.length, active, pending, completed }
@@ -205,6 +248,56 @@ export function MyBookingsPage() {
   const handleContactLandlord = (bookingId: string) => {
     // Navigate to messaging with landlord
     navigate(ROUTES.MESSAGING_CHAT(bookingId))
+  }
+  
+  const handleInspectionDecision = async (booking: PropertyBooking, proceed: boolean) => {
+    // Update booking status based on decision
+    toast.success(
+      proceed
+        ? 'Thank you! Proceeding with application...'
+        : 'Booking declined. You can browse other properties.'
+    )
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    handleCloseDetails()
+  }
+  
+  const handlePaySignOffFee = async (booking: PropertyBooking) => {
+    // Navigate to payment page for sign-off fee
+    toast.success('Redirecting to payment page...')
+    // Simulate navigation
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    // navigate(ROUTES.PAYMENT(booking.id, 'sign-off-fee'))
+  }
+  
+  const handlePayRental = async (booking: PropertyBooking) => {
+    // Navigate to payment page for rental
+    toast.success('Redirecting to payment page...')
+    // Simulate navigation
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    // navigate(ROUTES.PAYMENT(booking.id, 'rental'))
+  }
+  
+  const handleViewAgreement = (booking: PropertyBooking) => {
+    if (booking.agreement?.documentUrl) {
+      // Open agreement PDF in new tab
+      window.open(booking.agreement.documentUrl, '_blank')
+    } else {
+      toast.error('Agreement document not available yet')
+    }
+  }
+  
+  const handleDownloadAgreement = (booking: PropertyBooking) => {
+    if (booking.agreement?.documentUrl) {
+      // Download agreement PDF
+      const link = document.createElement('a')
+      link.href = booking.agreement.documentUrl
+      link.download = `agreement-${booking.id}.pdf`
+      link.click()
+      toast.success('Agreement downloaded')
+    } else {
+      toast.error('Agreement document not available yet')
+    }
   }
 
   return (
@@ -710,22 +803,205 @@ export function MyBookingsPage() {
 
             {/* Modal Footer */}
             <div className="p-5 lg:p-6 border-t border-border bg-background">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1 border-border hover:border-primary/50 hover:text-primary"
-                  onClick={() => handleViewProperty(selectedBooking.property.id)}
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  View Property
-                </Button>
-                <Button
-                  className="flex-1"
-                  onClick={() => handleContactLandlord(selectedBooking.id)}
-                >
-                  Contact Landlord
-                </Button>
-              </div>
+              {/* Action Buttons Based on Status */}
+              {selectedBooking.status === 'viewing_completed' && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                    <p className="text-sm font-semibold text-foreground mb-2">
+                      Inspection Completed
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      Would you like to proceed with this property? You'll be required to pay a sign-off fee first.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
+                        onClick={() => handleInspectionDecision(selectedBooking, false)}
+                      >
+                        <ThumbsDown className="h-4 w-4 mr-2" />
+                        Decline
+                      </Button>
+                      <Button
+                        className="flex-1 bg-primary hover:bg-primary/90"
+                        onClick={() => handleInspectionDecision(selectedBooking, true)}
+                      >
+                        <ThumbsUp className="h-4 w-4 mr-2" />
+                        Proceed with Application
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleViewProperty(selectedBooking.property.id)}
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      View Property
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleContactLandlord(selectedBooking.id)}
+                    >
+                      Contact Landlord
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {selectedBooking.status === 'sign_off_fee_pending' && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                    <p className="text-sm font-semibold text-foreground mb-2">
+                      Sign-off Fee Required
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      Pay the sign-off fee to proceed with your application. This is required before rental payment.
+                    </p>
+                    {selectedBooking.signOffFee && (
+                      <p className="text-lg font-bold text-primary mb-4">
+                        {formatCurrency(selectedBooking.signOffFee.amount)}
+                      </p>
+                    )}
+                    <Button
+                      className="w-full bg-primary hover:bg-primary/90"
+                      onClick={() => handlePaySignOffFee(selectedBooking)}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Pay Sign-off Fee
+                    </Button>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleViewProperty(selectedBooking.property.id)}
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      View Property
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleContactLandlord(selectedBooking.id)}
+                    >
+                      Contact Landlord
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {selectedBooking.status === 'rental_payment_pending' && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                    <p className="text-sm font-semibold text-foreground mb-2">
+                      Rental Payment Required
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      Complete your rental payment to proceed. The agreement will be sent after payment.
+                    </p>
+                    {selectedBooking.payment && (
+                      <p className="text-lg font-bold text-primary mb-4">
+                        {formatCurrency(selectedBooking.payment.amount)}
+                      </p>
+                    )}
+                    <Button
+                      className="w-full bg-primary hover:bg-primary/90"
+                      onClick={() => handlePayRental(selectedBooking)}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Pay Rental Amount
+                    </Button>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleViewProperty(selectedBooking.property.id)}
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      View Property
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleContactLandlord(selectedBooking.id)}
+                    >
+                      Contact Landlord
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {selectedBooking.status === 'agreement_sent' && selectedBooking.agreement && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                    <p className="text-sm font-semibold text-foreground mb-2">
+                      Agreement Available
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      Your rental agreement is ready. Review and sign to proceed.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                        onClick={() => handleViewAgreement(selectedBooking)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Agreement
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                        onClick={() => handleDownloadAgreement(selectedBooking)}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download PDF
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleViewProperty(selectedBooking.property.id)}
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      View Property
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                      onClick={() => handleContactLandlord(selectedBooking.id)}
+                    >
+                      Contact Landlord
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Default Footer Actions */}
+              {!['viewing_completed', 'sign_off_fee_pending', 'rental_payment_pending', 'agreement_sent'].includes(selectedBooking.status) && (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                    onClick={() => handleViewProperty(selectedBooking.property.id)}
+                  >
+                    <Home className="h-4 w-4 mr-2" />
+                    View Property
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={() => handleContactLandlord(selectedBooking.id)}
+                  >
+                    Contact Landlord
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

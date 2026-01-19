@@ -28,6 +28,13 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/ui/tabs'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/select'
 
 type FilterState = 'all' | 'received' | 'upcoming' | 'overdue'
 
@@ -73,9 +80,18 @@ export function LandlordEarningsPage() {
   const shortletTotal = earningSnapshots
     .filter((earning) => earning.bookingType === 'shortlet')
     .reduce((sum, earning) => sum + earning.amount, 0)
-  const payoutSuccessRate = Math.round(
-    (earningSnapshots.filter((earning) => earning.status === 'received').length / earningSnapshots.length) * 100
-  )
+  
+  // Calculate profit margin: profit = revenue - total cost, margin = (profit/revenue) * 100
+  const totalCosts = useMemo(() => {
+    return financialSummary.reduce((sum, property) => sum + property.totalExpenses, 0)
+  }, [financialSummary])
+  
+  const profitMargin = useMemo(() => {
+    if (receivedTotal === 0) return 0
+    const profit = receivedTotal - totalCosts
+    return Math.round((profit / receivedTotal) * 100)
+  }, [receivedTotal, totalCosts])
+  
   const nextUpcoming = earningSnapshots
     .filter((earning) => earning.status === 'upcoming')
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
@@ -91,8 +107,8 @@ export function LandlordEarningsPage() {
   }, [])
 
   const totalPortfolioStats = useMemo(() => {
-    const totalIncome = financialSummary.reduce((sum, property) => sum + property.totalIncome, 0)
-    const totalExpenses = financialSummary.reduce((sum, property) => sum + property.totalExpenses, 0)
+    const totalIncome = filteredFinancialSummary.reduce((sum, property) => sum + property.totalIncome, 0)
+    const totalExpenses = filteredFinancialSummary.reduce((sum, property) => sum + property.totalExpenses, 0)
     const netProfit = totalIncome - totalExpenses
     const profitMargin = totalIncome > 0 ? (netProfit / totalIncome) * 100 : 0
     
@@ -101,10 +117,11 @@ export function LandlordEarningsPage() {
       totalExpenses,
       netProfit,
       profitMargin,
-      profitableProperties: financialSummary.filter(p => p.netProfit > 0).length,
-      unprofitableProperties: financialSummary.filter(p => p.netProfit <= 0).length
+      profitableProperties: filteredFinancialSummary.filter(p => p.netProfit > 0).length,
+      unprofitableProperties: filteredFinancialSummary.filter(p => p.netProfit <= 0).length,
+      totalProperties: filteredFinancialSummary.length
     }
-  }, [financialSummary])
+  }, [filteredFinancialSummary])
 
   const recentTransactions = useMemo(() => {
     return filteredTransactions.slice(0, 10)
@@ -161,8 +178,8 @@ export function LandlordEarningsPage() {
                   </div>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-accent/10 border border-accent/20">
                     <Zap className="h-4 w-4 text-accent" />
-                    <span className="font-semibold text-accent">{payoutSuccessRate}%</span>
-                    <span className="text-muted-foreground">success rate</span>
+                    <span className="font-semibold text-accent">{profitMargin}%</span>
+                    <span className="text-muted-foreground">profit margin</span>
                   </div>
                 </div>
               </div>
@@ -224,14 +241,20 @@ export function LandlordEarningsPage() {
                 bg: 'bg-accent/5',
               },
               {
-                label: 'Success Rate',
-                value: payoutSuccessRate,
+                label: 'Profit Margin',
+                value: profitMargin,
                 suffix: '%',
-                change: '+5%',
-                trend: 'up',
-                gradient: 'from-emerald-500/20 via-emerald-500/10 to-transparent',
-                icon: <Activity className="h-5 w-5 text-emerald-500" />,
-                bg: 'bg-emerald-500/5',
+                change: profitMargin >= 0 ? `+${profitMargin}%` : `${profitMargin}%`,
+                trend: profitMargin >= 0 ? 'up' : 'down',
+                gradient: profitMargin >= 0 
+                  ? 'from-emerald-500/20 via-emerald-500/10 to-transparent'
+                  : 'from-destructive/20 via-destructive/10 to-transparent',
+                icon: profitMargin >= 0 ? (
+                  <BarChart3 className="h-5 w-5 text-emerald-500" />
+                ) : (
+                  <BarChart3 className="h-5 w-5 text-destructive" />
+                ),
+                bg: profitMargin >= 0 ? 'bg-emerald-500/5' : 'bg-destructive/5',
               },
               {
                 label: 'Shortlet Share',
@@ -266,9 +289,10 @@ export function LandlordEarningsPage() {
                     </p>
                     <div className="flex items-center gap-1.5">
                       {metric.trend === 'up' && <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />}
+                      {metric.trend === 'down' && <ArrowDownRight className="h-3.5 w-3.5 text-destructive" />}
                       <span className={cn(
                         'text-xs font-semibold',
-                        metric.trend === 'up' ? 'text-emerald-600' : 'text-muted-foreground'
+                        metric.trend === 'up' ? 'text-emerald-600' : metric.trend === 'down' ? 'text-destructive' : 'text-muted-foreground'
                       )}>
                         {metric.change}
                       </span>
@@ -277,8 +301,12 @@ export function LandlordEarningsPage() {
                   <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden">
                     <div className={cn(
                       'h-full rounded-full transition-all duration-700',
-                      metric.trend === 'up' ? 'bg-emerald-500' : 'bg-primary/80'
-                    )} style={{ width: `${Math.min(100, (metric.value / 10_000_000) * 100)}%` }} />
+                      metric.trend === 'up' ? 'bg-emerald-500' : metric.trend === 'down' ? 'bg-destructive' : 'bg-primary/80'
+                    )} style={{ 
+                      width: metric.suffix === '%' 
+                        ? `${Math.min(100, Math.max(0, Math.abs(metric.value)))}%`
+                        : `${Math.min(100, (metric.value / 10_000_000) * 100)}%`
+                    }} />
                   </div>
                 </div>
               </div>
@@ -367,18 +395,45 @@ export function LandlordEarningsPage() {
             </div>
           </div>
 
+          {/* Transaction & Financial Management Section */}
+          <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl shadow-xl p-6 lg:p-8 space-y-6">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+            <div className="relative space-y-6">
+              {/* Section Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-border/60">
+                <div className="space-y-1">
+                  <h2 className="text-2xl font-bold text-foreground">Transaction Management</h2>
+                  <p className="text-sm text-muted-foreground">View and manage your earnings pipeline and financial records</p>
+                </div>
+                <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+            </div>
+          </div>
+
           {/* Navigation Tabs */}
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'earnings' | 'financials')} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 rounded-2xl bg-muted/50 p-1">
-              <TabsTrigger value="earnings" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                Earnings Pipeline
+                <TabsList className="grid w-full grid-cols-2 rounded-2xl bg-background/80 backdrop-blur-lg border-2 border-primary/20 p-1.5 shadow-lg h-auto">
+                  <TabsTrigger 
+                    value="earnings" 
+                    className="rounded-xl px-6 py-4 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200 data-[state=inactive]:text-muted-foreground hover:text-foreground"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Wallet className="h-4 w-4" />
+                      <span>Earnings Pipeline</span>
+                    </div>
               </TabsTrigger>
-              <TabsTrigger value="financials" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                Income & Expenditure
+                  <TabsTrigger 
+                    value="financials" 
+                    className="rounded-xl px-6 py-4 text-base font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200 data-[state=inactive]:text-muted-foreground hover:text-foreground"
+                  >
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      <span>Income & Expenditure</span>
+                    </div>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="earnings" className="mt-6 space-y-6">
+            <TabsContent value="earnings" className="mt-8 space-y-6">
               {/* Filter tabs */}
               <div className="flex items-center gap-3 overflow-x-auto pb-2">
                 {(['all', 'received', 'upcoming', 'overdue'] as FilterState[]).map((tab) => {
@@ -467,22 +522,52 @@ export function LandlordEarningsPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="financials" className="mt-6 space-y-6">
+            <TabsContent value="financials" className="mt-8 space-y-6">
               {/* Property Filter */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-muted/30 border border-border/60">
+                <div className="space-y-1">
                 <h3 className="text-xl font-bold text-foreground">Financial Overview</h3>
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-muted-foreground" />
-                  <select 
-                    value={propertyFilter}
-                    onChange={(e) => setPropertyFilter(e.target.value)}
-                    className="bg-surface border border-border/60 rounded-xl px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="all">All Properties</option>
+                  <p className="text-sm text-muted-foreground">
+                    {propertyFilter === 'all' 
+                      ? `Viewing all ${financialSummary.length} properties` 
+                      : `Viewing 1 property`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-background/80 border border-border/60">
+                    <Filter className="h-4 w-4 text-primary" />
+                  </div>
+                  <Select value={propertyFilter} onValueChange={setPropertyFilter}>
+                    <SelectTrigger className="w-[240px] h-12 rounded-xl border-2 border-border/60 bg-background/80 backdrop-blur-lg shadow-sm hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                      <SelectValue placeholder="Select a property" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-2 border-border/60 bg-background/95 backdrop-blur-xl shadow-xl">
+                      <SelectItem 
+                        value="all" 
+                        className="rounded-lg px-4 py-3 cursor-pointer focus:bg-primary/10 focus:text-primary"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-4 w-4" />
+                          <span className="font-semibold">All Properties</span>
+                          <span className="ml-auto text-xs text-muted-foreground">
+                            ({financialSummary.length})
+                          </span>
+                        </div>
+                      </SelectItem>
                     {financialSummary.map(p => (
-                      <option key={p.propertyId} value={p.propertyId}>{p.propertyName}</option>
+                        <SelectItem 
+                          key={p.propertyId} 
+                          value={p.propertyId}
+                          className="rounded-lg px-4 py-3 cursor-pointer focus:bg-primary/10 focus:text-primary"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Building2 className="h-4 w-4 text-primary/60" />
+                            <span className="font-medium">{p.propertyName}</span>
+                          </div>
+                        </SelectItem>
                     ))}
-                  </select>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -585,12 +670,14 @@ export function LandlordEarningsPage() {
                     </div>
                     <div className="space-y-1">
                       <p className="text-3xl font-black text-foreground">
-                        {totalPortfolioStats.profitableProperties}/{financialSummary.length}
+                        {totalPortfolioStats.profitableProperties}/{totalPortfolioStats.totalProperties}
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
                       <TrendingUp className="h-3.5 w-3.5 text-accent" />
-                      <span className="text-xs font-semibold text-accent">Properties profitable</span>
+                      <span className="text-xs font-semibold text-accent">
+                        {totalPortfolioStats.totalProperties === 1 ? 'Property' : 'Properties'} profitable
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -745,6 +832,8 @@ export function LandlordEarningsPage() {
               </div>
             </TabsContent>
           </Tabs>
+            </div>
+          </div>
         </section>
       </main>
 

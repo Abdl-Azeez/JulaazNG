@@ -90,6 +90,21 @@ export const sampleUsers: SampleUser[] = [
     preferredRole: 'handyman',
   },
   {
+    id: 'hotel-manager-001',
+    name: 'Ahmed Manager',
+    email: 'hotelmanager@julaaz.com',
+    phone: '08010000008',
+    password: 'hotelmanager123',
+    roles: [
+      {
+        type: 'hotel_manager',
+        priority: 'primary',
+        lastUsed: true,
+      },
+    ],
+    preferredRole: 'hotel_manager',
+  },
+  {
     id: 'tenant-handyman-001',
     name: 'Emeka Okoro',
     email: 'tenant-handyman@julaaz.com',
