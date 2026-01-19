@@ -573,7 +573,7 @@ export function AdminBackgroundChecksPage() {
                     </Card>
 
                     {/* Actions */}
-                    <div className="space-y-2">
+                      <div className="space-y-2">
                       <Button
                         variant="outline"
                         className="w-full rounded-lg border-primary/30 text-primary hover:bg-primary/10"
@@ -584,30 +584,30 @@ export function AdminBackgroundChecksPage() {
                       </Button>
                       {check.status !== 'approved' && check.status !== 'rejected' && (
                         <>
-                          <Button
-                            className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-700"
-                            onClick={() => handleCheckApprove(check.id)}
-                            disabled={check.progress < 100}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Approve Check
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="w-full rounded-lg text-red-600 border-red-600/30 hover:bg-red-50"
-                            onClick={() => handleCheckReject(check.id)}
-                          >
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Reject Check
-                          </Button>
-                          {check.progress < 100 && (
-                            <p className="text-xs text-amber-600 text-center">
-                              All documents must be approved before final approval
-                            </p>
+                        <Button
+                          className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                          onClick={() => handleCheckApprove(check.id)}
+                          disabled={check.progress < 100}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Approve Check
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full rounded-lg text-red-600 border-red-600/30 hover:bg-red-50"
+                          onClick={() => handleCheckReject(check.id)}
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Reject Check
+                        </Button>
+                        {check.progress < 100 && (
+                          <p className="text-xs text-amber-600 text-center">
+                            All documents must be approved before final approval
+                          </p>
                           )}
                         </>
-                      )}
-                    </div>
+                        )}
+                      </div>
                   </div>
                 </div>
               </Card>

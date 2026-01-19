@@ -41,16 +41,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const isAdmin = currentRole === 'admin'
   const isRealtor = currentRole === 'realtor'
 
+  const isHotelManager = currentRole === 'hotel_manager'
   const hideTenantFeatures =
     currentRole === 'landlord' ||
     isRealtor ||
     isHandyman ||
     isHomerunner ||
     isAdmin ||
+    isHotelManager ||
     location.pathname.includes('/landlord') ||
     location.pathname.includes('/realtor') ||
     location.pathname.includes('/homerunner') ||
-    location.pathname.includes('/admin')
+    location.pathname.includes('/admin') ||
+    location.pathname.includes('/hotel-manager')
 
   // Public menu items for Explore section
   const publicMenuItems: MenuItem[] = [
@@ -206,6 +209,37 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       path: ROUTES.HOMERUNNER_EARNINGS,
       requiresAuth: true,
       roles: ['homerunner'],
+    },
+  ]
+
+  const hotelManagerMenuItems: MenuItem[] = [
+    {
+      icon: Home,
+      label: 'Dashboard',
+      path: ROUTES.HOTEL_MANAGER_DASHBOARD,
+      requiresAuth: true,
+      roles: ['hotel_manager'],
+    },
+    {
+      icon: Building2,
+      label: 'My Hotels',
+      path: ROUTES.HOTEL_MANAGER_HOTELS,
+      requiresAuth: true,
+      roles: ['hotel_manager'],
+    },
+    {
+      icon: Calendar,
+      label: 'Bookings',
+      path: ROUTES.HOTEL_MANAGER_BOOKINGS,
+      requiresAuth: true,
+      roles: ['hotel_manager'],
+    },
+    {
+      icon: Wallet,
+      label: 'Earnings',
+      path: ROUTES.HOTEL_MANAGER_EARNINGS,
+      requiresAuth: true,
+      roles: ['hotel_manager'],
     },
   ]
 

@@ -125,7 +125,9 @@ export const ROUTES = {
   HOTEL_MANAGER_HOTELS: '/hotel-manager/hotels',
   HOTEL_MANAGER_HOTEL_CREATE: '/hotel-manager/hotels/create',
   HOTEL_MANAGER_BOOKINGS: '/hotel-manager/bookings',
+  HOTEL_MANAGER_BOOKING_DETAILS: (id: string) => `/hotel-manager/bookings/${id}`,
   HOTEL_MANAGER_HOTEL_DETAILS: (id: string) => `/hotel-manager/hotels/${id}`,
+  HOTEL_MANAGER_EARNINGS: '/hotel-manager/earnings',
  
   // Info routes
   ABOUT: '/about',

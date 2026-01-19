@@ -985,22 +985,22 @@ export function MyBookingsPage() {
               
               {/* Default Footer Actions */}
               {!['viewing_completed', 'sign_off_fee_pending', 'rental_payment_pending', 'agreement_sent'].includes(selectedBooking.status) && (
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-border hover:border-primary/50 hover:text-primary"
-                    onClick={() => handleViewProperty(selectedBooking.property.id)}
-                  >
-                    <Home className="h-4 w-4 mr-2" />
-                    View Property
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={() => handleContactLandlord(selectedBooking.id)}
-                  >
-                    Contact Landlord
-                  </Button>
-                </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 border-border hover:border-primary/50 hover:text-primary"
+                  onClick={() => handleViewProperty(selectedBooking.property.id)}
+                >
+                  <Home className="h-4 w-4 mr-2" />
+                  View Property
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => handleContactLandlord(selectedBooking.id)}
+                >
+                  Contact Landlord
+                </Button>
+              </div>
               )}
             </div>
           </div>

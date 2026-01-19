@@ -72,6 +72,12 @@ const roleCatalog: Record<RoleType, RoleMeta> = {
     icon: Eye,
     to: ROUTES.HOMERUNNER_DASHBOARD,
   },
+  hotel_manager: {
+    label: 'Hotel Manager',
+    description: 'Manage hotels and bookings',
+    icon: Building2,
+    to: ROUTES.HOTEL_MANAGER_DASHBOARD,
+  },
 }
 
 export function RoleGateway() {

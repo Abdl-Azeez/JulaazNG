@@ -158,6 +158,7 @@ export function Header({ onMenuClick, onProfileClick, className }: HeaderProps) 
         { icon: Home, label: 'Dashboard', path: ROUTES.HOTEL_MANAGER_DASHBOARD },
         { icon: Building2, label: 'My Hotels', path: ROUTES.HOTEL_MANAGER_HOTELS },
         { icon: Calendar, label: 'Bookings', path: ROUTES.HOTEL_MANAGER_BOOKINGS },
+        { icon: Wallet, label: 'Earnings', path: ROUTES.HOTEL_MANAGER_EARNINGS },
       ]
     }
 

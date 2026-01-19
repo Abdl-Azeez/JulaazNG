@@ -738,9 +738,9 @@ export function LandlordPropertyCreatePage() {
                     <p>
                       {form.propertyUse === 'shortlet'
                         ? 'Shortlet selected: ensure power, water, internet, and security are available.'
-                        : hasEssentialAmenities
-                          ? 'This rental qualifies for shortlet if you opt-in.'
-                          : 'Enable essential utilities (power, water, internet, security) to qualify for shortlet bookings.'}
+                          : hasEssentialAmenities
+                            ? 'This rental qualifies for shortlet if you opt-in.'
+                            : 'Enable essential utilities (power, water, internet, security) to qualify for shortlet bookings.'}
                     </p>
                   </div>
                   {form.propertyUse === 'rental' && (

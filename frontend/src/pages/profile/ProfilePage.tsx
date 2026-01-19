@@ -902,7 +902,7 @@ export function ProfilePage() {
                               ? 'Identity and property verification documents securely stored.'
                               : effectiveRole === 'realtor'
                                 ? 'Identity and license documents securely stored.'
-                                : 'Identity and employment documents securely stored.'}
+                            : 'Identity and employment documents securely stored.'}
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
@@ -914,7 +914,7 @@ export function ProfilePage() {
                               ? 'Property verification and compliance reviewed by Julaaz team.'
                               : effectiveRole === 'realtor'
                                 ? 'License and credentials reviewed by Julaaz compliance team.'
-                                : 'Financial information reviewed by Julaaz compliance team.'}
+                            : 'Financial information reviewed by Julaaz compliance team.'}
                         </span>
                       </li>
                     </ul>
@@ -1303,7 +1303,7 @@ export function ProfilePage() {
         )}
       </div>
       
-      <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+        <AuthDialog open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
       
       {/* OTP Verification Dialog */}
       <Dialog open={showOtpDialog} onOpenChange={(open) => !open && handleCancelOtp()}>
@@ -1379,7 +1379,7 @@ export function ProfilePage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
     </SharedLayout>
   )
 }

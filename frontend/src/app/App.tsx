@@ -8,6 +8,16 @@ import { RoleGuard } from '@/common/guards/RoleGuard'
 import { HomePage } from '@/pages/home'
 import { PropertiesPage } from '@/pages/properties'
 import { PropertyDetailsPage, PropertyViewingPage } from '@/pages/property-details'
+import { HotelsPage } from '@/pages/hotels/HotelsPage'
+import { HotelDetailsPage } from '@/pages/hotels/HotelDetailsPage'
+import { HotelBookingPage } from '@/pages/hotels/HotelBookingPage'
+import { HotelManagerDashboardPage } from '@/pages/hotel-manager/HotelManagerDashboardPage'
+import { HotelManagerHotelsPage } from '@/pages/hotel-manager/HotelManagerHotelsPage'
+import { HotelManagerHotelCreatePage } from '@/pages/hotel-manager/HotelManagerHotelCreatePage'
+import { HotelManagerHotelDetailsPage } from '@/pages/hotel-manager/HotelManagerHotelDetailsPage'
+import { HotelManagerEarningsPage } from '@/pages/hotel-manager/HotelManagerEarningsPage'
+import { HotelManagerBookingsPage } from '@/pages/hotel-manager/HotelManagerBookingsPage'
+import { HotelManagerBookingDetailsPage } from '@/pages/hotel-manager/HotelManagerBookingDetailsPage'
 import { ProfilePage } from '@/pages/profile'
 import { SettingsPage } from '@/pages/settings'
 import { ServicesPage, ServiceJourneyPage } from '@/pages/services'
@@ -39,6 +49,8 @@ import {
   AdminDisputesPage,
   AdminServicesPage,
   AdminBackgroundChecksPage,
+  AdminFinancialsPage,
+  AdminAgreementsPage,
 } from '@/pages/admin'
 import { LoginPage } from '@/pages/auth/login'
 import { PasswordPage } from '@/pages/auth/password'
@@ -116,7 +128,9 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
   }
 
   const homeElement =
-    activeRole === 'realtor' ? <Navigate to={ROUTES.REALTOR_DASHBOARD} replace /> : <HomePage />
+    activeRole === 'realtor' ? <Navigate to={ROUTES.REALTOR_DASHBOARD} replace /> :
+    activeRole === 'hotel_manager' ? <Navigate to={ROUTES.HOTEL_MANAGER_DASHBOARD} replace /> :
+    <HomePage />
 
   return (
     <>
@@ -143,6 +157,30 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
           element={
             <RoleGuard allowedRoles={['tenant']} redirectTo={ROUTES.HOME}>
               <PropertyViewingPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTELS}
+          element={
+            <RoleGuard allowUnauthenticated redirectTo={ROUTES.HOME}>
+              <HotelsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_DETAILS(':id')}
+          element={
+            <RoleGuard allowUnauthenticated redirectTo={ROUTES.HOME}>
+              <HotelDetailsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_BOOKING(':id')}
+          element={
+            <RoleGuard allowedRoles={['tenant']} redirectTo={ROUTES.HOME}>
+              <HotelBookingPage />
             </RoleGuard>
           }
         />
@@ -289,6 +327,63 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
             </RoleGuard>
           }
         />
+        {/* Hotel Manager Routes */}
+        <Route
+          path={ROUTES.HOTEL_MANAGER_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['hotel_manager']} redirectTo={ROUTES.HOTEL_MANAGER_DASHBOARD}>
+              <HotelManagerDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_MANAGER_HOTELS}
+          element={
+            <RoleGuard allowedRoles={['hotel_manager']} redirectTo={ROUTES.HOTEL_MANAGER_DASHBOARD}>
+              <HotelManagerHotelsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_MANAGER_HOTEL_CREATE}
+          element={
+            <RoleGuard allowedRoles={['hotel_manager']} redirectTo={ROUTES.HOTEL_MANAGER_DASHBOARD}>
+              <HotelManagerHotelCreatePage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_MANAGER_BOOKINGS}
+          element={
+            <RoleGuard allowedRoles={['hotel_manager']} redirectTo={ROUTES.HOTEL_MANAGER_DASHBOARD}>
+              <HotelManagerBookingsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_MANAGER_BOOKING_DETAILS(':id')}
+          element={
+            <RoleGuard allowedRoles={['hotel_manager']} redirectTo={ROUTES.HOTEL_MANAGER_DASHBOARD}>
+              <HotelManagerBookingDetailsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_MANAGER_HOTEL_DETAILS(':id')}
+          element={
+            <RoleGuard allowedRoles={['hotel_manager']} redirectTo={ROUTES.HOTEL_MANAGER_DASHBOARD}>
+              <HotelManagerHotelDetailsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.HOTEL_MANAGER_EARNINGS}
+          element={
+            <RoleGuard allowedRoles={['hotel_manager']} redirectTo={ROUTES.HOTEL_MANAGER_DASHBOARD}>
+              <HotelManagerEarningsPage />
+            </RoleGuard>
+          }
+        />
         {/* Admin Routes */}
         <Route
           path={ROUTES.ADMIN}
@@ -383,6 +478,22 @@ function AppRoutes({ showSplash, isMobile, onSplashComplete }: AppRoutesProps) {
           element={
             <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
               <AdminBackgroundChecksPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_FINANCIALS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminFinancialsPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path={ROUTES.ADMIN_AGREEMENTS}
+          element={
+            <RoleGuard allowedRoles={['admin']} redirectTo={ROUTES.ADMIN_DASHBOARD}>
+              <AdminAgreementsPage />
             </RoleGuard>
           }
         />
