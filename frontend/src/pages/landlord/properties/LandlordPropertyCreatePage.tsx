@@ -314,9 +314,6 @@ export function LandlordPropertyCreatePage() {
       if (prev.propertyUse === 'shortlet' && !prev.allowShortlet) {
         return { ...prev, allowShortlet: true }
       }
-      if (prev.propertyUse === 'hotel' && prev.allowShortlet) {
-        return { ...prev, allowShortlet: false }
-      }
       return prev
     })
   }, [form.propertyUse])
@@ -994,19 +991,17 @@ export function LandlordPropertyCreatePage() {
                       <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/80 px-4 py-1 text-xs font-semibold text-foreground">
                         {form.propertyType}
                       </span>
-                      {form.propertyUse !== 'hotel' && (
-                        <span
-                          className={cn(
-                            'inline-flex items-center gap-2 rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.15em] border',
-                            form.allowShortlet
-                              ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
-                              : 'border-amber-200 bg-amber-100 text-amber-700'
-                          )}
-                        >
-                          <Sparkles className="h-3.5 w-3.5" />
-                          <span>{form.allowShortlet ? 'Shortlet Enabled' : 'Long-term Focus'}</span>
-                        </span>
-                      )}
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-2 rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.15em] border',
+                          form.allowShortlet
+                            ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
+                            : 'border-amber-200 bg-amber-100 text-amber-700'
+                        )}
+                      >
+                        <Sparkles className="h-3.5 w-3.5" />
+                        <span>{form.allowShortlet ? 'Shortlet Enabled' : 'Long-term Focus'}</span>
+                      </span>
                     </div>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-3">

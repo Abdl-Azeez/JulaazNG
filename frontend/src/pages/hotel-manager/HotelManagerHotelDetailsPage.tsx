@@ -9,13 +9,8 @@ import {
   Edit,
   Eye,
   Calendar,
-  Users,
-  DollarSign,
   Image as ImageIcon,
-  Video,
   Plus,
-  Trash2,
-  X,
 } from 'lucide-react'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
@@ -23,31 +18,10 @@ import { Footer } from '@/widgets/footer'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
-import { Input } from '@/shared/ui/input'
-import { Label } from '@/shared/ui/label'
-import { Textarea } from '@/shared/ui/textarea'
 import { Checkbox } from '@/shared/ui/checkbox'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shared/ui/table'
 import { mockHotels, mockHotelRooms } from '@/__mocks__/data/hotels.mock'
 import { ROUTES } from '@/shared/constants/routes'
 import { cn } from '@/shared/lib/utils/cn'
-import toast from 'react-hot-toast'
-import { format } from 'date-fns'
-import type { Hotel, HotelRoom } from '@/shared/types/hotel.types'
 
 export function HotelManagerHotelDetailsPage() {
   const { id } = useParams<{ id: string }>()

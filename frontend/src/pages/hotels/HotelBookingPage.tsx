@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, CheckCircle, AlertCircle, CreditCard } from 'lucide-react'
+import { ArrowLeft, Clock, CheckCircle, AlertCircle, CreditCard } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
@@ -19,7 +19,7 @@ export function HotelBookingPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
   const navigate = useNavigate()
-  const { isAuthenticated, user } = useAuthStore()
+  const { isAuthenticated } = useAuthStore()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const bookingData = location.state as {

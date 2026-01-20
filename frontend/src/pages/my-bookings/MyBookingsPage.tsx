@@ -20,6 +20,7 @@ import {
   ThumbsDown,
 } from 'lucide-react'
 import { format } from 'date-fns'
+import toast from 'react-hot-toast'
 import { Header } from '@/widgets/header'
 import { Sidebar } from '@/widgets/sidebar'
 import { AuthDialog } from '@/widgets/auth-dialog'
@@ -250,7 +251,7 @@ export function MyBookingsPage() {
     navigate(ROUTES.MESSAGING_CHAT(bookingId))
   }
   
-  const handleInspectionDecision = async (booking: PropertyBooking, proceed: boolean) => {
+  const handleInspectionDecision = async (_booking: PropertyBooking, proceed: boolean) => {
     // Update booking status based on decision
     toast.success(
       proceed
@@ -262,7 +263,7 @@ export function MyBookingsPage() {
     handleCloseDetails()
   }
   
-  const handlePaySignOffFee = async (booking: PropertyBooking) => {
+  const handlePaySignOffFee = async (_booking: PropertyBooking) => {
     // Navigate to payment page for sign-off fee
     toast.success('Redirecting to payment page...')
     // Simulate navigation
@@ -270,7 +271,7 @@ export function MyBookingsPage() {
     // navigate(ROUTES.PAYMENT(booking.id, 'sign-off-fee'))
   }
   
-  const handlePayRental = async (booking: PropertyBooking) => {
+  const handlePayRental = async (_booking: PropertyBooking) => {
     // Navigate to payment page for rental
     toast.success('Redirecting to payment page...')
     // Simulate navigation

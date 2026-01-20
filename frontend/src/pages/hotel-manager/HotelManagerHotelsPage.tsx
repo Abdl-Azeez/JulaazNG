@@ -16,12 +16,9 @@ import {
 import { mockHotels } from '@/__mocks__/data/hotels.mock'
 import { ROUTES } from '@/shared/constants/routes'
 import { cn } from '@/shared/lib/utils/cn'
-import { useAuthStore } from '@/shared/store/auth.store'
-import type { Hotel } from '@/shared/types/hotel.types'
 
 export function HotelManagerHotelsPage() {
   const navigate = useNavigate()
-  const { user } = useAuthStore()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   // Filter hotels for current hotel manager (in real app, this would come from API)
